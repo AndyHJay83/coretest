@@ -1050,19 +1050,53 @@ async function loadWordList() {
 // Function to execute workflow
 async function executeWorkflow(steps) {
     try {
-        // Load the wordlist
+        // Load the wordlist first
         await loadWordList();
+        let currentWordlist = [...wordList]; // Start with the full wordlist
         
-        // Execute each step in the workflow
+        // Hide all features initially
+        const allFeatures = [
+            'originalLexFeature',
+            'eeeFeature',
+            'lexiconFeature',
+            'consonantQuestion',
+            'position1Feature',
+            'vowelFeature',
+            'colour3Feature',
+            'shapeFeature',
+            'oFeature',
+            'curvedFeature'
+        ];
+        
+        allFeatures.forEach(featureId => {
+            const feature = document.getElementById(featureId);
+            if (feature) {
+                feature.style.display = 'none';
+            }
+        });
+        
+        // Execute each step in sequence
         for (const step of steps) {
-            // Show the appropriate feature based on the step
-            const featureElement = document.getElementById(step + 'Feature');
-            if (featureElement) {
-                featureElement.style.display = 'block';
+            console.log('Executing step:', step);
+            
+            // Show the appropriate feature
+            const featureElement = document.getElementById(`${step}Feature`);
+            if (!featureElement) {
+                console.error(`Feature element not found for step: ${step}`);
+                continue;
             }
             
+            // Show the feature
+            featureElement.style.display = 'block';
+            
+            // Set up event listeners for this feature
+            setupFeatureListeners(step, (filteredWords) => {
+                currentWordlist = filteredWords;
+                displayResults(currentWordlist);
+            });
+            
             // Wait for user interaction
-            await new Promise(resolve => {
+            await new Promise((resolve) => {
                 const handleFeatureComplete = () => {
                     featureElement.classList.add('completed');
                     resolve();
@@ -1074,10 +1108,200 @@ async function executeWorkflow(steps) {
         }
         
         // Show results
-        displayResults(currentFilteredWords);
+        displayResults(currentWordlist);
     } catch (error) {
         console.error('Error executing workflow:', error);
         throw error;
+    }
+}
+
+// Function to set up feature listeners
+function setupFeatureListeners(feature, callback) {
+    switch (feature) {
+        case 'eee':
+            const eeeButton = document.getElementById('eeeButton');
+            const eeeYesBtn = document.getElementById('eeeYesBtn');
+            const eeeNoBtn = document.getElementById('eeeNoBtn');
+            
+            if (eeeButton) {
+                eeeButton.onclick = () => {
+                    const filteredWords = filterWordsByEee(currentFilteredWords, 'E');
+                    callback(filteredWords);
+                };
+            }
+            
+            if (eeeYesBtn) {
+                eeeYesBtn.onclick = () => {
+                    const filteredWords = filterWordsByEee(currentFilteredWords, 'YES');
+                    callback(filteredWords);
+                };
+            }
+            
+            if (eeeNoBtn) {
+                eeeNoBtn.onclick = () => {
+                    const filteredWords = filterWordsByEee(currentFilteredWords, 'NO');
+                    callback(filteredWords);
+                };
+            }
+            break;
+            
+        case 'o':
+            const oYesBtn = document.getElementById('oYesBtn');
+            const oNoBtn = document.getElementById('oNoBtn');
+            const oSkipBtn = document.getElementById('oSkipBtn');
+            
+            if (oYesBtn) {
+                oYesBtn.onclick = () => {
+                    const filteredWords = filterWordsByO(currentFilteredWords, true);
+                    callback(filteredWords);
+                };
+            }
+            
+            if (oNoBtn) {
+                oNoBtn.onclick = () => {
+                    const filteredWords = filterWordsByO(currentFilteredWords, false);
+                    callback(filteredWords);
+                };
+            }
+            
+            if (oSkipBtn) {
+                oSkipBtn.onclick = () => {
+                    callback(currentFilteredWords);
+                };
+            }
+            break;
+            
+        case 'curved':
+            const curvedButtons = document.querySelectorAll('.curved-btn');
+            const curvedSkipBtn = document.getElementById('curvedSkipBtn');
+            
+            curvedButtons.forEach(button => {
+                button.onclick = () => {
+                    const letter = button.textContent;
+                    const filteredWords = filterWordsByCurvedPositions(currentFilteredWords, letter);
+                    callback(filteredWords);
+                };
+            });
+            
+            if (curvedSkipBtn) {
+                curvedSkipBtn.onclick = () => {
+                    callback(currentFilteredWords);
+                };
+            }
+            break;
+            
+        case 'colour3':
+            const colour3YesBtn = document.getElementById('colour3YesBtn');
+            const colour3SkipButton = document.getElementById('colour3SkipButton');
+            
+            if (colour3YesBtn) {
+                colour3YesBtn.onclick = () => {
+                    const filteredWords = filterWordsByColour3(currentFilteredWords);
+                    callback(filteredWords);
+                };
+            }
+            
+            if (colour3SkipButton) {
+                colour3SkipButton.onclick = () => {
+                    callback(currentFilteredWords);
+                };
+            }
+            break;
+            
+        case 'lexicon':
+            const lexiconButton = document.getElementById('lexiconButton');
+            const lexiconSkipButton = document.getElementById('lexiconSkipButton');
+            
+            if (lexiconButton) {
+                lexiconButton.onclick = () => {
+                    const input = document.getElementById('lexiconInput')?.value.trim();
+                    if (input) {
+                        const filteredWords = filterWordsByLexicon(currentFilteredWords, input);
+                        callback(filteredWords);
+                    }
+                };
+            }
+            
+            if (lexiconSkipButton) {
+                lexiconSkipButton.onclick = () => {
+                    callback(currentFilteredWords);
+                };
+            }
+            break;
+            
+        case 'consonant':
+            const consonantYesBtn = document.getElementById('consonantYesBtn');
+            const consonantNoBtn = document.getElementById('consonantNoBtn');
+            
+            if (consonantYesBtn) {
+                consonantYesBtn.onclick = () => {
+                    const filteredWords = currentFilteredWords.filter(word => hasWordAdjacentConsonants(word));
+                    callback(filteredWords);
+                };
+            }
+            
+            if (consonantNoBtn) {
+                consonantNoBtn.onclick = () => {
+                    const filteredWords = currentFilteredWords.filter(word => !hasWordAdjacentConsonants(word));
+                    callback(filteredWords);
+                };
+            }
+            break;
+            
+        case 'position1':
+            const position1Button = document.getElementById('position1Button');
+            const position1DoneButton = document.getElementById('position1DoneButton');
+            
+            if (position1Button) {
+                position1Button.onclick = () => {
+                    const input = document.getElementById('position1Input')?.value.trim();
+                    if (input) {
+                        const consonants = getConsonantsInOrder(input);
+                        if (consonants.length >= 2) {
+                            const filteredWords = filterWordsByPosition1(currentFilteredWords, consonants);
+                            callback(filteredWords);
+                        }
+                    }
+                };
+            }
+            
+            if (position1DoneButton) {
+                position1DoneButton.onclick = () => {
+                    callback(currentFilteredWords);
+                };
+            }
+            break;
+            
+        case 'vowel':
+            const vowelYesBtn = document.querySelector('#vowelFeature .yes-btn');
+            const vowelNoBtn = document.querySelector('#vowelFeature .no-btn');
+            
+            if (vowelYesBtn) {
+                vowelYesBtn.onclick = () => {
+                    handleVowelSelection(true);
+                    callback(currentFilteredWordsForVowels);
+                };
+            }
+            
+            if (vowelNoBtn) {
+                vowelNoBtn.onclick = () => {
+                    handleVowelSelection(false);
+                    callback(currentFilteredWordsForVowels);
+                };
+            }
+            break;
+            
+        case 'shape':
+            const categoryButtons = document.querySelectorAll('.category-button');
+            
+            categoryButtons.forEach(button => {
+                button.onclick = () => {
+                    const category = button.textContent.split(' ')[0].toLowerCase();
+                    const filteredWords = filterWordsByShape(currentFilteredWords, currentPosition, category);
+                    callback(filteredWords);
+                };
+            });
+            break;
     }
 }
 
