@@ -31,6 +31,20 @@ const workflowName = document.getElementById('workflowName');
 const selectedFeaturesList = document.getElementById('selectedFeaturesList');
 const workflowSelect = document.getElementById('workflowSelect');
 
+// Show workflow creation page
+function showWorkflowCreation() {
+    document.getElementById('homepage').style.display = 'none';
+    document.getElementById('workflowCreation').style.display = 'block';
+    document.getElementById('workflowExecution').style.display = 'none';
+}
+
+// Hide workflow creation page
+function hideWorkflowCreation() {
+    document.getElementById('homepage').style.display = 'block';
+    document.getElementById('workflowCreation').style.display = 'none';
+    document.getElementById('workflowExecution').style.display = 'none';
+}
+
 // Initialize workflow creation
 createWorkflowButton.addEventListener('click', showWorkflowCreation);
 cancelWorkflowButton.addEventListener('click', hideWorkflowCreation);
