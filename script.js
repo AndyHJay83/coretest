@@ -1145,10 +1145,14 @@ async function executeWorkflow(steps) {
         for (const step of steps) {
             console.log('Executing step:', step);
             
+            // Get the feature ID from the step object
+            const featureId = step.feature + 'Feature';
+            console.log('Looking for feature element with ID:', featureId);
+            
             // Show the appropriate feature
-            const featureElement = document.getElementById(`${step}Feature`);
+            const featureElement = document.getElementById(featureId);
             if (!featureElement) {
-                console.error(`Feature element not found for step: ${step}`);
+                console.error(`Feature element not found for step: ${featureId}`);
                 continue;
             }
             
@@ -1156,7 +1160,7 @@ async function executeWorkflow(steps) {
             featureElement.style.display = 'block';
             
             // Set up event listeners for this feature
-            setupFeatureListeners(step, (filteredWords) => {
+            setupFeatureListeners(step.feature, (filteredWords) => {
                 currentWordlist = filteredWords;
                 displayResults(currentWordlist);
             });
@@ -1193,6 +1197,7 @@ function setupFeatureListeners(feature, callback) {
                 eeeButton.onclick = () => {
                     const filteredWords = filterWordsByEee(currentFilteredWords, 'E');
                     callback(filteredWords);
+                    document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
                 };
             }
             
@@ -1200,6 +1205,7 @@ function setupFeatureListeners(feature, callback) {
                 eeeYesBtn.onclick = () => {
                     const filteredWords = filterWordsByEee(currentFilteredWords, 'YES');
                     callback(filteredWords);
+                    document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
                 };
             }
             
@@ -1207,6 +1213,7 @@ function setupFeatureListeners(feature, callback) {
                 eeeNoBtn.onclick = () => {
                     const filteredWords = filterWordsByEee(currentFilteredWords, 'NO');
                     callback(filteredWords);
+                    document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
                 };
             }
             break;
@@ -1220,6 +1227,7 @@ function setupFeatureListeners(feature, callback) {
                 oYesBtn.onclick = () => {
                     const filteredWords = filterWordsByO(currentFilteredWords, true);
                     callback(filteredWords);
+                    document.getElementById('oFeature').dispatchEvent(new Event('completed'));
                 };
             }
             
@@ -1227,12 +1235,14 @@ function setupFeatureListeners(feature, callback) {
                 oNoBtn.onclick = () => {
                     const filteredWords = filterWordsByO(currentFilteredWords, false);
                     callback(filteredWords);
+                    document.getElementById('oFeature').dispatchEvent(new Event('completed'));
                 };
             }
             
             if (oSkipBtn) {
                 oSkipBtn.onclick = () => {
                     callback(currentFilteredWords);
+                    document.getElementById('oFeature').dispatchEvent(new Event('completed'));
                 };
             }
             break;
@@ -1246,12 +1256,14 @@ function setupFeatureListeners(feature, callback) {
                     const letter = button.textContent;
                     const filteredWords = filterWordsByCurvedPositions(currentFilteredWords, letter);
                     callback(filteredWords);
+                    document.getElementById('curvedFeature').dispatchEvent(new Event('completed'));
                 };
             });
             
             if (curvedSkipBtn) {
                 curvedSkipBtn.onclick = () => {
                     callback(currentFilteredWords);
+                    document.getElementById('curvedFeature').dispatchEvent(new Event('completed'));
                 };
             }
             break;
@@ -1264,12 +1276,14 @@ function setupFeatureListeners(feature, callback) {
                 colour3YesBtn.onclick = () => {
                     const filteredWords = filterWordsByColour3(currentFilteredWords);
                     callback(filteredWords);
+                    document.getElementById('colour3Feature').dispatchEvent(new Event('completed'));
                 };
             }
             
             if (colour3SkipButton) {
                 colour3SkipButton.onclick = () => {
                     callback(currentFilteredWords);
+                    document.getElementById('colour3Feature').dispatchEvent(new Event('completed'));
                 };
             }
             break;
@@ -1284,6 +1298,7 @@ function setupFeatureListeners(feature, callback) {
                     if (input) {
                         const filteredWords = filterWordsByLexicon(currentFilteredWords, input);
                         callback(filteredWords);
+                        document.getElementById('lexiconFeature').dispatchEvent(new Event('completed'));
                     }
                 };
             }
@@ -1291,6 +1306,7 @@ function setupFeatureListeners(feature, callback) {
             if (lexiconSkipButton) {
                 lexiconSkipButton.onclick = () => {
                     callback(currentFilteredWords);
+                    document.getElementById('lexiconFeature').dispatchEvent(new Event('completed'));
                 };
             }
             break;
@@ -1303,6 +1319,7 @@ function setupFeatureListeners(feature, callback) {
                 consonantYesBtn.onclick = () => {
                     const filteredWords = currentFilteredWords.filter(word => hasWordAdjacentConsonants(word));
                     callback(filteredWords);
+                    document.getElementById('consonantQuestion').dispatchEvent(new Event('completed'));
                 };
             }
             
@@ -1310,6 +1327,7 @@ function setupFeatureListeners(feature, callback) {
                 consonantNoBtn.onclick = () => {
                     const filteredWords = currentFilteredWords.filter(word => !hasWordAdjacentConsonants(word));
                     callback(filteredWords);
+                    document.getElementById('consonantQuestion').dispatchEvent(new Event('completed'));
                 };
             }
             break;
@@ -1326,6 +1344,7 @@ function setupFeatureListeners(feature, callback) {
                         if (consonants.length >= 2) {
                             const filteredWords = filterWordsByPosition1(currentFilteredWords, consonants);
                             callback(filteredWords);
+                            document.getElementById('position1Feature').dispatchEvent(new Event('completed'));
                         }
                     }
                 };
@@ -1334,6 +1353,7 @@ function setupFeatureListeners(feature, callback) {
             if (position1DoneButton) {
                 position1DoneButton.onclick = () => {
                     callback(currentFilteredWords);
+                    document.getElementById('position1Feature').dispatchEvent(new Event('completed'));
                 };
             }
             break;
@@ -1346,6 +1366,7 @@ function setupFeatureListeners(feature, callback) {
                 vowelYesBtn.onclick = () => {
                     handleVowelSelection(true);
                     callback(currentFilteredWordsForVowels);
+                    document.getElementById('vowelFeature').dispatchEvent(new Event('completed'));
                 };
             }
             
@@ -1353,6 +1374,7 @@ function setupFeatureListeners(feature, callback) {
                 vowelNoBtn.onclick = () => {
                     handleVowelSelection(false);
                     callback(currentFilteredWordsForVowels);
+                    document.getElementById('vowelFeature').dispatchEvent(new Event('completed'));
                 };
             }
             break;
@@ -1365,6 +1387,7 @@ function setupFeatureListeners(feature, callback) {
                     const category = button.textContent.split(' ')[0].toLowerCase();
                     const filteredWords = filterWordsByShape(currentFilteredWords, currentPosition, category);
                     callback(filteredWords);
+                    document.getElementById('shapeFeature').dispatchEvent(new Event('completed'));
                 };
             });
             break;
