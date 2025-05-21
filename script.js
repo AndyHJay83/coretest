@@ -1938,3 +1938,14 @@ function exportWordlist() {
     // Clean up the URL object
     window.URL.revokeObjectURL(url);
 }
+
+function filterWordsByPosition1(word, position1Word) {
+    if (!position1Word) return true;
+    
+    // Convert both words to uppercase for comparison
+    const upperWord = word.toUpperCase();
+    const upperPosition1Word = position1Word.toUpperCase();
+    
+    // Check if the word contains the position1 word
+    return upperWord.includes(upperPosition1Word);
+}
