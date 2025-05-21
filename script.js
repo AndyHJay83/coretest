@@ -1939,13 +1939,55 @@ function exportWordlist() {
     window.URL.revokeObjectURL(url);
 }
 
-function filterWordsByPosition1(word, position1Word) {
-    if (!position1Word) return true;
+function filterWordsByPosition1(words, consonants) {
+    if (!consonants || consonants.length < 2) return words;
     
-    // Convert both words to uppercase for comparison
-    const upperWord = word.toUpperCase();
-    const upperPosition1Word = position1Word.toUpperCase();
-    
-    // Check if the word contains the position1 word
-    return upperWord.includes(upperPosition1Word);
+    return words.filter(word => {
+        const wordLower = word.toLowerCase();
+        
+        if (hasAdjacentConsonants) {
+            // YES to Consonants Together: look for the specific consonant pairs together
+            // Create all possible pairs of consonants from the input word
+            const consonantPairs = [];
+            for (let i = 0; i < consonants.length; i++) {
+                for (let j = i + 1; j < consonants.length; j++) {
+                    consonantPairs.push([consonants[i], consonants[j]]);
+                }
+            }
+            
+            // Check if any of the consonant pairs appear together in the word
+            for (const [con1, con2] of consonantPairs) {
+                const pair1 = con1 + con2;
+                const pair2 = con2 + con1;
+                if (wordLower.includes(pair1) || wordLower.includes(pair2)) {
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            // NO to Consonants Together: look for ANY pair of consonants in middle 5/6 characters
+            const wordLength = wordLower.length;
+            
+            // Determine middle section length (5 for odd, 6 for even)
+            const middleLength = wordLength % 2 === 0 ? 6 : 5;
+            const startPos = Math.floor((wordLength - middleLength) / 2);
+            const middleSection = wordLower.slice(startPos, startPos + middleLength);
+            
+            // Create all possible pairs of consonants from the input word
+            const consonantPairs = [];
+            for (let i = 0; i < consonants.length; i++) {
+                for (let j = i + 1; j < consonants.length; j++) {
+                    consonantPairs.push([consonants[i], consonants[j]]);
+                }
+            }
+            
+            // Check if ANY pair of consonants appears in the middle section
+            for (const [con1, con2] of consonantPairs) {
+                if (middleSection.includes(con1) && middleSection.includes(con2)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    });
 }
