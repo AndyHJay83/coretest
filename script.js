@@ -27,9 +27,11 @@ let currentWorkflow = null;
 const createWorkflowButton = document.getElementById('createWorkflowButton');
 const cancelWorkflowButton = document.getElementById('cancelWorkflowButton');
 const saveWorkflowButton = document.getElementById('saveWorkflowButton');
+const backToHomeButton = document.getElementById('backToHomeButton');
 const workflowName = document.getElementById('workflowName');
 const selectedFeaturesList = document.getElementById('selectedFeaturesList');
 const workflowSelect = document.getElementById('workflowSelect');
+const performButton = document.getElementById('performButton');
 
 // Show workflow creation page
 function showWorkflowCreation() {
@@ -141,7 +143,9 @@ function saveWorkflow() {
 
 // Event Listeners
 saveWorkflowButton.addEventListener('click', saveWorkflow);
-backToHomeButton.addEventListener('click', hideWorkflowCreation);
+if (backToHomeButton) {
+    backToHomeButton.addEventListener('click', hideWorkflowCreation);
+}
 
 // Initialize
 initializeWorkflowDropdown();
@@ -360,10 +364,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadWordList();
     
     // Initialize perform button
-    const performButton = document.getElementById('performButton');
     if (performButton) {
         performButton.addEventListener('click', async () => {
-            const workflowSelect = document.getElementById('workflowSelect');
             const selectedWorkflow = workflowSelect.value;
             
             if (!selectedWorkflow) {
