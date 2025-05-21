@@ -31,7 +31,6 @@ const workflowCreationPage = document.getElementById('workflowCreationPage');
 const workflowNameInput = document.getElementById('workflowName');
 const saveWorkflowButton = document.getElementById('saveWorkflow');
 const backToHomeButton = document.getElementById('backToHome');
-const workflowSteps = document.getElementById('workflowSteps');
 const featureButtons = document.querySelectorAll('.feature-button');
 
 // Initialize workflow dropdown
@@ -123,49 +122,6 @@ document.querySelectorAll('.feature-button').forEach(button => {
     button.addEventListener('click', function() {
         this.classList.toggle('selected');
     });
-});
-
-// Drag and Drop functionality
-featureButtons.forEach(button => {
-    button.addEventListener('dragstart', (e) => {
-        e.dataTransfer.setData('text/plain', button.dataset.feature);
-        button.classList.add('dragging');
-    });
-
-    button.addEventListener('dragend', () => {
-        button.classList.remove('dragging');
-    });
-});
-
-workflowSteps.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    workflowSteps.classList.add('drag-over');
-});
-
-workflowSteps.addEventListener('dragleave', () => {
-    workflowSteps.classList.remove('drag-over');
-});
-
-workflowSteps.addEventListener('drop', (e) => {
-    e.preventDefault();
-    workflowSteps.classList.remove('drag-over');
-    
-    const feature = e.dataTransfer.getData('text/plain');
-    const button = document.querySelector(`[data-feature="${feature}"]`);
-    
-    const step = document.createElement('div');
-    step.className = 'workflow-step';
-    step.dataset.feature = feature;
-    step.innerHTML = `
-        ${button.textContent}
-        <button class="remove-step">&times;</button>
-    `;
-    
-    step.querySelector('.remove-step').addEventListener('click', () => {
-        step.remove();
-    });
-    
-    workflowSteps.appendChild(step);
 });
 
 // Event Listeners
