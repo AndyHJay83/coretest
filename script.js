@@ -1138,8 +1138,12 @@ async function executeWorkflow(steps) {
             const feature = document.getElementById(featureId);
             if (feature) {
                 feature.style.display = 'none';
+                console.log(`Hiding feature: ${featureId}`);
             }
         });
+        
+        // Show the workflow execution area
+        document.getElementById('workflowExecution').style.display = 'block';
         
         // Execute each step in sequence
         for (const step of steps) {
@@ -1158,6 +1162,7 @@ async function executeWorkflow(steps) {
             
             // Show the feature
             featureElement.style.display = 'block';
+            console.log(`Showing feature: ${featureId}`);
             
             // Set up event listeners for this feature
             setupFeatureListeners(step.feature, (filteredWords) => {
