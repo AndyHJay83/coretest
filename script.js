@@ -24,82 +24,54 @@ let workflows = JSON.parse(localStorage.getItem('workflows')) || [];
 let currentWorkflow = null;
 
 // DOM Elements
-const workflowSelect = document.getElementById('workflowSelect');
-const wordlistSelect = document.getElementById('wordlistSelect');
-const performButton = document.getElementById('performButton');
-const workflowCreationPage = document.getElementById('workflowCreation');
-const workflowNameInput = document.getElementById('workflowName');
-const saveWorkflowButton = document.getElementById('saveWorkflowButton');
+const createWorkflowButton = document.getElementById('createWorkflowButton');
 const cancelWorkflowButton = document.getElementById('cancelWorkflowButton');
+const saveWorkflowButton = document.getElementById('saveWorkflowButton');
+const workflowName = document.getElementById('workflowName');
 const selectedFeaturesList = document.getElementById('selectedFeaturesList');
-
-// Initialize workflow dropdown
-function initializeWorkflowDropdown() {
-    workflowSelect.innerHTML = '<option value="">Select a workflow...</option><option value="create-new">Create New Workflow</option>';
-    workflows.forEach(workflow => {
-        const option = document.createElement('option');
-        option.value = workflow.name;
-        option.textContent = workflow.name;
-        workflowSelect.appendChild(option);
-    });
-}
-
-// Handle workflow selection
-workflowSelect.addEventListener('change', (e) => {
-    if (e.target.value === 'create-new') {
-        showWorkflowCreation();
-    } else {
-        currentWorkflow = workflows.find(w => w.name === e.target.value);
-    }
-});
-
-// Show workflow creation page
-function showWorkflowCreation() {
-    document.getElementById('homepage').style.display = 'none';
-    document.getElementById('workflowCreation').style.display = 'block';
-    document.getElementById('workflowExecution').style.display = 'none';
-}
-
-function hideWorkflowCreation() {
-    document.getElementById('homepage').style.display = 'block';
-    document.getElementById('workflowCreation').style.display = 'none';
-}
+const workflowSelect = document.getElementById('workflowSelect');
 
 // Initialize workflow creation
-document.getElementById('createWorkflowButton').addEventListener('click', showWorkflowCreation);
-document.getElementById('cancelWorkflowButton').addEventListener('click', hideWorkflowCreation);
+createWorkflowButton.addEventListener('click', showWorkflowCreation);
+cancelWorkflowButton.addEventListener('click', hideWorkflowCreation);
 
-// Handle workflow selection
-document.getElementById('workflowSelect').addEventListener('change', function(e) {
-    if (e.target.value === 'create-new') {
-        showWorkflowCreation();
-    }
-});
-
-// Feature button selection
+// Make feature buttons draggable
 document.querySelectorAll('.feature-button').forEach(button => {
-    button.addEventListener('click', function() {
-        const feature = this.dataset.feature;
-        const featureName = this.textContent;
-        
-        // Toggle selected state
-        this.classList.toggle('selected');
-        
-        // Update selected features list
-        updateSelectedFeaturesList();
+    button.setAttribute('draggable', 'true');
+    
+    button.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', button.dataset.feature);
+        button.classList.add('dragging');
+    });
+    
+    button.addEventListener('dragend', () => {
+        button.classList.remove('dragging');
     });
 });
 
-// Update selected features list
-function updateSelectedFeaturesList() {
-    selectedFeaturesList.innerHTML = '';
+// Add drag and drop event listeners
+selectedFeaturesList.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    selectedFeaturesList.classList.add('drag-over');
+});
+
+selectedFeaturesList.addEventListener('dragleave', () => {
+    selectedFeaturesList.classList.remove('drag-over');
+});
+
+selectedFeaturesList.addEventListener('drop', (e) => {
+    e.preventDefault();
+    selectedFeaturesList.classList.remove('drag-over');
     
-    document.querySelectorAll('.feature-button.selected').forEach(button => {
-        const feature = button.dataset.feature;
-        const featureName = button.textContent;
-        
+    const feature = e.dataTransfer.getData('text/plain');
+    const featureButton = document.querySelector(`.feature-button[data-feature="${feature}"]`);
+    const featureName = featureButton.textContent;
+    
+    // Check if feature is already selected
+    if (!document.querySelector(`.selected-feature-item[data-feature="${feature}"]`)) {
         const featureItem = document.createElement('div');
         featureItem.className = 'selected-feature-item';
+        featureItem.dataset.feature = feature;
         featureItem.innerHTML = `
             <span>${featureName}</span>
             <button class="remove-feature" data-feature="${feature}">&times;</button>
@@ -107,29 +79,24 @@ function updateSelectedFeaturesList() {
         
         // Add remove button functionality
         featureItem.querySelector('.remove-feature').addEventListener('click', function() {
-            const featureToRemove = this.dataset.feature;
-            const buttonToDeselect = document.querySelector(`.feature-button[data-feature="${featureToRemove}"]`);
-            if (buttonToDeselect) {
-                buttonToDeselect.classList.remove('selected');
-            }
-            updateSelectedFeaturesList();
+            featureItem.remove();
         });
         
         selectedFeaturesList.appendChild(featureItem);
-    });
-}
+    }
+});
 
 // Save workflow
-document.getElementById('saveWorkflowButton').addEventListener('click', function() {
-    const workflowName = document.getElementById('workflowName').value.trim();
-    if (!workflowName) {
+saveWorkflowButton.addEventListener('click', function() {
+    const workflowNameValue = workflowName.value.trim();
+    if (!workflowNameValue) {
         alert('Please enter a workflow name');
         return;
     }
 
-    // Get selected features
-    const selectedFeatures = Array.from(document.querySelectorAll('.feature-button.selected'))
-        .map(button => button.dataset.feature);
+    // Get selected features in order
+    const selectedFeatures = Array.from(document.querySelectorAll('.selected-feature-item'))
+        .map(item => item.dataset.feature);
 
     if (selectedFeatures.length === 0) {
         alert('Please select at least one feature');
@@ -138,7 +105,7 @@ document.getElementById('saveWorkflowButton').addEventListener('click', function
 
     // Create new workflow
     const newWorkflow = {
-        name: workflowName,
+        name: workflowNameValue,
         steps: selectedFeatures
     };
 
@@ -146,18 +113,14 @@ document.getElementById('saveWorkflowButton').addEventListener('click', function
     workflows.push(newWorkflow);
 
     // Update workflow select dropdown
-    const workflowSelect = document.getElementById('workflowSelect');
     const option = document.createElement('option');
-    option.value = workflows.length - 1;
-    option.textContent = workflowName;
+    option.value = workflowNameValue;
+    option.textContent = workflowNameValue;
     workflowSelect.insertBefore(option, workflowSelect.lastElementChild);
 
     // Reset and hide workflow creation
-    document.getElementById('workflowName').value = '';
-    document.querySelectorAll('.feature-button.selected').forEach(button => {
-        button.classList.remove('selected');
-    });
-    updateSelectedFeaturesList();
+    workflowName.value = '';
+    selectedFeaturesList.innerHTML = '';
     hideWorkflowCreation();
 });
 
