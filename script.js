@@ -160,8 +160,8 @@ performButton.addEventListener('click', async () => {
     }
     
     try {
-        // Get the workflow steps
-        const workflow = workflows.find(w => w.id === selectedWorkflow);
+        // Get the workflow steps - find by name instead of id
+        const workflow = workflows.find(w => w.name === selectedWorkflow);
         if (!workflow) {
             throw new Error('Selected workflow not found');
         }
@@ -2045,7 +2045,7 @@ document.getElementById('saveWorkflowButton').addEventListener('click', () => {
     // Update workflow select
     const workflowSelect = document.getElementById('workflowSelect');
     const option = document.createElement('option');
-    option.value = newWorkflow.id;
+    option.value = newWorkflow.name; // Use name as value instead of id
     option.textContent = newWorkflow.name;
     workflowSelect.appendChild(option);
     
