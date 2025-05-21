@@ -19,6 +19,175 @@ let lexiconCompleted = false;
 let originalLexCompleted = false;
 let originalLexPosition = -1;
 
+// Workflow Management
+let workflows = JSON.parse(localStorage.getItem('workflows')) || [];
+let currentWorkflow = null;
+
+// DOM Elements
+const workflowSelect = document.getElementById('workflowSelect');
+const wordlistSelect = document.getElementById('wordlistSelect');
+const performButton = document.getElementById('performButton');
+const workflowCreationPage = document.getElementById('workflowCreationPage');
+const workflowNameInput = document.getElementById('workflowName');
+const saveWorkflowButton = document.getElementById('saveWorkflow');
+const backToHomeButton = document.getElementById('backToHome');
+const workflowSteps = document.getElementById('workflowSteps');
+const featureButtons = document.querySelectorAll('.feature-button');
+
+// Initialize workflow dropdown
+function initializeWorkflowDropdown() {
+    workflowSelect.innerHTML = '<option value="">Select a workflow...</option><option value="create-new">Create New Workflow</option>';
+    workflows.forEach(workflow => {
+        const option = document.createElement('option');
+        option.value = workflow.name;
+        option.textContent = workflow.name;
+        workflowSelect.appendChild(option);
+    });
+}
+
+// Handle workflow selection
+workflowSelect.addEventListener('change', (e) => {
+    if (e.target.value === 'create-new') {
+        showWorkflowCreation();
+    } else {
+        currentWorkflow = workflows.find(w => w.name === e.target.value);
+    }
+});
+
+// Show workflow creation page
+function showWorkflowCreation() {
+    document.querySelector('.homepage-content').style.display = 'none';
+    workflowCreationPage.style.display = 'block';
+    workflowNameInput.value = '';
+    workflowSteps.innerHTML = '';
+}
+
+// Hide workflow creation page
+function hideWorkflowCreation() {
+    document.querySelector('.homepage-content').style.display = 'block';
+    workflowCreationPage.style.display = 'none';
+}
+
+// Save workflow
+function saveWorkflow() {
+    const name = workflowNameInput.value.trim();
+    if (!name) {
+        alert('Please enter a workflow name');
+        return;
+    }
+
+    const steps = Array.from(workflowSteps.children).map(step => ({
+        feature: step.dataset.feature,
+        name: step.textContent.trim()
+    }));
+
+    const workflow = {
+        name,
+        steps
+    };
+
+    // Check if workflow with same name exists
+    const existingIndex = workflows.findIndex(w => w.name === name);
+    if (existingIndex !== -1) {
+        workflows[existingIndex] = workflow;
+    } else {
+        workflows.push(workflow);
+    }
+
+    localStorage.setItem('workflows', JSON.stringify(workflows));
+    initializeWorkflowDropdown();
+    hideWorkflowCreation();
+}
+
+// Drag and Drop functionality
+featureButtons.forEach(button => {
+    button.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', button.dataset.feature);
+        button.classList.add('dragging');
+    });
+
+    button.addEventListener('dragend', () => {
+        button.classList.remove('dragging');
+    });
+});
+
+workflowSteps.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    workflowSteps.classList.add('drag-over');
+});
+
+workflowSteps.addEventListener('dragleave', () => {
+    workflowSteps.classList.remove('drag-over');
+});
+
+workflowSteps.addEventListener('drop', (e) => {
+    e.preventDefault();
+    workflowSteps.classList.remove('drag-over');
+    
+    const feature = e.dataTransfer.getData('text/plain');
+    const button = document.querySelector(`[data-feature="${feature}"]`);
+    
+    const step = document.createElement('div');
+    step.className = 'workflow-step';
+    step.dataset.feature = feature;
+    step.innerHTML = `
+        ${button.textContent}
+        <button class="remove-step">&times;</button>
+    `;
+    
+    step.querySelector('.remove-step').addEventListener('click', () => {
+        step.remove();
+    });
+    
+    workflowSteps.appendChild(step);
+});
+
+// Event Listeners
+saveWorkflowButton.addEventListener('click', saveWorkflow);
+backToHomeButton.addEventListener('click', hideWorkflowCreation);
+
+// Initialize
+initializeWorkflowDropdown();
+
+// Perform workflow
+performButton.addEventListener('click', () => {
+    if (!currentWorkflow) {
+        alert('Please select a workflow first');
+        return;
+    }
+
+    // Hide homepage and show feature area
+    document.querySelector('.homepage-content').style.display = 'none';
+    document.getElementById('featureArea').style.display = 'block';
+
+    // Start the workflow
+    executeWorkflow(currentWorkflow.steps);
+});
+
+// Execute workflow steps
+async function executeWorkflow(steps) {
+    let currentWordlist = await loadWordList(); // Implement this function to load your wordlist
+
+    for (const step of steps) {
+        // Show the appropriate feature
+        const featureElement = document.getElementById(`${step.feature}Feature`);
+        if (featureElement) {
+            featureElement.style.display = 'block';
+        }
+
+        // Wait for user interaction and filter wordlist
+        currentWordlist = await executeFeature(step.feature, currentWordlist);
+    }
+
+    // Display final results
+    displayResults(currentWordlist);
+}
+
+// Initialize the app
+document.addEventListener('DOMContentLoaded', () => {
+    initializeWorkflowDropdown();
+});
+
 // Function to check if a word has any adjacent consonants
 function hasWordAdjacentConsonants(word) {
     const vowels = new Set(['a', 'e', 'i', 'o', 'u']);
