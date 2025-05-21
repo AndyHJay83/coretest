@@ -48,6 +48,7 @@ function hideWorkflowCreation() {
 // Initialize workflow creation
 createWorkflowButton.addEventListener('click', showWorkflowCreation);
 cancelWorkflowButton.addEventListener('click', hideWorkflowCreation);
+saveWorkflowButton.addEventListener('click', saveWorkflow);
 
 // Make feature buttons draggable
 document.querySelectorAll('.feature-button').forEach(button => {
@@ -100,8 +101,8 @@ selectedFeaturesList.addEventListener('drop', (e) => {
     }
 });
 
-// Save workflow
-saveWorkflowButton.addEventListener('click', function() {
+// Save workflow function
+function saveWorkflow() {
     const workflowNameValue = workflowName.value.trim();
     if (!workflowNameValue) {
         alert('Please enter a workflow name');
@@ -136,7 +137,7 @@ saveWorkflowButton.addEventListener('click', function() {
     workflowName.value = '';
     selectedFeaturesList.innerHTML = '';
     hideWorkflowCreation();
-});
+}
 
 // Event Listeners
 saveWorkflowButton.addEventListener('click', saveWorkflow);
@@ -2066,4 +2067,11 @@ document.getElementById('cancelWorkflowButton').addEventListener('click', () => 
     document.querySelectorAll('.feature-checkbox').forEach(checkbox => {
         checkbox.checked = false;
     });
+});
+
+// Handle workflow selection change
+workflowSelect.addEventListener('change', function() {
+    if (this.value === 'create-new') {
+        showWorkflowCreation();
+    }
 });
