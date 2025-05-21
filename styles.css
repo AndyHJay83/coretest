@@ -1418,4 +1418,61 @@ input:checked + .slider:before {
 
 .remove-feature:hover {
     color: #cc0000;
+}
+
+/* Position 1 feature */
+#position1Feature {
+    display: none;
+    margin-bottom: 20px;
+}
+
+#position1Feature .position-input {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+#position1Feature input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    text-align: center;
+}
+
+#position1Feature button {
+    padding: 12px 24px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: bold;
+    text-transform: uppercase;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+#position1Feature #position1Button {
+    background-color: #4CAF50;
+    color: white;
+}
+
+#position1Feature #position1DoneButton {
+    background-color: #f44336;
+    color: white;
+}
+
+#position1Feature button:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+#position1Feature button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 } 
