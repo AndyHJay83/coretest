@@ -1097,7 +1097,7 @@ workflowSelect.addEventListener('change', function() {
 // Function to load word list
 async function loadWordList() {
     try {
-        const response = await fetch('wordlist.txt');
+        const response = await fetch('words/ENUK-Long words Noun.txt');
         if (!response.ok) {
             throw new Error('Failed to load wordlist');
         }
