@@ -356,806 +356,41 @@ function filterWordsByPosition1(words, consonants) {
 }
 
 // Initialize the app
-document.addEventListener('DOMContentLoaded', () => {
-    initializeWorkflowDropdown();
-});
-
-// Function to check if a word has any adjacent consonants
-function hasWordAdjacentConsonants(word) {
-    const vowels = new Set(['a', 'e', 'i', 'o', 'u']);
-    const wordLower = word.toLowerCase();
-    
-    for (let i = 0; i < wordLower.length - 1; i++) {
-        const currentChar = wordLower[i];
-        const nextChar = wordLower[i + 1];
-        
-        // Check if both current and next characters are consonants
-        if (!vowels.has(currentChar) && !vowels.has(nextChar)) {
-            console.log(`Found adjacent consonants in "${wordLower}": "${currentChar}${nextChar}" at position ${i}`);
-            return true;
-        }
-    }
-    return false;
-}
-
-// Letter shape categories with exact categorization
-const letterShapes = {
-    straight: new Set(['A', 'E', 'F', 'H', 'I', 'K', 'L', 'M', 'N', 'T', 'V', 'W', 'X', 'Y', 'Z']),
-    curved: new Set(['B', 'C', 'D', 'G', 'J', 'O', 'P', 'Q', 'R', 'S', 'U'])
-};
-
-// Function to get letter shape
-function getLetterShape(letter) {
-    letter = letter.toUpperCase();
-    if (letterShapes.straight.has(letter)) return 'straight';
-    if (letterShapes.curved.has(letter)) return 'curved';
-    return null;
-}
-
-// Function to analyze position shapes
-function analyzePositionShapes(words, position) {
-    const shapes = {
-        straight: new Set(),
-        curved: new Set()
-    };
-    
-    let totalLetters = 0;
-    
-    words.forEach(word => {
-        if (word.length > position) {
-            const letter = word[position];
-            const shape = getLetterShape(letter);
-            console.log(`Word ${word}: Position ${position + 1} has letter ${letter} which is ${shape}`);
-            if (shape) {
-                shapes[shape].add(letter);
-                totalLetters++;
-            }
-        }
-    });
-    
-    const distribution = {
-        straight: shapes.straight.size / totalLetters,
-        curved: shapes.curved.size / totalLetters
-    };
-    
-    console.log(`Position ${position + 1} analysis:`, {
-        shapes: {
-            straight: Array.from(shapes.straight),
-            curved: Array.from(shapes.curved)
-        },
-        distribution,
-        totalLetters
-    });
-    
-    return {
-        shapes,
-        distribution,
-        totalLetters
-    };
-}
-
-// Function to find position with least variance
-function findLeastVariancePosition(words, startPos, endPos) {
-    let maxVariance = -1;
-    let result = -1;
-    
-    console.log('Finding position with most variance in words:', words);
-    
-    for (let pos = startPos; pos < endPos; pos++) {
-        const analysis = analyzePositionShapes(words, pos);
-        
-        // Skip if we don't have at least one letter of each shape
-        if (analysis.shapes.straight.size === 0 || analysis.shapes.curved.size === 0) {
-            console.log(`Position ${pos + 1} skipped: missing one or both shapes`);
-            continue;
-        }
-        
-        // Calculate variance between the two distributions
-        const variance = Math.abs(analysis.distribution.straight - analysis.distribution.curved);
-        console.log(`Position ${pos + 1} variance:`, variance, 'straight:', analysis.distribution.straight, 'curved:', analysis.distribution.curved);
-        
-        if (variance > maxVariance) {
-            maxVariance = variance;
-            result = pos;
-            console.log(`New best position: ${pos + 1} with variance ${variance}`);
-        }
-    }
-    
-    console.log('Selected position:', result + 1, 'with variance:', maxVariance);
-    return result;
-}
-
-// Function to get shortest word length
-function getShortestWordLength(words) {
-    return Math.min(...words.map(word => word.length));
-}
-
-// Function to filter words by shape category
-function filterWordsByShape(words, position, category) {
-    return words.filter(word => {
-        if (word.length <= position) return false;
-        const letter = word[position];
-        return getLetterShape(letter) === category;
-    });
-}
-
-// Function to update shape display
-function updateShapeDisplay(words) {
-    console.log('Updating shape display with words:', words.length);
-    const shapeFeature = document.getElementById('shapeFeature');
-    const shapeDisplay = shapeFeature.querySelector('.shape-display');
-    
-    if (!isShapeMode || words.length === 0) {
-        console.log('Shape mode disabled or no words to display');
-        shapeFeature.style.display = 'none';
-        return;
-    }
-
-    // Get the length of the shortest word to avoid out-of-bounds
-    const shortestLength = getShortestWordLength(words);
-    console.log('Shortest word length:', shortestLength);
-    
-    // Analyze all positions in the words
-    const startPos = 0;
-    const endPos = shortestLength;
-    console.log('Analyzing positions from', startPos, 'to', endPos);
-
-    const position = findLeastVariancePosition(words, startPos, endPos);
-    console.log('Found position with most variance:', position);
-    
-    if (position === -1) {
-        console.log('No valid position found');
-        shapeFeature.style.display = 'none';
-        return;
-    }
-
-    currentPosition = position;
-    const analysis = analyzePositionShapes(words, position);
-    console.log('Shape analysis:', analysis);
-    
-    const shapes = analysis.shapes;
-    
-    const positionDisplay = shapeDisplay.querySelector('.position-display');
-    positionDisplay.textContent = `Position ${position + 1}`;
-    
-    const categoryButtons = shapeDisplay.querySelector('.category-buttons');
-    categoryButtons.innerHTML = '';
-    
-    Object.entries(shapes).forEach(([category, letters]) => {
-        if (letters.size > 0) {
-            const button = document.createElement('button');
-            button.className = 'category-button';
-            const percentage = Math.round(analysis.distribution[category] * 100);
-            button.textContent = `${category.toUpperCase()} (${percentage}%)`;
-            button.addEventListener('click', () => {
-                const filteredWords = filterWordsByShape(words, position, category);
-                displayResults(filteredWords);
-                expandWordList();
-            });
-            categoryButtons.appendChild(button);
-            console.log('Added button for category:', category, 'with percentage:', percentage);
-        }
-    });
-    
-    shapeFeature.style.display = 'block';
-    console.log('Shape feature display updated');
-}
-
-// Function to load word list
-async function loadWordList() {
-    try {
-        const response = await fetch('wordlist.txt');
-        if (!response.ok) {
-            throw new Error('Failed to load wordlist');
-        }
-        const text = await response.text();
-        wordList = text.split('\n').filter(word => word.trim());
-        currentFilteredWords = [...wordList];
-        currentWordlistForVowels = [...wordList];
-        console.log('Wordlist loaded successfully:', wordList.length, 'words');
-        return wordList;
-    } catch (error) {
-        console.error('Error loading wordlist:', error);
-        throw error;
-    }
-}
-
-// Function to update word count
-function updateWordCount(count) {
-    const wordCountElement = document.getElementById('wordCount');
-    if (wordCountElement) {
-        wordCountElement.textContent = count;
-    }
-}
-
-// Function to get consonants in order
-function getConsonantsInOrder(str) {
-    const vowels = new Set(['a', 'e', 'i', 'o', 'u']);
-    const consonants = [];
-    const word = str.toLowerCase();
-    
-    for (let i = 0; i < word.length; i++) {
-        if (!vowels.has(word[i])) {
-            consonants.push(word[i]);
-        }
-    }
-    
-    console.log('Input word:', word);
-    console.log('Consonants found in order:', consonants);
-    return consonants;
-}
-
-// Function to get unique vowels
-function getUniqueVowels(str) {
-    const vowels = new Set(['a', 'e', 'i', 'o', 'u']);
-    const uniqueVowels = new Set();
-    str.toLowerCase().split('').forEach(char => {
-        if (vowels.has(char)) {
-            uniqueVowels.add(char);
-        }
-    });
-    const result = Array.from(uniqueVowels);
-    console.log('Found unique vowels:', result);
-    return result;
-}
-
-// Function to find least common vowel
-function findLeastCommonVowel(words, vowels) {
-    const vowelCounts = {};
-    vowels.forEach(vowel => {
-        vowelCounts[vowel] = 0;
-    });
-
-    words.forEach(word => {
-        const wordLower = word.toLowerCase();
-        vowels.forEach(vowel => {
-            if (wordLower.includes(vowel)) {
-                vowelCounts[vowel]++;
-            }
-        });
-    });
-
-    console.log('Vowel counts:', vowelCounts);
-
-    let leastCommonVowel = vowels[0];
-    let lowestCount = vowelCounts[vowels[0]];
-
-    vowels.forEach(vowel => {
-        if (vowelCounts[vowel] < lowestCount) {
-            lowestCount = vowelCounts[vowel];
-            leastCommonVowel = vowel;
-        }
-    });
-
-    console.log('Selected least common vowel:', leastCommonVowel, 'with count:', lowestCount);
-    return leastCommonVowel;
-}
-
-// Function to handle vowel selection
-function handleVowelSelection(includeVowel) {
-    const currentVowel = uniqueVowels[currentVowelIndex];
-    console.log('Handling vowel selection:', currentVowel, 'Include:', includeVowel);
-    console.log('Current vowel index:', currentVowelIndex);
-    console.log('Remaining vowels:', uniqueVowels);
-    console.log('Before filtering:', currentFilteredWordsForVowels.length, 'words');
-    
-    if (includeVowel) {
-        currentFilteredWordsForVowels = currentFilteredWordsForVowels.filter(word => 
-            word.toLowerCase().includes(currentVowel)
-        );
-    } else {
-        currentFilteredWordsForVowels = currentFilteredWordsForVowels.filter(word => 
-            !word.toLowerCase().includes(currentVowel)
-        );
-    }
-    
-    console.log('After filtering:', currentFilteredWordsForVowels.length, 'words');
-    
-    // Remove only the current vowel from uniqueVowels array
-    uniqueVowels = uniqueVowels.filter((v, index) => index !== currentVowelIndex);
-    
-    // Update the display with the filtered words
-    displayResults(currentFilteredWordsForVowels);
-    
-    // If we still have vowels to process, show the next one
-    if (uniqueVowels.length > 0) {
-        const vowelFeature = document.getElementById('vowelFeature');
-        const vowelLetter = vowelFeature.querySelector('.vowel-letter');
-        console.log('Setting next vowel letter to:', uniqueVowels[0].toUpperCase());
-        vowelLetter.textContent = uniqueVowels[0].toUpperCase();
-        vowelLetter.style.display = 'inline-block';
-    } else {
-        // No more vowels to process, mark as completed and move to next feature
-        document.getElementById('vowelFeature').classList.add('completed');
-        // Update currentFilteredWords with the vowel-filtered results
-        currentFilteredWords = [...currentFilteredWordsForVowels];
-        console.log('Vowel feature completed, moving to O? feature');
-        
-        // Hide vowel feature and show O? feature
-        document.getElementById('vowelFeature').style.display = 'none';
-        document.getElementById('oFeature').style.display = 'block';
-    }
-}
-
-// Function to filter words by EEE? feature
-function filterWordsByEee(words, mode) {
-    console.log('Filtering words by EEE? mode:', mode);
-    console.log('Total words before filtering:', words.length);
-    
-    const filteredWords = words.filter(word => {
-        if (word.length < 2) return false;
-        
-        const secondChar = word[1].toUpperCase();
-        console.log(`Word: ${word}, Second character: ${secondChar}`);
-        
-        switch(mode) {
-            case 'E':
-                const hasE = secondChar === 'E';
-                console.log(`Word ${word} ${hasE ? 'KEEP' : 'REMOVE'}: Second character ${secondChar} ${hasE ? 'is' : 'is not'} E`);
-                return hasE;
-                
-            case 'YES':
-                const yesLetters = new Set(['B', 'C', 'D', 'G', 'P', 'T', 'V', 'Z']);
-                const hasYesLetter = yesLetters.has(secondChar);
-                console.log(`Word ${word} ${hasYesLetter ? 'KEEP' : 'REMOVE'}: Second character ${secondChar} ${hasYesLetter ? 'is' : 'is not'} in YES set`);
-                return hasYesLetter;
-                
-            case 'NO':
-                const noLetters = new Set(['B', 'C', 'D', 'G', 'P', 'T', 'V', 'Z']);
-                const hasNoLetter = noLetters.has(secondChar);
-                console.log(`Word ${word} ${!hasNoLetter ? 'KEEP' : 'REMOVE'}: Second character ${secondChar} ${hasNoLetter ? 'is' : 'is not'} in NO set`);
-                return !hasNoLetter;
-        }
-    });
-    
-    console.log('Filtering Summary:');
-    console.log('Words before filtering:', words.length);
-    console.log('Words after filtering:', filteredWords.length);
-    console.log('Removed words:', words.length - filteredWords.length);
-    
-    return filteredWords;
-}
-
-// Function to filter words by LEXICON feature
-function filterWordsByLexicon(words, positions) {
-    console.log('Filtering words by LEXICON positions:', positions);
-    console.log('Total words before filtering:', words.length);
-    
-    const curvedLetters = new Set(['B', 'C', 'D', 'G', 'J', 'O', 'P', 'Q', 'R', 'S', 'U']);
-    
-    // Special case: if input is "0", filter for words with all straight letters in first 5 positions
-    if (positions === "0") {
-        const filteredWords = words.filter(word => {
-            // Check first 5 positions (or word length if shorter)
-            for (let i = 0; i < Math.min(5, word.length); i++) {
-                if (curvedLetters.has(word[i].toUpperCase())) {
-                    console.log(`Word ${word} REMOVED: Position ${i + 1} has curved letter ${word[i]}`);
-                    return false;
-                }
-            }
-            console.log(`Word ${word} KEPT: All first 5 positions have straight letters`);
-            return true;
-        });
-        
-        console.log('Filtering Summary (0 case):');
-        console.log('Words before filtering:', words.length);
-        console.log('Words after filtering:', filteredWords.length);
-        console.log('Removed words:', words.length - filteredWords.length);
-        
-        return filteredWords;
-    }
-    
-    // Convert positions string to array of numbers
-    const positionArray = positions.split('').map(Number);
-    console.log('Processing positions:', positionArray);
-    
-    const filteredWords = words.filter(word => {
-        // Skip words shorter than 5 characters
-        if (word.length < 5) {
-            console.log(`Word ${word} REMOVED: Too short (length ${word.length})`);
-            return false;
-        }
-        
-        // Check each position from 1 to 5
-        for (let i = 0; i < 5; i++) {
-            const pos = i + 1; // Convert to 1-based position
-            const letter = word[i].toUpperCase();
-            const isCurved = curvedLetters.has(letter);
-            
-            if (positionArray.includes(pos)) {
-                // This position should have a curved letter
-                if (!isCurved) {
-                    console.log(`Word ${word} REMOVED: Position ${pos} has straight letter ${letter}`);
-                    return false;
-                }
-            } else {
-                // This position should have a straight letter
-                if (isCurved) {
-                    console.log(`Word ${word} REMOVED: Position ${pos} has curved letter ${letter}`);
-                    return false;
-                }
-            }
-        }
-        
-        console.log(`Word ${word} KEPT: All positions match requirements`);
-        return true;
-    });
-    
-    console.log('Filtering Summary:');
-    console.log('Words before filtering:', words.length);
-    console.log('Words after filtering:', filteredWords.length);
-    console.log('Removed words:', words.length - filteredWords.length);
-    
-    return filteredWords;
-}
-
-// Function to find position with most variance
-function findPositionWithMostVariance(words) {
-    console.log('Finding position with most variance in words:', words);
-    
-    // Initialize array to store unique letters for each position
-    const positionLetters = Array(5).fill().map(() => new Set());
-    
-    // Collect unique letters for each position
-    words.forEach(word => {
-        for (let i = 0; i < Math.min(5, word.length); i++) {
-            positionLetters[i].add(word[i].toUpperCase());
-        }
-    });
-    
-    // Find position with most unique letters
-    let maxVariance = -1;
-    let result = -1;
-    let resultLetters = [];
-    
-    positionLetters.forEach((letters, index) => {
-        const uniqueLetters = Array.from(letters).sort();
-        console.log(`Position ${index + 1} has ${letters.size} unique letters:`, uniqueLetters);
-        if (letters.size > maxVariance) {
-            maxVariance = letters.size;
-            result = index;
-            resultLetters = uniqueLetters;
-        }
-    });
-    
-    console.log('Selected position:', result + 1, 'with variance:', maxVariance, 'letters:', resultLetters);
-    return {
-        position: result,
-        letters: resultLetters
-    };
-}
-
-// Function to filter words by original lex
-function filterWordsByOriginalLex(words, position, letter) {
-    console.log('Filtering words by ORIGINAL LEX:', { position, letter });
-    console.log('Total words before filtering:', words.length);
-    
-    const filteredWords = words.filter(word => {
-        if (word.length <= position) {
-            console.log(`Word ${word} REMOVED: Too short for position ${position + 1}`);
-            return false;
-        }
-        
-        const wordLetter = word[position].toUpperCase();
-        const matches = wordLetter === letter.toUpperCase();
-        
-        if (matches) {
-            console.log(`Word ${word} KEPT: Position ${position + 1} has ${letter}`);
-        } else {
-            console.log(`Word ${word} REMOVED: Position ${position + 1} has ${wordLetter} instead of ${letter}`);
-        }
-        
-        return matches;
-    });
-    
-    console.log('Filtering Summary:');
-    console.log('Words before filtering:', words.length);
-    console.log('Words after filtering:', filteredWords.length);
-    console.log('Removed words:', words.length - filteredWords.length);
-    
-    return filteredWords;
-}
-
-// Function to show next feature
-function showNextFeature() {
-    console.log('Showing next feature...');
-    console.log('Current states:', {
-        originalLexCompleted,
-        eeeCompleted,
-        lexiconCompleted,
-        hasAdjacentConsonants,
-        isVowelMode,
-        isColour3Mode,
-        isShapeMode,
-        position1Completed: document.getElementById('position1Feature').classList.contains('completed'),
-        vowelCompleted: document.getElementById('vowelFeature').classList.contains('completed'),
-        colour3Completed: document.getElementById('colour3Feature').classList.contains('completed'),
-        shapeCompleted: document.getElementById('shapeFeature').classList.contains('completed'),
-        oCompleted: document.getElementById('oFeature').classList.contains('completed'),
-        curvedCompleted: document.getElementById('curvedFeature').classList.contains('completed')
-    });
-    
-    // First hide all features
-    const allFeatures = [
-        'originalLexFeature',
-        'eeeFeature',
-        'lexiconFeature',
-        'consonantQuestion',
-        'position1Feature',
-        'vowelFeature',
-        'colour3Feature',
-        'shapeFeature',
-        'oFeature',
-        'curvedFeature'
-    ];
-    
-    allFeatures.forEach(featureId => {
-        document.getElementById(featureId).style.display = 'none';
-    });
-    
-    // Then show the appropriate feature based on the current state
-    if (hasAdjacentConsonants === null) {
-        console.log('Showing consonant question');
-        const consonantQuestion = document.getElementById('consonantQuestion');
-        console.log('consonantQuestion element:', consonantQuestion);
-        if (consonantQuestion) {
-            consonantQuestion.style.display = 'block';
-            console.log('Consonant question display set to block');
-        } else {
-            console.error('Consonant question element not found!');
-        }
-    }
-    else if (!document.getElementById('position1Feature').classList.contains('completed')) {
-        console.log('Showing Position 1 feature');
-        document.getElementById('position1Feature').style.display = 'block';
-    }
-    else if (isVowelMode && !document.getElementById('vowelFeature').classList.contains('completed')) {
-        console.log('Showing VOWEL feature');
-        const vowelFeature = document.getElementById('vowelFeature');
-        vowelFeature.style.display = 'block';
-        
-        // Initialize vowel processing
-        if (uniqueVowels.length === 0) {
-            console.log('Initializing vowels from current word list');
-            // Get unique vowels from current word list
-            const vowels = new Set(['a', 'e', 'i', 'o', 'u']);
-            uniqueVowels = Array.from(new Set(
-                currentFilteredWords.join('').toLowerCase().split('')
-                    .filter(char => vowels.has(char))
-            ));
-            currentFilteredWordsForVowels = [...currentFilteredWords];
-            originalFilteredWords = [...currentFilteredWords];
-            currentVowelIndex = 0;
-        }
-        
-        // Set up the vowel display
-        const vowelLetter = vowelFeature.querySelector('.vowel-letter');
-        if (uniqueVowels.length > 0) {
-            console.log('Setting vowel letter to:', uniqueVowels[0].toUpperCase());
-            vowelLetter.textContent = uniqueVowels[0].toUpperCase();
-            vowelLetter.style.display = 'inline-block';
-        } else {
-            console.log('No vowels found in current word list');
-            vowelLetter.style.display = 'none';
-        }
-    }
-    else if (!document.getElementById('oFeature').classList.contains('completed')) {
-        console.log('Showing O? feature');
-        document.getElementById('oFeature').style.display = 'block';
-    }
-    else if (!lexiconCompleted) {
-        console.log('Showing LEXICON feature');
-        document.getElementById('lexiconFeature').style.display = 'block';
-    }
-    else if (!originalLexCompleted) {
-        console.log('Showing ORIGINAL LEX feature');
-        const originalLexFeature = document.getElementById('originalLexFeature');
-        originalLexFeature.style.display = 'block';
-        
-        // Find position with most variance if not already found
-        if (originalLexPosition === -1) {
-            const result = findPositionWithMostVariance(currentFilteredWords);
-            originalLexPosition = result.position;
-            
-            // Update the display
-            document.getElementById('originalLexPosition').textContent = originalLexPosition + 1;
-            document.getElementById('originalLexLetters').textContent = result.letters.join(', ');
-        }
-    }
-    else if (!eeeCompleted) {
-        console.log('Showing EEE? feature');
-        document.getElementById('eeeFeature').style.display = 'block';
-    }
-    else if (isColour3Mode && !document.getElementById('colour3Feature').classList.contains('completed')) {
-        console.log('Showing COLOUR3 feature');
-        const colour3Feature = document.getElementById('colour3Feature');
-        colour3Feature.style.display = 'block';
-    }
-    else if (isShapeMode && !document.getElementById('shapeFeature').classList.contains('completed')) {
-        console.log('Showing SHAPE feature');
-        document.getElementById('shapeFeature').style.display = 'block';
-        updateShapeDisplay(currentFilteredWords);
-    }
-    else if (!document.getElementById('curvedFeature').classList.contains('completed')) {
-        console.log('Showing CURVED feature');
-        document.getElementById('curvedFeature').style.display = 'block';
-    }
-    else {
-        console.log('Expanding word list');
-        expandWordList();
-    }
-}
-
-// Function to expand word list
-function expandWordList() {
-    const wordListContainer = document.getElementById('wordListContainer');
-    wordListContainer.classList.add('expanded');
-}
-
-// Function to display results
-function displayResults(words) {
-    const resultsContainer = document.getElementById('results');
-    if (!resultsContainer) return;
-    
-    resultsContainer.innerHTML = '';
-    
-    if (words.length === 0) {
-        resultsContainer.innerHTML = '<p>No words match the current criteria.</p>';
-        return;
-    }
-    
-    const wordList = document.createElement('ul');
-    wordList.className = 'word-list';
-    
-    words.forEach(word => {
-        const li = document.createElement('li');
-        li.textContent = word;
-        wordList.appendChild(li);
-    });
-    
-    resultsContainer.appendChild(wordList);
-}
-
-// Function to reset the app
-function resetApp() {
-    // Reset all variables
-    currentFilteredWords = [...originalFilteredWords];
-    currentVowelIndex = 0;
-    uniqueVowels = [];
-    hasAdjacentConsonants = null;
-    selectedCurvedLetter = null;
-    hasO = null;
-    currentFilteredWordsForVowels = [];
-    
-    // Clear all results and show full wordlist
-    displayResults(originalFilteredWords);
-    
-    // Reset all features
-    const features = [
-        'consonantQuestion',
-        'position1Feature',
-        'vowelFeature',
-        'colour3Feature',
-        'shapeFeature',
-        'oFeature',
-        'curvedFeature'
-    ];
-    
-    features.forEach(featureId => {
-        const feature = document.getElementById(featureId);
-        if (feature) {
-            // Remove completed class from all features
-            feature.classList.remove('completed');
-            // Hide all features initially
-            feature.style.display = 'none';
-        }
-    });
-    
-    // Reset all input fields
-    document.getElementById('position1Input').value = '';
-    
-    // Show the first feature (consonant question)
-    document.getElementById('consonantQuestion').style.display = 'block';
-    
-    // Update word count
-    updateWordCount(originalFilteredWords.length);
-}
-
-// Function to toggle mode
-function toggleMode() {
-    isNewMode = true; // Default to new mode
-    resetApp();
-}
-
-// Function to toggle feature
-function toggleFeature(featureId) {
-    // Default all features to enabled
-    isColour3Mode = true;
-    isVowelMode = true;
-    isShapeMode = true;
-    
-    // Update the display
-    showNextFeature();
-}
-
-// Function to export wordlist
-function exportWordlist() {
-    // Create a text file with the current filtered words
-    const text = currentFilteredWords.join('\n');
-    const blob = new Blob([text], { type: 'text/plain' });
-    const url = window.URL.createObjectURL(blob);
-    
-    // Create a temporary link element
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `wordlist_${currentFilteredWords.length}_words.txt`;
-    
-    // Append to body, click, and remove
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    // Clean up the URL object
-    window.URL.revokeObjectURL(url);
-}
-
-// Function to filter words by COLOUR3
-function filterWordsByColour3(words) {
-    const colour3Letters = new Set(['A', 'B', 'C', 'E', 'G', 'I', 'L', 'N', 'M', 'O', 'P', 'R', 'S', 'T', 'V', 'W', 'Y']);
-    console.log('COLOUR3 letters:', Array.from(colour3Letters));
-    console.log('Total words before filtering:', words.length);
-    
-    const filteredWords = words.filter(word => {
-        // Check only position 5 (0-based index 4)
-        const pos5 = word.length > 4 ? word[4].toUpperCase() : null;
-        
-        // Detailed logging for debugging
-        console.log(`\nAnalyzing word: ${word}`);
-        console.log(`Word length: ${word.length}`);
-        console.log(`Position 5 character: ${pos5}`);
-        console.log(`Is character in COLOUR3 set? ${pos5 && colour3Letters.has(pos5)}`);
-        
-        // Check if position 5 has a letter from our set
-        const hasColour3Letter = pos5 && colour3Letters.has(pos5);
-        
-        if (hasColour3Letter) {
-            console.log(`KEEPING word "${word}" - Position 5 (${pos5}) matches COLOUR3 set`);
-        } else {
-            console.log(`REMOVING word "${word}" - Position 5 (${pos5}) does not match COLOUR3 set`);
-        }
-        
-        return hasColour3Letter;
-    });
-    
-    console.log('\nFiltering Summary:');
-    console.log('Words before filtering:', words.length);
-    console.log('Words after filtering:', filteredWords.length);
-    console.log('Removed words:', words.length - filteredWords.length);
-    
-    return filteredWords;
-}
-
-// Function to filter words by O? feature
-function filterWordsByO(words, includeO) {
-    console.log('Filtering words by O? mode:', includeO ? 'YES' : 'NO');
-    console.log('Total words before filtering:', words.length);
-    
-    const filteredWords = words.filter(word => {
-        const hasO = word.toLowerCase().includes('o');
-        return includeO ? hasO : !hasO;
-    });
-    
-    console.log('Filtering Summary:');
-    console.log('Words before filtering:', words.length);
-    console.log('Words after filtering:', filteredWords.length);
-    console.log('Removed words:', words.length - filteredWords.length);
-    
-    return filteredWords;
-}
-
-// Event Listeners
 document.addEventListener('DOMContentLoaded', async () => {
     await loadWordList();
+    
+    // Initialize perform button
+    const performButton = document.getElementById('performButton');
+    if (performButton) {
+        performButton.addEventListener('click', async () => {
+            const workflowSelect = document.getElementById('workflowSelect');
+            const selectedWorkflow = workflowSelect.value;
+            
+            if (!selectedWorkflow) {
+                alert('Please select a workflow first');
+                return;
+            }
+            
+            try {
+                // Get the workflow steps - find by name instead of id
+                const workflow = workflows.find(w => w.name === selectedWorkflow);
+                if (!workflow) {
+                    throw new Error('Selected workflow not found');
+                }
+                
+                // Show the workflow execution area
+                document.getElementById('workflowExecution').style.display = 'block';
+                
+                // Execute the workflow
+                await executeWorkflow(workflow.steps);
+            } catch (error) {
+                console.error('Error executing workflow:', error);
+                alert('Error executing workflow: ' + error.message);
+            }
+        });
+    } else {
+        console.error('Perform button not found!');
+    }
     
     // Mark CURVED feature as completed by default
     document.getElementById('curvedFeature').classList.add('completed');
@@ -2075,3 +1310,601 @@ workflowSelect.addEventListener('change', function() {
         showWorkflowCreation();
     }
 });
+
+// Function to load word list
+async function loadWordList() {
+    try {
+        const response = await fetch('wordlist.txt');
+        if (!response.ok) {
+            throw new Error('Failed to load wordlist');
+        }
+        const text = await response.text();
+        wordList = text.split('\n').filter(word => word.trim());
+        currentFilteredWords = [...wordList];
+        currentWordlistForVowels = [...wordList];
+        console.log('Wordlist loaded successfully:', wordList.length, 'words');
+        return wordList;
+    } catch (error) {
+        console.error('Error loading wordlist:', error);
+        throw error;
+    }
+}
+
+// Function to execute workflow
+async function executeWorkflow(steps) {
+    try {
+        // Load the wordlist
+        await loadWordList();
+        
+        // Execute each step in the workflow
+        for (const step of steps) {
+            // Show the appropriate feature based on the step
+            const featureElement = document.getElementById(step + 'Feature');
+            if (featureElement) {
+                featureElement.style.display = 'block';
+            }
+            
+            // Wait for user interaction
+            await new Promise(resolve => {
+                const handleFeatureComplete = () => {
+                    featureElement.classList.add('completed');
+                    resolve();
+                };
+                
+                // Add event listener for feature completion
+                featureElement.addEventListener('completed', handleFeatureComplete);
+            });
+        }
+        
+        // Show results
+        displayResults(currentFilteredWords);
+    } catch (error) {
+        console.error('Error executing workflow:', error);
+        throw error;
+    }
+}
+
+// Function to display results
+function displayResults(words) {
+    const resultsContainer = document.getElementById('results');
+    if (!resultsContainer) return;
+    
+    resultsContainer.innerHTML = '';
+    
+    if (words.length === 0) {
+        resultsContainer.innerHTML = '<p>No words match the current criteria.</p>';
+        return;
+    }
+    
+    const wordList = document.createElement('ul');
+    wordList.className = 'word-list';
+    
+    words.forEach(word => {
+        const li = document.createElement('li');
+        li.textContent = word;
+        wordList.appendChild(li);
+    });
+    
+    resultsContainer.appendChild(wordList);
+}
+
+// Function to handle vowel selection
+function handleVowelSelection(includeVowel) {
+    const currentVowel = uniqueVowels[currentVowelIndex];
+    console.log('Handling vowel selection:', currentVowel, 'Include:', includeVowel);
+    
+    if (includeVowel) {
+        currentFilteredWordsForVowels = currentFilteredWordsForVowels.filter(word => 
+            word.toLowerCase().includes(currentVowel)
+        );
+    } else {
+        currentFilteredWordsForVowels = currentFilteredWordsForVowels.filter(word => 
+            !word.toLowerCase().includes(currentVowel)
+        );
+    }
+    
+    // Remove the current vowel from uniqueVowels array
+    uniqueVowels = uniqueVowels.filter((v, index) => index !== currentVowelIndex);
+    
+    // Update the display with the filtered words
+    displayResults(currentFilteredWordsForVowels);
+    
+    // If we still have vowels to process, show the next one
+    if (uniqueVowels.length > 0) {
+        const vowelFeature = document.getElementById('vowelFeature');
+        const vowelLetter = vowelFeature.querySelector('.vowel-letter');
+        vowelLetter.textContent = uniqueVowels[0].toUpperCase();
+        vowelLetter.style.display = 'inline-block';
+    } else {
+        // No more vowels to process, mark as completed
+        document.getElementById('vowelFeature').classList.add('completed');
+        // Update currentFilteredWords with the vowel-filtered results
+        currentFilteredWords = [...currentFilteredWordsForVowels];
+        
+        // Hide vowel feature and show next feature
+        document.getElementById('vowelFeature').style.display = 'none';
+        showNextFeature();
+    }
+}
+
+// Function to filter words by O? feature
+function filterWordsByO(words, includeO) {
+    console.log('Filtering words by O? mode:', includeO ? 'YES' : 'NO');
+    
+    const filteredWords = words.filter(word => {
+        const hasO = word.toLowerCase().includes('o');
+        return includeO ? hasO : !hasO;
+    });
+    
+    return filteredWords;
+}
+
+// Function to filter words by COLOUR3
+function filterWordsByColour3(words) {
+    const colour3Letters = new Set(['A', 'B', 'C', 'E', 'G', 'I', 'L', 'N', 'M', 'O', 'P', 'R', 'S', 'T', 'V', 'W', 'Y']);
+    
+    const filteredWords = words.filter(word => {
+        // Check only position 5 (0-based index 4)
+        const pos5 = word.length > 4 ? word[4].toUpperCase() : null;
+        return pos5 && colour3Letters.has(pos5);
+    });
+    
+    return filteredWords;
+}
+
+// Function to show next feature
+function showNextFeature() {
+    // First hide all features
+    const allFeatures = [
+        'originalLexFeature',
+        'eeeFeature',
+        'lexiconFeature',
+        'consonantQuestion',
+        'position1Feature',
+        'vowelFeature',
+        'colour3Feature',
+        'shapeFeature',
+        'oFeature',
+        'curvedFeature'
+    ];
+    
+    allFeatures.forEach(featureId => {
+        document.getElementById(featureId).style.display = 'none';
+    });
+    
+    // Then show the appropriate feature based on the current state
+    if (hasAdjacentConsonants === null) {
+        document.getElementById('consonantQuestion').style.display = 'block';
+    }
+    else if (!document.getElementById('position1Feature').classList.contains('completed')) {
+        document.getElementById('position1Feature').style.display = 'block';
+    }
+    else if (isVowelMode && !document.getElementById('vowelFeature').classList.contains('completed')) {
+        document.getElementById('vowelFeature').style.display = 'block';
+    }
+    else if (!document.getElementById('oFeature').classList.contains('completed')) {
+        document.getElementById('oFeature').style.display = 'block';
+    }
+    else if (!lexiconCompleted) {
+        document.getElementById('lexiconFeature').style.display = 'block';
+    }
+    else if (!originalLexCompleted) {
+        document.getElementById('originalLexFeature').style.display = 'block';
+    }
+    else if (!eeeCompleted) {
+        document.getElementById('eeeFeature').style.display = 'block';
+    }
+    else if (isColour3Mode && !document.getElementById('colour3Feature').classList.contains('completed')) {
+        document.getElementById('colour3Feature').style.display = 'block';
+    }
+    else if (isShapeMode && !document.getElementById('shapeFeature').classList.contains('completed')) {
+        document.getElementById('shapeFeature').style.display = 'block';
+    }
+    else if (!document.getElementById('curvedFeature').classList.contains('completed')) {
+        document.getElementById('curvedFeature').style.display = 'block';
+    }
+    else {
+        expandWordList();
+    }
+}
+
+// Function to expand word list
+function expandWordList() {
+    const wordListContainer = document.getElementById('wordListContainer');
+    wordListContainer.classList.add('expanded');
+}
+
+// Function to reset the app
+function resetApp() {
+    // Reset all variables
+    currentFilteredWords = [...originalFilteredWords];
+    currentVowelIndex = 0;
+    uniqueVowels = [];
+    hasAdjacentConsonants = null;
+    selectedCurvedLetter = null;
+    hasO = null;
+    currentFilteredWordsForVowels = [];
+    
+    // Clear all results and show full wordlist
+    displayResults(originalFilteredWords);
+    
+    // Reset all features
+    const features = [
+        'consonantQuestion',
+        'position1Feature',
+        'vowelFeature',
+        'colour3Feature',
+        'shapeFeature',
+        'oFeature',
+        'curvedFeature'
+    ];
+    
+    features.forEach(featureId => {
+        const feature = document.getElementById(featureId);
+        if (feature) {
+            feature.classList.remove('completed');
+            feature.style.display = 'none';
+        }
+    });
+    
+    // Reset all input fields
+    document.getElementById('position1Input').value = '';
+    
+    // Show the first feature (consonant question)
+    document.getElementById('consonantQuestion').style.display = 'block';
+}
+
+// Function to check if a word has any adjacent consonants
+function hasWordAdjacentConsonants(word) {
+    const vowels = new Set(['a', 'e', 'i', 'o', 'u']);
+    const wordLower = word.toLowerCase();
+    
+    for (let i = 0; i < wordLower.length - 1; i++) {
+        const currentChar = wordLower[i];
+        const nextChar = wordLower[i + 1];
+        
+        // Check if both current and next characters are consonants
+        if (!vowels.has(currentChar) && !vowels.has(nextChar)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Letter shape categories with exact categorization
+const letterShapes = {
+    straight: new Set(['A', 'E', 'F', 'H', 'I', 'K', 'L', 'M', 'N', 'T', 'V', 'W', 'X', 'Y', 'Z']),
+    curved: new Set(['B', 'C', 'D', 'G', 'J', 'O', 'P', 'Q', 'R', 'S', 'U'])
+};
+
+// Function to get letter shape
+function getLetterShape(letter) {
+    letter = letter.toUpperCase();
+    if (letterShapes.straight.has(letter)) return 'straight';
+    if (letterShapes.curved.has(letter)) return 'curved';
+    return null;
+}
+
+// Function to filter words by shape category
+function filterWordsByShape(words, position, category) {
+    return words.filter(word => {
+        if (word.length <= position) return false;
+        const letter = word[position];
+        return getLetterShape(letter) === category;
+    });
+}
+
+// Function to update shape display
+function updateShapeDisplay(words) {
+    const shapeFeature = document.getElementById('shapeFeature');
+    const shapeDisplay = shapeFeature.querySelector('.shape-display');
+    
+    if (!isShapeMode || words.length === 0) {
+        shapeFeature.style.display = 'none';
+        return;
+    }
+    
+    // Get the length of the shortest word to avoid out-of-bounds
+    const shortestLength = Math.min(...words.map(word => word.length));
+    
+    // Analyze all positions in the words
+    const startPos = 0;
+    const endPos = shortestLength;
+    
+    const position = findLeastVariancePosition(words, startPos, endPos);
+    
+    if (position === -1) {
+        shapeFeature.style.display = 'none';
+        return;
+    }
+    
+    currentPosition = position;
+    const analysis = analyzePositionShapes(words, position);
+    const shapes = analysis.shapes;
+    
+    const positionDisplay = shapeDisplay.querySelector('.position-display');
+    positionDisplay.textContent = `Position ${position + 1}`;
+    
+    const categoryButtons = shapeDisplay.querySelector('.category-buttons');
+    categoryButtons.innerHTML = '';
+    
+    Object.entries(shapes).forEach(([category, letters]) => {
+        if (letters.size > 0) {
+            const button = document.createElement('button');
+            button.className = 'category-button';
+            const percentage = Math.round(analysis.distribution[category] * 100);
+            button.textContent = `${category.toUpperCase()} (${percentage}%)`;
+            button.addEventListener('click', () => {
+                const filteredWords = filterWordsByShape(words, position, category);
+                displayResults(filteredWords);
+                expandWordList();
+            });
+            categoryButtons.appendChild(button);
+        }
+    });
+    
+    shapeFeature.style.display = 'block';
+}
+
+// Function to analyze position shapes
+function analyzePositionShapes(words, position) {
+    const shapes = {
+        straight: new Set(),
+        curved: new Set()
+    };
+    
+    let totalLetters = 0;
+    
+    words.forEach(word => {
+        if (word.length > position) {
+            const letter = word[position];
+            const shape = getLetterShape(letter);
+            if (shape) {
+                shapes[shape].add(letter);
+                totalLetters++;
+            }
+        }
+    });
+    
+    const distribution = {
+        straight: shapes.straight.size / totalLetters,
+        curved: shapes.curved.size / totalLetters
+    };
+    
+    return {
+        shapes,
+        distribution,
+        totalLetters
+    };
+}
+
+// Function to find position with least variance
+function findLeastVariancePosition(words, startPos, endPos) {
+    let maxVariance = -1;
+    let result = -1;
+    
+    for (let pos = startPos; pos < endPos; pos++) {
+        const analysis = analyzePositionShapes(words, pos);
+        
+        // Skip if we don't have at least one letter of each shape
+        if (analysis.shapes.straight.size === 0 || analysis.shapes.curved.size === 0) {
+            continue;
+        }
+        
+        // Calculate variance between the two distributions
+        const variance = Math.abs(analysis.distribution.straight - analysis.distribution.curved);
+        
+        if (variance > maxVariance) {
+            maxVariance = variance;
+            result = pos;
+        }
+    }
+    
+    return result;
+}
+
+// Function to find position with most variance
+function findPositionWithMostVariance(words) {
+    // Initialize array to store unique letters for each position
+    const positionLetters = Array(5).fill().map(() => new Set());
+    
+    // Collect unique letters for each position
+    words.forEach(word => {
+        for (let i = 0; i < Math.min(5, word.length); i++) {
+            positionLetters[i].add(word[i].toUpperCase());
+        }
+    });
+    
+    // Find position with most unique letters
+    let maxVariance = -1;
+    let result = -1;
+    let resultLetters = [];
+    
+    positionLetters.forEach((letters, index) => {
+        if (letters.size > maxVariance) {
+            maxVariance = letters.size;
+            result = index;
+            resultLetters = Array.from(letters).sort();
+        }
+    });
+    
+    return {
+        position: result,
+        letters: resultLetters
+    };
+}
+
+// Function to filter words by original lex
+function filterWordsByOriginalLex(words, position, letter) {
+    return words.filter(word => {
+        if (word.length <= position) return false;
+        return word[position].toUpperCase() === letter.toUpperCase();
+    });
+}
+
+// Function to filter words by EEE? feature
+function filterWordsByEee(words, mode) {
+    return words.filter(word => {
+        if (word.length < 2) return false;
+        
+        const secondChar = word[1].toUpperCase();
+        
+        switch(mode) {
+            case 'E':
+                return secondChar === 'E';
+                
+            case 'YES':
+                const yesLetters = new Set(['B', 'C', 'D', 'G', 'P', 'T', 'V', 'Z']);
+                return yesLetters.has(secondChar);
+                
+            case 'NO':
+                const noLetters = new Set(['B', 'C', 'D', 'G', 'P', 'T', 'V', 'Z']);
+                return !noLetters.has(secondChar);
+        }
+    });
+}
+
+// Function to filter words by LEXICON feature
+function filterWordsByLexicon(words, positions) {
+    const curvedLetters = new Set(['B', 'C', 'D', 'G', 'J', 'O', 'P', 'Q', 'R', 'S', 'U']);
+    
+    // Special case: if input is "0", filter for words with all straight letters in first 5 positions
+    if (positions === "0") {
+        return words.filter(word => {
+            // Check first 5 positions (or word length if shorter)
+            for (let i = 0; i < Math.min(5, word.length); i++) {
+                if (curvedLetters.has(word[i].toUpperCase())) {
+                    return false;
+                }
+            }
+            return true;
+        });
+    }
+    
+    // Convert positions string to array of numbers
+    const positionArray = positions.split('').map(Number);
+    
+    return words.filter(word => {
+        // Skip words shorter than 5 characters
+        if (word.length < 5) return false;
+        
+        // Check each position from 1 to 5
+        for (let i = 0; i < 5; i++) {
+            const pos = i + 1; // Convert to 1-based position
+            const letter = word[i].toUpperCase();
+            const isCurved = curvedLetters.has(letter);
+            
+            if (positionArray.includes(pos)) {
+                // This position should have a curved letter
+                if (!isCurved) return false;
+            } else {
+                // This position should have a straight letter
+                if (isCurved) return false;
+            }
+        }
+        
+        return true;
+    });
+}
+
+// Function to get consonants in order
+function getConsonantsInOrder(str) {
+    const vowels = new Set(['a', 'e', 'i', 'o', 'u']);
+    const consonants = [];
+    const word = str.toLowerCase();
+    
+    for (let i = 0; i < word.length; i++) {
+        if (!vowels.has(word[i])) {
+            consonants.push(word[i]);
+        }
+    }
+    
+    return consonants;
+}
+
+// Function to get unique vowels
+function getUniqueVowels(str) {
+    const vowels = new Set(['a', 'e', 'i', 'o', 'u']);
+    const uniqueVowels = new Set();
+    str.toLowerCase().split('').forEach(char => {
+        if (vowels.has(char)) {
+            uniqueVowels.add(char);
+        }
+    });
+    return Array.from(uniqueVowels);
+}
+
+// Function to find least common vowel
+function findLeastCommonVowel(words, vowels) {
+    const vowelCounts = {};
+    vowels.forEach(vowel => {
+        vowelCounts[vowel] = 0;
+    });
+
+    words.forEach(word => {
+        const wordLower = word.toLowerCase();
+        vowels.forEach(vowel => {
+            if (wordLower.includes(vowel)) {
+                vowelCounts[vowel]++;
+            }
+        });
+    });
+
+    let leastCommonVowel = vowels[0];
+    let lowestCount = vowelCounts[vowels[0]];
+
+    vowels.forEach(vowel => {
+        if (vowelCounts[vowel] < lowestCount) {
+            lowestCount = vowelCounts[vowel];
+            leastCommonVowel = vowel;
+        }
+    });
+
+    return leastCommonVowel;
+}
+
+// Function to update word count
+function updateWordCount(count) {
+    const wordCountElement = document.getElementById('wordCount');
+    if (wordCountElement) {
+        wordCountElement.textContent = count;
+    }
+}
+
+// Function to toggle mode
+function toggleMode() {
+    isNewMode = true; // Default to new mode
+    resetApp();
+}
+
+// Function to toggle feature
+function toggleFeature(featureId) {
+    // Default all features to enabled
+    isColour3Mode = true;
+    isVowelMode = true;
+    isShapeMode = true;
+    
+    // Update the display
+    showNextFeature();
+}
+
+// Function to export wordlist
+function exportWordlist() {
+    // Create a text file with the current filtered words
+    const text = currentFilteredWords.join('\n');
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    
+    // Create a temporary link element
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `wordlist_${currentFilteredWords.length}_words.txt`;
+    
+    // Append to body, click, and remove
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Clean up the URL object
+    window.URL.revokeObjectURL(url);
+}
