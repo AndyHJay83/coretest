@@ -27,11 +27,11 @@ let currentWorkflow = null;
 const workflowSelect = document.getElementById('workflowSelect');
 const wordlistSelect = document.getElementById('wordlistSelect');
 const performButton = document.getElementById('performButton');
-const workflowCreationPage = document.getElementById('workflowCreationPage');
+const workflowCreationPage = document.getElementById('workflowCreation');
 const workflowNameInput = document.getElementById('workflowName');
-const saveWorkflowButton = document.getElementById('saveWorkflow');
-const backToHomeButton = document.getElementById('backToHome');
-const featureButtons = document.querySelectorAll('.feature-button');
+const saveWorkflowButton = document.getElementById('saveWorkflowButton');
+const cancelWorkflowButton = document.getElementById('cancelWorkflowButton');
+const selectedFeaturesList = document.getElementById('selectedFeaturesList');
 
 // Initialize workflow dropdown
 function initializeWorkflowDropdown() {
@@ -76,6 +76,49 @@ document.getElementById('workflowSelect').addEventListener('change', function(e)
     }
 });
 
+// Feature button selection
+document.querySelectorAll('.feature-button').forEach(button => {
+    button.addEventListener('click', function() {
+        const feature = this.dataset.feature;
+        const featureName = this.textContent;
+        
+        // Toggle selected state
+        this.classList.toggle('selected');
+        
+        // Update selected features list
+        updateSelectedFeaturesList();
+    });
+});
+
+// Update selected features list
+function updateSelectedFeaturesList() {
+    selectedFeaturesList.innerHTML = '';
+    
+    document.querySelectorAll('.feature-button.selected').forEach(button => {
+        const feature = button.dataset.feature;
+        const featureName = button.textContent;
+        
+        const featureItem = document.createElement('div');
+        featureItem.className = 'selected-feature-item';
+        featureItem.innerHTML = `
+            <span>${featureName}</span>
+            <button class="remove-feature" data-feature="${feature}">&times;</button>
+        `;
+        
+        // Add remove button functionality
+        featureItem.querySelector('.remove-feature').addEventListener('click', function() {
+            const featureToRemove = this.dataset.feature;
+            const buttonToDeselect = document.querySelector(`.feature-button[data-feature="${featureToRemove}"]`);
+            if (buttonToDeselect) {
+                buttonToDeselect.classList.remove('selected');
+            }
+            updateSelectedFeaturesList();
+        });
+        
+        selectedFeaturesList.appendChild(featureItem);
+    });
+}
+
 // Save workflow
 document.getElementById('saveWorkflowButton').addEventListener('click', function() {
     const workflowName = document.getElementById('workflowName').value.trim();
@@ -114,14 +157,8 @@ document.getElementById('saveWorkflowButton').addEventListener('click', function
     document.querySelectorAll('.feature-button.selected').forEach(button => {
         button.classList.remove('selected');
     });
+    updateSelectedFeaturesList();
     hideWorkflowCreation();
-});
-
-// Feature button selection
-document.querySelectorAll('.feature-button').forEach(button => {
-    button.addEventListener('click', function() {
-        this.classList.toggle('selected');
-    });
 });
 
 // Event Listeners
