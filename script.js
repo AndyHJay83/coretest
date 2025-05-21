@@ -5,7 +5,7 @@ let isColour3Mode = true;
 let isVowelMode = true;
 let isShapeMode = true;
 let currentFilteredWords = [];
-let currentPosition = -1;
+let currentPosition = 0;
 let currentPosition2 = -1;
 let currentVowelIndex = 0;
 let uniqueVowels = [];
@@ -150,37 +150,212 @@ backToHomeButton.addEventListener('click', hideWorkflowCreation);
 initializeWorkflowDropdown();
 
 // Perform workflow
-performButton.addEventListener('click', () => {
-    if (!currentWorkflow) {
+performButton.addEventListener('click', async () => {
+    const workflowSelect = document.getElementById('workflowSelect');
+    const selectedWorkflow = workflowSelect.value;
+    
+    if (!selectedWorkflow) {
         alert('Please select a workflow first');
         return;
     }
-
-    // Hide homepage and show feature area
-    document.querySelector('.homepage-content').style.display = 'none';
-    document.getElementById('featureArea').style.display = 'block';
-
-    // Start the workflow
-    executeWorkflow(currentWorkflow.steps);
+    
+    try {
+        // Get the workflow steps
+        const workflow = workflows.find(w => w.id === selectedWorkflow);
+        if (!workflow) {
+            throw new Error('Selected workflow not found');
+        }
+        
+        // Show the workflow execution area
+        document.getElementById('workflowExecution').style.display = 'block';
+        
+        // Execute the workflow
+        await executeWorkflow(workflow.steps);
+    } catch (error) {
+        console.error('Error executing workflow:', error);
+        alert('Error executing workflow: ' + error.message);
+    }
 });
 
 // Execute workflow steps
 async function executeWorkflow(steps) {
-    let currentWordlist = await loadWordList(); // Implement this function to load your wordlist
+    try {
+        // Load the wordlist first
+        await loadWordList();
+        let currentWordlist = [...wordList]; // Start with the full wordlist
+        
+        // Hide all features initially
+        const allFeatures = [
+            'originalLexFeature',
+            'eeeFeature',
+            'lexiconFeature',
+            'consonantQuestion',
+            'position1Feature',
+            'vowelFeature',
+            'colour3Feature',
+            'shapeFeature',
+            'oFeature',
+            'curvedFeature'
+        ];
+        
+        allFeatures.forEach(featureId => {
+            document.getElementById(featureId).style.display = 'none';
+        });
 
-    for (const step of steps) {
-        // Show the appropriate feature
-        const featureElement = document.getElementById(`${step.feature}Feature`);
-        if (featureElement) {
-            featureElement.style.display = 'block';
+        // Execute each step in sequence
+        for (const step of steps) {
+            console.log('Executing step:', step);
+            
+            // Show the appropriate feature
+            const featureElement = document.getElementById(`${step.feature}Feature`);
+            if (featureElement) {
+                featureElement.style.display = 'block';
+                
+                // Set up event listeners for this feature
+                setupFeatureListeners(step.feature, (filteredWords) => {
+                    currentWordlist = filteredWords;
+                    displayResults(currentWordlist);
+                });
+            }
         }
-
-        // Wait for user interaction and filter wordlist
-        currentWordlist = await executeFeature(step.feature, currentWordlist);
+    } catch (error) {
+        console.error('Error executing workflow:', error);
+        alert('Error executing workflow: ' + error.message);
     }
+}
 
-    // Display final results
-    displayResults(currentWordlist);
+// Function to set up feature listeners
+function setupFeatureListeners(feature, callback) {
+    switch (feature) {
+        case 'eee':
+            document.getElementById('eeeButton').onclick = () => {
+                const filteredWords = filterWordsByEee(currentFilteredWords, 'E');
+                callback(filteredWords);
+            };
+            document.getElementById('eeeYesBtn').onclick = () => {
+                const filteredWords = filterWordsByEee(currentFilteredWords, 'YES');
+                callback(filteredWords);
+            };
+            document.getElementById('eeeNoBtn').onclick = () => {
+                const filteredWords = filterWordsByEee(currentFilteredWords, 'NO');
+                callback(filteredWords);
+            };
+            break;
+            
+        case 'o':
+            document.getElementById('oYesBtn').onclick = () => {
+                const filteredWords = filterWordsByO(currentFilteredWords, true);
+                callback(filteredWords);
+            };
+            document.getElementById('oNoBtn').onclick = () => {
+                const filteredWords = filterWordsByO(currentFilteredWords, false);
+                callback(filteredWords);
+            };
+            document.getElementById('oSkipBtn').onclick = () => {
+                callback(currentFilteredWords);
+            };
+            break;
+            
+        case 'curved':
+            const curvedButtons = document.querySelectorAll('.curved-btn');
+            curvedButtons.forEach(button => {
+                button.onclick = () => {
+                    const letter = button.textContent;
+                    const filteredWords = filterWordsByCurvedPositions(currentFilteredWords, letter);
+                    callback(filteredWords);
+                };
+            });
+            document.getElementById('curvedSkipBtn').onclick = () => {
+                callback(currentFilteredWords);
+            };
+            break;
+            
+        case 'colour3':
+            document.getElementById('colour3YesBtn').onclick = () => {
+                const filteredWords = filterWordsByColour3(currentFilteredWords);
+                callback(filteredWords);
+            };
+            document.getElementById('colour3SkipButton').onclick = () => {
+                callback(currentFilteredWords);
+            };
+            break;
+            
+        case 'lexicon':
+            document.getElementById('lexiconButton').onclick = () => {
+                const input = document.getElementById('lexiconInput').value.trim();
+                if (input) {
+                    const filteredWords = filterWordsByLexicon(currentFilteredWords, input);
+                    callback(filteredWords);
+                }
+            };
+            document.getElementById('lexiconSkipButton').onclick = () => {
+                callback(currentFilteredWords);
+            };
+            break;
+            
+        case 'consonant':
+            document.getElementById('consonantYesBtn').onclick = () => {
+                const filteredWords = currentFilteredWords.filter(word => hasWordAdjacentConsonants(word));
+                callback(filteredWords);
+            };
+            document.getElementById('consonantNoBtn').onclick = () => {
+                const filteredWords = currentFilteredWords.filter(word => !hasWordAdjacentConsonants(word));
+                callback(filteredWords);
+            };
+            break;
+            
+        case 'position1':
+            document.getElementById('position1Button').onclick = () => {
+                const input = document.getElementById('position1Input').value.trim();
+                if (input) {
+                    const consonants = getConsonantsInOrder(input);
+                    if (consonants.length >= 2) {
+                        const filteredWords = filterWordsByPosition1(currentFilteredWords, consonants);
+                        callback(filteredWords);
+                    }
+                }
+            };
+            document.getElementById('position1DoneButton').onclick = () => {
+                callback(currentFilteredWords);
+            };
+            break;
+            
+        case 'vowel':
+            document.querySelector('#vowelFeature .yes-btn').onclick = () => {
+                handleVowelSelection(true);
+                callback(currentFilteredWordsForVowels);
+            };
+            document.querySelector('#vowelFeature .no-btn').onclick = () => {
+                handleVowelSelection(false);
+                callback(currentFilteredWordsForVowels);
+            };
+            break;
+            
+        case 'shape':
+            const categoryButtons = document.querySelectorAll('.category-button');
+            categoryButtons.forEach(button => {
+                button.onclick = () => {
+                    const category = button.textContent.split(' ')[0].toLowerCase();
+                    const filteredWords = filterWordsByShape(currentFilteredWords, currentPosition, category);
+                    callback(filteredWords);
+                };
+            });
+            break;
+    }
+}
+
+// Function to filter words by Position 1
+function filterWordsByPosition1(words, consonants) {
+    return words.filter(word => {
+        const wordLower = word.toLowerCase();
+        for (let i = 0; i < consonants.length - 1; i++) {
+            const pair = consonants[i] + consonants[i + 1];
+            if (wordLower.includes(pair)) {
+                return true;
+            }
+        }
+        return false;
+    });
 }
 
 // Initialize the app
@@ -372,62 +547,19 @@ function updateShapeDisplay(words) {
 // Function to load word list
 async function loadWordList() {
     try {
-        console.log('Attempting to load word list...');
-        const possiblePaths = [
-            'words/ENUK-Long words Noun.txt',
-            './words/ENUK-Long words Noun.txt',
-            '../words/ENUK-Long words Noun.txt',
-            'ENUK-Long words Noun.txt'
-        ];
-
-        let response = null;
-        let successfulPath = null;
-
-        for (const path of possiblePaths) {
-            try {
-                console.log(`Trying path: ${path}`);
-                response = await fetch(path);
-                if (response.ok) {
-                    successfulPath = path;
-                    break;
-                }
-            } catch (e) {
-                console.log(`Failed to load from ${path}: ${e.message}`);
-            }
+        const response = await fetch('wordlist.txt');
+        if (!response.ok) {
+            throw new Error('Failed to load wordlist');
         }
-
-        if (!response || !response.ok) {
-            throw new Error(`Could not load word list from any of the attempted paths`);
-        }
-
-        console.log(`Successfully loaded from: ${successfulPath}`);
         const text = await response.text();
-        console.log('Raw text length:', text.length);
-        
-        wordList = text.split('\n')
-            .map(word => word.trim())
-            .filter(word => word !== '');
-            
-        console.log('Processed word list length:', wordList.length);
-        
-        if (wordList.length === 0) {
-            throw new Error('No words found in the file');
-        }
-        
-        totalWords = wordList.length;
-        console.log(`Successfully loaded ${totalWords} words`);
-        updateWordCount(totalWords);
-        displayResults(wordList);
-        
+        wordList = text.split('\n').filter(word => word.trim());
+        currentFilteredWords = [...wordList];
+        currentWordlistForVowels = [...wordList];
+        console.log('Wordlist loaded successfully:', wordList.length, 'words');
+        return wordList;
     } catch (error) {
-        console.error('Error loading word list:', error);
-        document.getElementById('wordCount').textContent = 'Error loading words';
-        
-        const errorDetails = document.createElement('div');
-        errorDetails.style.color = 'red';
-        errorDetails.style.padding = '10px';
-        errorDetails.textContent = `Error details: ${error.message}`;
-        document.getElementById('wordCount').parentNode.appendChild(errorDetails);
+        console.error('Error loading wordlist:', error);
+        throw error;
     }
 }
 
@@ -865,45 +997,26 @@ function expandWordList() {
 
 // Function to display results
 function displayResults(words) {
-    currentFilteredWords = words;
-    const resultsContainer = document.getElementById('resultsContainer');
+    const resultsContainer = document.getElementById('results');
+    if (!resultsContainer) return;
+    
     resultsContainer.innerHTML = '';
     
-    // Group similar words
-    const { representativeWords, displayWords } = groupSimilarWords(words);
+    if (words.length === 0) {
+        resultsContainer.innerHTML = '<p>No words match the current criteria.</p>';
+        return;
+    }
     
-    // Create a set of all words that are part of groups
-    const groupedWords = new Set();
-    representativeWords.forEach(group => {
-        group.forEach(word => groupedWords.add(word));
-    });
+    const wordList = document.createElement('ul');
+    wordList.className = 'word-list';
     
-    // Display representative words (in red)
-    displayWords.forEach(word => {
-        const wordElement = document.createElement('div');
-        wordElement.className = 'word-item representative-word';
-        wordElement.textContent = word.toUpperCase();
-        
-        // Add click handler to show group
-        wordElement.onclick = () => {
-            const groupWords = representativeWords.get(word);
-            showWordGroupOverlay(groupWords);
-        };
-        
-        resultsContainer.appendChild(wordElement);
-    });
-    
-    // Add only words that are not part of any group
     words.forEach(word => {
-        if (!groupedWords.has(word)) {
-            const wordElement = document.createElement('div');
-            wordElement.className = 'word-item';
-            wordElement.textContent = word.toUpperCase();
-            resultsContainer.appendChild(wordElement);
-        }
+        const li = document.createElement('li');
+        li.textContent = word;
+        wordList.appendChild(li);
     });
     
-    updateWordCount(words.length);
+    resultsContainer.appendChild(wordList);
 }
 
 // Function to reset the app
@@ -1896,3 +2009,65 @@ function showWordGroupOverlay(words) {
     // Add to document
     document.body.appendChild(overlay);
 }
+
+// Handle workflow creation
+document.getElementById('createWorkflowButton').addEventListener('click', () => {
+    document.getElementById('homepage').style.display = 'none';
+    document.getElementById('workflowCreation').style.display = 'block';
+});
+
+// Handle workflow saving
+document.getElementById('saveWorkflowButton').addEventListener('click', () => {
+    const workflowName = document.getElementById('workflowName').value.trim();
+    const selectedFeatures = Array.from(document.querySelectorAll('.feature-checkbox:checked'))
+        .map(checkbox => checkbox.value);
+    
+    if (!workflowName) {
+        alert('Please enter a workflow name');
+        return;
+    }
+    
+    if (selectedFeatures.length === 0) {
+        alert('Please select at least one feature');
+        return;
+    }
+    
+    // Create new workflow
+    const newWorkflow = {
+        id: 'workflow_' + Date.now(),
+        name: workflowName,
+        steps: selectedFeatures.map(feature => ({ feature }))
+    };
+    
+    // Add to workflows array
+    workflows.push(newWorkflow);
+    
+    // Update workflow select
+    const workflowSelect = document.getElementById('workflowSelect');
+    const option = document.createElement('option');
+    option.value = newWorkflow.id;
+    option.textContent = newWorkflow.name;
+    workflowSelect.appendChild(option);
+    
+    // Return to homepage
+    document.getElementById('workflowCreation').style.display = 'none';
+    document.getElementById('homepage').style.display = 'block';
+    
+    // Clear form
+    document.getElementById('workflowName').value = '';
+    document.querySelectorAll('.feature-checkbox').forEach(checkbox => {
+        checkbox.checked = false;
+    });
+});
+
+// Handle cancel workflow creation
+document.getElementById('cancelWorkflowButton').addEventListener('click', () => {
+    document.getElementById('workflowCreation').style.display = 'none';
+    document.getElementById('homepage').style.display = 'block';
+    
+    // Clear form
+    document.getElementById('workflowName').value = '';
+    document.querySelectorAll('.feature-checkbox').forEach(checkbox => {
+        checkbox.checked = false;
+    });
+});
