@@ -965,8 +965,8 @@ document.getElementById('createWorkflowButton').addEventListener('click', () => 
     document.getElementById('workflowCreation').style.display = 'block';
 });
 
-// Handle workflow saving
-document.getElementById('saveWorkflowButton').addEventListener('click', () => {
+// Function to save workflow
+function saveWorkflow() {
     const workflowName = document.getElementById('workflowName').value.trim();
     const selectedFeatures = Array.from(document.querySelectorAll('.feature-checkbox:checked'))
         .map(checkbox => checkbox.value);
@@ -991,10 +991,12 @@ document.getElementById('saveWorkflowButton').addEventListener('click', () => {
     // Add to workflows array
     workflows.push(newWorkflow);
     
+    // Save to localStorage
+    localStorage.setItem('workflows', JSON.stringify(workflows));
+    
     // Update workflow select
-    const workflowSelect = document.getElementById('workflowSelect');
     const option = document.createElement('option');
-    option.value = newWorkflow.name; // Use name as value instead of id
+    option.value = newWorkflow.name;
     option.textContent = newWorkflow.name;
     workflowSelect.appendChild(option);
     
@@ -1007,7 +1009,7 @@ document.getElementById('saveWorkflowButton').addEventListener('click', () => {
     document.querySelectorAll('.feature-checkbox').forEach(checkbox => {
         checkbox.checked = false;
     });
-});
+}
 
 // Handle cancel workflow creation
 document.getElementById('cancelWorkflowButton').addEventListener('click', () => {
