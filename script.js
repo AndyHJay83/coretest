@@ -65,110 +65,38 @@ function hideWorkflowCreation() {
     document.getElementById('workflowExecution').style.display = 'none';
 }
 
-// Initialize workflow creation
-createWorkflowButton.addEventListener('click', showWorkflowCreation);
-cancelWorkflowButton.addEventListener('click', hideWorkflowCreation);
-saveWorkflowButton.addEventListener('click', saveWorkflow);
-if (backToHomeButton) {
-    backToHomeButton.addEventListener('click', hideWorkflowCreation);
-}
-
-// Make feature buttons draggable
-document.querySelectorAll('.feature-button').forEach(button => {
-    button.setAttribute('draggable', 'true');
-    
-    button.addEventListener('dragstart', (e) => {
-        e.dataTransfer.setData('text/plain', button.dataset.feature);
-        button.classList.add('dragging');
-    });
-    
-    button.addEventListener('dragend', () => {
-        button.classList.remove('dragging');
-    });
-});
-
-// Add drag and drop event listeners
-selectedFeaturesList.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    selectedFeaturesList.classList.add('drag-over');
-});
-
-selectedFeaturesList.addEventListener('dragleave', () => {
-    selectedFeaturesList.classList.remove('drag-over');
-});
-
-selectedFeaturesList.addEventListener('drop', (e) => {
-    e.preventDefault();
-    selectedFeaturesList.classList.remove('drag-over');
-    
-    const feature = e.dataTransfer.getData('text/plain');
-    const featureButton = document.querySelector(`.feature-button[data-feature="${feature}"]`);
-    const featureName = featureButton.textContent;
-    
-    // Check if feature is already selected
-    if (!document.querySelector(`.selected-feature-item[data-feature="${feature}"]`)) {
-        const featureItem = document.createElement('div');
-        featureItem.className = 'selected-feature-item';
-        featureItem.dataset.feature = feature;
-        featureItem.innerHTML = `
-            <span>${featureName}</span>
-            <button class="remove-feature" data-feature="${feature}">&times;</button>
-        `;
-        
-        // Add remove button functionality
-        featureItem.querySelector('.remove-feature').addEventListener('click', function() {
-            featureItem.remove();
-        });
-        
-        selectedFeaturesList.appendChild(featureItem);
-    }
-});
-
-// Save workflow function
-function saveWorkflow() {
-    const workflowNameValue = workflowName.value.trim();
-    if (!workflowNameValue) {
-        alert('Please enter a workflow name');
-        return;
-    }
-
-    // Get selected features in order
-    const selectedFeatures = Array.from(document.querySelectorAll('.selected-feature-item'))
-        .map(item => item.dataset.feature);
-
-    if (selectedFeatures.length === 0) {
-        alert('Please select at least one feature');
-        return;
-    }
-
-    // Create new workflow
-    const newWorkflow = {
-        name: workflowNameValue,
-        steps: selectedFeatures
-    };
-
-    // Add to workflows array
-    workflows.push(newWorkflow);
-
-    // Update workflow select dropdown
-    const option = document.createElement('option');
-    option.value = workflowNameValue;
-    option.textContent = workflowNameValue;
-    workflowSelect.insertBefore(option, workflowSelect.lastElementChild);
-
-    // Reset and hide workflow creation
-    workflowName.value = '';
-    selectedFeaturesList.innerHTML = '';
-    hideWorkflowCreation();
-}
-
-// Event Listeners
-saveWorkflowButton.addEventListener('click', saveWorkflow);
-
-// Initialize
+// Initialize everything when the DOM is loaded
 document.addEventListener('DOMContentLoaded', async () => {
+    // Load word list
     await loadWordList();
+    
+    // Initialize workflow dropdown
     initializeWorkflowDropdown();
+    
+    // Set up event listeners
+    if (createWorkflowButton) {
+        createWorkflowButton.addEventListener('click', showWorkflowCreation);
+    }
+    
+    if (cancelWorkflowButton) {
+        cancelWorkflowButton.addEventListener('click', hideWorkflowCreation);
+    }
+    
+    if (saveWorkflowButton) {
+        saveWorkflowButton.addEventListener('click', saveWorkflow);
+    }
+    
+    if (backToHomeButton) {
+        backToHomeButton.addEventListener('click', hideWorkflowCreation);
+    }
+    
+    if (workflowSelect) {
+        workflowSelect.addEventListener('change', function() {
+            if (this.value === 'create-new') {
+                showWorkflowCreation();
+            }
+        });
+    }
     
     // Initialize perform button
     if (performButton) {
@@ -201,36 +129,34 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Perform button not found!');
     }
     
-    // Mark CURVED feature as completed by default
-    document.getElementById('curvedFeature').classList.add('completed');
+    // Share button listener
+    const shareButton = document.getElementById('shareButton');
+    if (shareButton) {
+        shareButton.addEventListener('click', exportWordlist);
+    }
     
-    // Hide all features initially except Consonants Together
-    const allFeatures = [
-        'originalLexFeature',
-        'eeeFeature',
-        'lexiconFeature',
-        'position1Feature',
-        'vowelFeature',
-        'colour3Feature',
-        'shapeFeature',
-        'oFeature',
-        'curvedFeature'
-    ];
+    // COLOUR3 feature
+    const colour3YesBtn = document.getElementById('colour3YesBtn');
+    const colour3SkipButton = document.getElementById('colour3SkipButton');
     
-    allFeatures.forEach(featureId => {
-        document.getElementById(featureId).style.display = 'none';
-    });
+    if (colour3YesBtn) {
+        colour3YesBtn.addEventListener('click', () => {
+            console.log('COLOUR3 YES selected');
+            const filteredWords = filterWordsByColour3(currentFilteredWords);
+            document.getElementById('colour3Feature').classList.add('completed');
+            displayResults(filteredWords);
+            showNextFeature();
+        });
+    }
     
-    // Show Consonants Together first
-    document.getElementById('consonantQuestion').style.display = 'block';
-    
-    // Reset states
-    originalLexCompleted = false;
-    eeeCompleted = false;
-    lexiconCompleted = false;
-    originalLexPosition = -1;
-    hasAdjacentConsonants = null;
-    
+    if (colour3SkipButton) {
+        colour3SkipButton.addEventListener('click', () => {
+            console.log('COLOUR3 SKIP selected');
+            document.getElementById('colour3Feature').classList.add('completed');
+            showNextFeature();
+        });
+    }
+
     // Consonant question buttons
     const consonantYesBtn = document.getElementById('consonantYesBtn');
     const consonantNoBtn = document.getElementById('consonantNoBtn');
@@ -384,24 +310,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('lexiconFeature').style.display = 'block';
     });
     
-    // Share button listener
-    document.getElementById('shareButton').addEventListener('click', exportWordlist);
-    
-    // COLOUR3 feature
-    document.getElementById('colour3YesBtn').addEventListener('click', () => {
-        console.log('COLOUR3 YES selected');
-        const filteredWords = filterWordsByColour3(currentFilteredWords);
-        document.getElementById('colour3Feature').classList.add('completed');
-        displayResults(filteredWords);
-        showNextFeature();
-    });
-    
-    document.getElementById('colour3SkipButton').addEventListener('click', () => {
-        console.log('COLOUR3 SKIP selected');
-        document.getElementById('colour3Feature').classList.add('completed');
-        showNextFeature();
-    });
-
     // Position 1 feature
     document.getElementById('position1Button').addEventListener('click', () => {
         const input = document.getElementById('position1Input').value.trim();
