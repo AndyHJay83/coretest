@@ -362,6 +362,7 @@ function filterWordsByPosition1(words, consonants) {
 // Initialize the app
 document.addEventListener('DOMContentLoaded', async () => {
     await loadWordList();
+    initializeWorkflowDropdown();
     
     // Initialize perform button
     if (performButton) {
@@ -1909,4 +1910,23 @@ function exportWordlist() {
     
     // Clean up the URL object
     window.URL.revokeObjectURL(url);
+}
+
+// Function to initialize workflow dropdown
+function initializeWorkflowDropdown() {
+    const workflowSelect = document.getElementById('workflowSelect');
+    if (!workflowSelect) return;
+
+    // Clear existing options except the first one
+    while (workflowSelect.options.length > 1) {
+        workflowSelect.remove(1);
+    }
+
+    // Add saved workflows to dropdown
+    workflows.forEach(workflow => {
+        const option = document.createElement('option');
+        option.value = workflow.name;
+        option.textContent = workflow.name;
+        workflowSelect.appendChild(option);
+    });
 }
