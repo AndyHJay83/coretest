@@ -56,48 +56,74 @@ workflowSelect.addEventListener('change', (e) => {
 
 // Show workflow creation page
 function showWorkflowCreation() {
-    document.querySelector('.homepage-content').style.display = 'none';
-    workflowCreationPage.style.display = 'block';
-    workflowNameInput.value = '';
-    workflowSteps.innerHTML = '';
+    document.getElementById('homepage').style.display = 'none';
+    document.getElementById('workflowCreation').style.display = 'block';
+    document.getElementById('workflowExecution').style.display = 'none';
 }
 
-// Hide workflow creation page
 function hideWorkflowCreation() {
-    document.querySelector('.homepage-content').style.display = 'block';
-    workflowCreationPage.style.display = 'none';
+    document.getElementById('homepage').style.display = 'block';
+    document.getElementById('workflowCreation').style.display = 'none';
 }
+
+// Initialize workflow creation
+document.getElementById('createWorkflowButton').addEventListener('click', showWorkflowCreation);
+document.getElementById('cancelWorkflowButton').addEventListener('click', hideWorkflowCreation);
+
+// Handle workflow selection
+document.getElementById('workflowSelect').addEventListener('change', function(e) {
+    if (e.target.value === 'create-new') {
+        showWorkflowCreation();
+    }
+});
 
 // Save workflow
-function saveWorkflow() {
-    const name = workflowNameInput.value.trim();
-    if (!name) {
+document.getElementById('saveWorkflowButton').addEventListener('click', function() {
+    const workflowName = document.getElementById('workflowName').value.trim();
+    if (!workflowName) {
         alert('Please enter a workflow name');
         return;
     }
 
-    const steps = Array.from(workflowSteps.children).map(step => ({
-        feature: step.dataset.feature,
-        name: step.textContent.trim()
-    }));
+    // Get selected features
+    const selectedFeatures = Array.from(document.querySelectorAll('.feature-button.selected'))
+        .map(button => button.dataset.feature);
 
-    const workflow = {
-        name,
-        steps
-    };
-
-    // Check if workflow with same name exists
-    const existingIndex = workflows.findIndex(w => w.name === name);
-    if (existingIndex !== -1) {
-        workflows[existingIndex] = workflow;
-    } else {
-        workflows.push(workflow);
+    if (selectedFeatures.length === 0) {
+        alert('Please select at least one feature');
+        return;
     }
 
-    localStorage.setItem('workflows', JSON.stringify(workflows));
-    initializeWorkflowDropdown();
+    // Create new workflow
+    const newWorkflow = {
+        name: workflowName,
+        steps: selectedFeatures
+    };
+
+    // Add to workflows array
+    workflows.push(newWorkflow);
+
+    // Update workflow select dropdown
+    const workflowSelect = document.getElementById('workflowSelect');
+    const option = document.createElement('option');
+    option.value = workflows.length - 1;
+    option.textContent = workflowName;
+    workflowSelect.insertBefore(option, workflowSelect.lastElementChild);
+
+    // Reset and hide workflow creation
+    document.getElementById('workflowName').value = '';
+    document.querySelectorAll('.feature-button.selected').forEach(button => {
+        button.classList.remove('selected');
+    });
     hideWorkflowCreation();
-}
+});
+
+// Feature button selection
+document.querySelectorAll('.feature-button').forEach(button => {
+    button.addEventListener('click', function() {
+        this.classList.toggle('selected');
+    });
+});
 
 // Drag and Drop functionality
 featureButtons.forEach(button => {
