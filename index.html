@@ -20,10 +20,13 @@
     <div class="container">
         <div class="header">
             <h1>Word Filter</h1>
+            <button id="settingsButton" class="settings-button">
+                <i class="fas fa-cog"></i>
+            </button>
         </div>
         
         <!-- Homepage Content -->
-        <div class="homepage-content">
+        <div id="homepage" class="homepage-content">
             <div class="selection-container">
                 <div class="dropdown-group">
                     <label for="workflowSelect">Select Workflow:</label>
@@ -42,16 +45,17 @@
             </div>
             
             <button id="performButton" class="perform-button">PERFORM</button>
+            <button id="createWorkflowButton" class="create-button">Create New Workflow</button>
         </div>
 
         <!-- Workflow Creation Page (Hidden by default) -->
-        <div id="workflowCreationPage" class="workflow-creation" style="display: none;">
+        <div id="workflowCreation" class="workflow-creation" style="display: none;">
             <div class="workflow-header">
                 <h2>Create New Workflow</h2>
                 <div class="workflow-actions">
                     <input type="text" id="workflowName" placeholder="Enter workflow name" class="workflow-name-input">
-                    <button id="saveWorkflow" class="save-button">Save Workflow</button>
-                    <button id="backToHome" class="back-button">Back to Home</button>
+                    <button id="saveWorkflowButton" class="save-button">Save Workflow</button>
+                    <button id="cancelWorkflowButton" class="back-button">Cancel</button>
                 </div>
             </div>
             
@@ -70,123 +74,143 @@
                         <button class="feature-button" draggable="true" data-feature="shape">SHAPE</button>
                     </div>
                 </div>
-                
-                <div class="workflow-builder">
-                    <h3>Your Workflow</h3>
-                    <div id="workflowSteps" class="workflow-steps">
-                        <!-- Workflow steps will be added here dynamically -->
+            </div>
+        </div>
+
+        <!-- Workflow Execution Area -->
+        <div id="workflowExecution" class="workflow-execution" style="display: none;">
+            <div id="results" class="results-container"></div>
+            
+            <!-- Feature sections -->
+            <div id="featureArea" class="feature-area">
+                <!-- ORIGINAL LEX Feature -->
+                <div id="originalLexFeature" class="feature-section" style="display: none;">
+                    <div class="feature-title">ORIGINAL LEX</div>
+                    <div class="original-lex-display">
+                        <div class="position-display">Position <span id="originalLexPosition">-</span></div>
+                        <div class="letters-display">Letters: <span id="originalLexLetters">-</span></div>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="originalLexInput" placeholder="Enter a word...">
+                        <button id="originalLexButton">DONE</button>
+                        <button id="originalLexSkipButton" class="skip-button">SKIP</button>
+                    </div>
+                </div>
+
+                <!-- EEE? feature -->
+                <div id="eeeFeature" class="feature-section" style="display: none;">
+                    <div class="feature-title">EEE?</div>
+                    <div class="button-container">
+                        <button id="eeeButton" class="yes-btn">E</button>
+                        <button id="eeeYesBtn" class="yes-btn">YES</button>
+                        <button id="eeeNoBtn" class="no-btn">NO</button>
+                    </div>
+                </div>
+
+                <!-- O? feature -->
+                <div id="oFeature" class="feature-section">
+                    <div class="feature-title">O?</div>
+                    <div class="button-container">
+                        <button id="oYesBtn" class="yes-btn">YES</button>
+                        <button id="oNoBtn" class="no-btn">NO</button>
+                        <button id="oSkipBtn" class="skip-button">SKIP</button>
+                    </div>
+                </div>
+
+                <!-- CURVED feature -->
+                <div id="curvedFeature" class="feature-section" style="display: none;">
+                    <div class="feature-title">CURVED</div>
+                    <div class="curved-buttons">
+                        <button class="curved-btn">B</button>
+                        <button class="curved-btn">C</button>
+                        <button class="curved-btn">D</button>
+                        <button class="curved-btn">G</button>
+                        <button class="curved-btn">J</button>
+                        <button class="curved-btn">O</button>
+                        <button class="curved-btn">P</button>
+                        <button class="curved-btn">Q</button>
+                        <button class="curved-btn">R</button>
+                        <button class="curved-btn">S</button>
+                        <button class="curved-btn">U</button>
+                    </div>
+                    <button id="curvedSkipBtn" class="skip-button">SKIP</button>
+                </div>
+
+                <!-- COLOUR3 feature -->
+                <div id="colour3Feature" class="feature-section" style="display: none;">
+                    <div class="feature-title">COLOUR3</div>
+                    <div class="button-container">
+                        <button id="colour3YesBtn" class="yes-btn">YES</button>
+                        <button id="colour3SkipButton" class="skip-button">SKIP</button>
+                    </div>
+                </div>
+
+                <!-- LEXICON feature -->
+                <div id="lexiconFeature" class="feature-section" style="display: none;">
+                    <div class="feature-title">LEXICON</div>
+                    <div class="lexicon-input">
+                        <input type="text" id="lexiconInput" placeholder="Enter positions (e.g., 14)">
+                        <button id="lexiconButton">DONE</button>
+                    </div>
+                    <button id="lexiconSkipButton" class="skip-button">SKIP</button>
+                </div>
+
+                <!-- Consonant question section -->
+                <div id="consonantQuestion" class="feature-section" style="display: none;">
+                    <div class="feature-title">Consonants together?</div>
+                    <div class="button-container">
+                        <button id="consonantYesBtn" class="yes-btn">YES</button>
+                        <button id="consonantNoBtn" class="no-btn">NO</button>
+                    </div>
+                </div>
+
+                <!-- Position 1 feature -->
+                <div id="position1Feature" class="feature-section" style="display: none;">
+                    <div class="position-input">
+                        <input type="text" id="position1Input" placeholder="Enter a word...">
+                        <button id="position1Button">DONE</button>
+                        <button id="position1DoneButton" class="skip-button">SKIP</button>
+                    </div>
+                </div>
+
+                <!-- Vowel feature -->
+                <div id="vowelFeature" class="feature-section" style="display: none;">
+                    <div class="feature-title">VOWEL</div>
+                    <div class="vowel-letter"></div>
+                    <div class="button-container">
+                        <button class="yes-btn">YES</button>
+                        <button class="no-btn">NO</button>
+                    </div>
+                </div>
+
+                <!-- Shape feature -->
+                <div id="shapeFeature" class="feature-section" style="display: none;">
+                    <div class="shape-display">
+                        <div class="position-display"></div>
+                        <div class="category-buttons"></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Original Feature Area (Hidden by default) -->
-        <div id="featureArea" class="feature-area" style="display: none;">
-            <!-- ORIGINAL LEX Feature -->
-            <div id="originalLexFeature" class="feature-section" style="display: none;">
-                <div class="feature-title">ORIGINAL LEX</div>
-                <div class="original-lex-display">
-                    <div class="position-display">Position <span id="originalLexPosition">-</span></div>
-                    <div class="letters-display">Letters: <span id="originalLexLetters">-</span></div>
-                </div>
-                <div class="input-group">
-                    <input type="text" id="originalLexInput" placeholder="Enter a word...">
-                    <button id="originalLexButton">DONE</button>
-                    <button id="originalLexSkipButton" class="skip-button">SKIP</button>
-                </div>
-            </div>
-
-            <!-- EEE? feature -->
-            <div id="eeeFeature" class="feature-section" style="display: none;">
-                <div class="feature-title">EEE?</div>
-                <div class="button-container">
-                    <button id="eeeButton" class="yes-btn">E</button>
-                    <button id="eeeYesBtn" class="yes-btn">YES</button>
-                    <button id="eeeNoBtn" class="no-btn">NO</button>
-                </div>
-            </div>
-
-            <!-- O? feature -->
-            <div id="oFeature" class="feature-section">
-                <div class="feature-title">O?</div>
-                <div class="button-container">
-                    <button id="oYesBtn" class="yes-btn">YES</button>
-                    <button id="oNoBtn" class="no-btn">NO</button>
-                    <button id="oSkipBtn" class="skip-button">SKIP</button>
-                </div>
-            </div>
-
-            <!-- CURVED feature -->
-            <div id="curvedFeature" class="feature-section" style="display: none;">
-                <div class="feature-title">CURVED</div>
-                <div class="curved-buttons">
-                    <button class="curved-btn">B</button>
-                    <button class="curved-btn">C</button>
-                    <button class="curved-btn">D</button>
-                    <button class="curved-btn">G</button>
-                    <button class="curved-btn">J</button>
-                    <button class="curved-btn">O</button>
-                    <button class="curved-btn">P</button>
-                    <button class="curved-btn">Q</button>
-                    <button class="curved-btn">R</button>
-                    <button class="curved-btn">S</button>
-                    <button class="curved-btn">U</button>
-                </div>
-                <button id="curvedSkipBtn" class="skip-button">SKIP</button>
-            </div>
-
-            <!-- COLOUR3 feature -->
-            <div id="colour3Feature" class="feature-section" style="display: none;">
-                <div class="feature-title">COLOUR3</div>
-                <div class="button-container">
-                    <button id="colour3YesBtn" class="yes-btn">YES</button>
-                    <button id="colour3SkipButton" class="skip-button">SKIP</button>
-                </div>
-            </div>
-
-            <!-- LEXICON feature -->
-            <div id="lexiconFeature" class="feature-section" style="display: none;">
-                <div class="feature-title">LEXICON</div>
-                <div class="lexicon-input">
-                    <input type="text" id="lexiconInput" placeholder="Enter positions (e.g., 14)">
-                    <button id="lexiconButton">DONE</button>
-                </div>
-                <button id="lexiconSkipButton" class="skip-button">SKIP</button>
-            </div>
-
-            <!-- Consonant question section -->
-            <div id="consonantQuestion" class="feature-section" style="display: none;">
-                <div class="feature-title">Consonants together?</div>
-                <div class="button-container">
-                    <button id="consonantYesBtn" class="yes-btn">YES</button>
-                    <button id="consonantNoBtn" class="no-btn">NO</button>
-                </div>
-            </div>
-
-            <!-- Position 1 feature -->
-            <div id="position1Feature" class="feature-section" style="display: none;">
-                <div class="position-input">
-                    <input type="text" id="position1Input" placeholder="Enter a word...">
-                    <button id="position1Button">DONE</button>
-                    <button id="position1DoneButton" class="skip-button">SKIP</button>
-                </div>
-            </div>
-
-            <!-- Vowel feature -->
-            <div id="vowelFeature" class="feature-section" style="display: none;">
-                <div class="feature-title">VOWEL</div>
-                <div class="vowel-letter"></div>
-                <div class="button-container">
-                    <button class="yes-btn">YES</button>
-                    <button class="no-btn">NO</button>
-                </div>
-            </div>
-
-            <!-- Shape feature -->
-            <div id="shapeFeature" class="feature-section" style="display: none;">
-                <div class="shape-display">
-                    <div class="position-display"></div>
-                    <div class="category-buttons"></div>
+        <!-- Settings Modal -->
+        <div id="settingsModal" class="modal">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <h2>Settings</h2>
+                <div class="settings-options">
+                    <label>
+                        <input type="checkbox" id="enableColour3" checked>
+                        Enable COLOUR3 Feature
+                    </label>
+                    <label>
+                        <input type="checkbox" id="enableVowel" checked>
+                        Enable VOWEL Feature
+                    </label>
+                    <label>
+                        <input type="checkbox" id="enableShape" checked>
+                        Enable SHAPE Feature
+                    </label>
                 </div>
             </div>
         </div>
