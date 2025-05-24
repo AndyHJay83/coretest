@@ -1,115 +1,9 @@
-let wordList = [];
-let totalWords = 0;
-let isNewMode = true;
-let isColour3Mode = true;
-let isVowelMode = true;
-let isShapeMode = true;
+// Global variables
 let currentFilteredWords = [];
-let currentPosition = 0;
-let currentPosition2 = -1;
-let currentVowelIndex = 0;
-let uniqueVowels = [];
-let currentFilteredWordsForVowels = [];
-let originalFilteredWords = [];
-let hasAdjacentConsonants = null;
-let hasO = null;
-let selectedCurvedLetter = null;
-let eeeCompleted = false;
-let lexiconCompleted = false;
-let originalLexCompleted = false;
-let originalLexPosition = -1;
-let currentPosition1Word = '';
-
-// Workflow Management
-let workflows = JSON.parse(localStorage.getItem('workflows')) || [];
-let currentWorkflow = null;
-
-// DOM Elements
-const createWorkflowButton = document.getElementById('createWorkflowButton');
-const cancelWorkflowButton = document.getElementById('cancelWorkflowButton');
-const saveWorkflowButton = document.getElementById('saveWorkflowButton');
-const backToHomeButton = document.getElementById('backToHomeButton');
-const workflowName = document.getElementById('workflowName');
-const selectedFeaturesList = document.getElementById('selectedFeaturesList');
-const workflowSelect = document.getElementById('workflowSelect');
-const performButton = document.getElementById('performButton');
-
-// Function to initialize workflow dropdown
-function initializeWorkflowDropdown() {
-    const workflowSelect = document.getElementById('workflowSelect');
-    if (!workflowSelect) {
-        console.error('Workflow select element not found');
-        return;
-    }
-
-    // Load saved workflows
-    const savedWorkflows = JSON.parse(localStorage.getItem('workflows') || '[]');
-    console.log('Initializing dropdown with workflows:', savedWorkflows); // Debug log
-    
-    // Clear existing options except the first two (default and create new)
-    while (workflowSelect.options.length > 2) {
-        workflowSelect.remove(2);
-    }
-    
-    // Add saved workflows
-    savedWorkflows.forEach(workflow => {
-        const option = document.createElement('option');
-        option.value = workflow.id;
-        option.textContent = workflow.name;
-        workflowSelect.appendChild(option);
-        console.log('Added workflow to dropdown:', workflow); // Debug log
-    });
-
-    // Reset dropdown to default state
-    workflowSelect.value = '';
-
-    // Set up event listeners
-    workflowSelect.addEventListener('change', function() {
-        const performButton = document.getElementById('performButton');
-        if (performButton) {
-            performButton.disabled = this.value === '' || this.value === 'create-new';
-        }
-
-        if (this.value === 'create-new') {
-            showWorkflowCreation();
-        }
-    });
-
-    // Set up button listeners
-    const createButton = document.getElementById('createWorkflowButton');
-    if (createButton) {
-        createButton.addEventListener('click', showWorkflowCreation);
-    }
-
-    const performButton = document.getElementById('performButton');
-    if (performButton) {
-        performButton.addEventListener('click', performWorkflow);
-    }
-}
-
-function showWorkflowCreation() {
-    document.getElementById('homepageContent').style.display = 'none';
-    document.getElementById('workflowCreationContent').style.display = 'block';
-    document.getElementById('workflowName').focus();
-}
-
+let wordList = [];
 let currentFeatureIndex = 0;
 
-function showNextFeature() {
-    const featureArea = document.getElementById('featureArea');
-    const features = featureArea.querySelectorAll('.feature-section');
-    
-    // Hide all features
-    features.forEach(feature => {
-        feature.style.display = 'none';
-    });
-    
-    // Show current feature
-    if (features[currentFeatureIndex]) {
-        features[currentFeatureIndex].style.display = 'block';
-    }
-}
-
+// Feature listener setup
 function setupFeatureListeners(featureId, callback) {
     console.log('Setting up listeners for feature:', featureId);
     const featureSection = document.getElementById(`${featureId}Feature`);
@@ -270,6 +164,114 @@ function setupFeatureListeners(featureId, callback) {
             console.warn('Unknown feature type for listeners:', featureId);
             break;
     }
+}
+
+function showNextFeature() {
+    const featureArea = document.getElementById('featureArea');
+    const features = featureArea.querySelectorAll('.feature-section');
+    
+    // Hide all features
+    features.forEach(feature => {
+        feature.style.display = 'none';
+    });
+    
+    // Show current feature
+    if (features[currentFeatureIndex]) {
+        features[currentFeatureIndex].style.display = 'block';
+    }
+}
+
+let totalWords = 0;
+let isNewMode = true;
+let isColour3Mode = true;
+let isVowelMode = true;
+let isShapeMode = true;
+let currentPosition = 0;
+let currentPosition2 = -1;
+let currentVowelIndex = 0;
+let uniqueVowels = [];
+let currentFilteredWordsForVowels = [];
+let originalFilteredWords = [];
+let hasAdjacentConsonants = null;
+let hasO = null;
+let selectedCurvedLetter = null;
+let eeeCompleted = false;
+let lexiconCompleted = false;
+let originalLexCompleted = false;
+let originalLexPosition = -1;
+let currentPosition1Word = '';
+
+// Workflow Management
+let workflows = JSON.parse(localStorage.getItem('workflows')) || [];
+let currentWorkflow = null;
+
+// DOM Elements
+const createWorkflowButton = document.getElementById('createWorkflowButton');
+const cancelWorkflowButton = document.getElementById('cancelWorkflowButton');
+const saveWorkflowButton = document.getElementById('saveWorkflowButton');
+const backToHomeButton = document.getElementById('backToHomeButton');
+const workflowName = document.getElementById('workflowName');
+const selectedFeaturesList = document.getElementById('selectedFeaturesList');
+const workflowSelect = document.getElementById('workflowSelect');
+const performButton = document.getElementById('performButton');
+
+// Function to initialize workflow dropdown
+function initializeWorkflowDropdown() {
+    const workflowSelect = document.getElementById('workflowSelect');
+    if (!workflowSelect) {
+        console.error('Workflow select element not found');
+        return;
+    }
+
+    // Load saved workflows
+    const savedWorkflows = JSON.parse(localStorage.getItem('workflows') || '[]');
+    console.log('Initializing dropdown with workflows:', savedWorkflows); // Debug log
+    
+    // Clear existing options except the first two (default and create new)
+    while (workflowSelect.options.length > 2) {
+        workflowSelect.remove(2);
+    }
+    
+    // Add saved workflows
+    savedWorkflows.forEach(workflow => {
+        const option = document.createElement('option');
+        option.value = workflow.id;
+        option.textContent = workflow.name;
+        workflowSelect.appendChild(option);
+        console.log('Added workflow to dropdown:', workflow); // Debug log
+    });
+
+    // Reset dropdown to default state
+    workflowSelect.value = '';
+
+    // Set up event listeners
+    workflowSelect.addEventListener('change', function() {
+        const performButton = document.getElementById('performButton');
+        if (performButton) {
+            performButton.disabled = this.value === '' || this.value === 'create-new';
+        }
+
+        if (this.value === 'create-new') {
+            showWorkflowCreation();
+        }
+    });
+
+    // Set up button listeners
+    const createButton = document.getElementById('createWorkflowButton');
+    if (createButton) {
+        createButton.addEventListener('click', showWorkflowCreation);
+    }
+
+    const performButton = document.getElementById('performButton');
+    if (performButton) {
+        performButton.addEventListener('click', performWorkflow);
+    }
+}
+
+function showWorkflowCreation() {
+    document.getElementById('homepageContent').style.display = 'none';
+    document.getElementById('workflowCreationContent').style.display = 'block';
+    document.getElementById('workflowName').focus();
 }
 
 async function performWorkflow() {
@@ -1409,22 +1411,6 @@ function filterWordsByColour3(words) {
     });
     
     return filteredWords;
-}
-
-// Function to show next feature
-function showNextFeature() {
-    const featureArea = document.getElementById('featureArea');
-    const features = featureArea.querySelectorAll('.feature-section');
-    
-    // Hide all features
-    features.forEach(feature => {
-        feature.style.display = 'none';
-    });
-    
-    // Show current feature
-    if (features[currentFeatureIndex]) {
-        features[currentFeatureIndex].style.display = 'block';
-    }
 }
 
 // Function to expand word list
