@@ -62,22 +62,22 @@
             <div class="workflow-container">
                 <div class="available-features">
                     <h3>Available Features</h3>
-                    <div class="feature-buttons">
-                        <button class="feature-button" data-feature="eee">EEE?</button>
-                        <button class="feature-button" data-feature="position1">Position 1</button>
-                        <button class="feature-button" data-feature="o">O?</button>
-                        <button class="feature-button" data-feature="curved">CURVED</button>
-                        <button class="feature-button" data-feature="colour3">COLOUR3</button>
-                        <button class="feature-button" data-feature="lexicon">LEXICON</button>
-                        <button class="feature-button" data-feature="consonant">Consonants</button>
-                        <button class="feature-button" data-feature="vowel">VOWEL</button>
-                        <button class="feature-button" data-feature="shape">SHAPE</button>
+                    <div class="feature-buttons" id="availableFeatures">
+                        <button class="feature-button" data-feature="eee" draggable="true">EEE?</button>
+                        <button class="feature-button" data-feature="position1" draggable="true">Position 1</button>
+                        <button class="feature-button" data-feature="o" draggable="true">O?</button>
+                        <button class="feature-button" data-feature="curved" draggable="true">CURVED</button>
+                        <button class="feature-button" data-feature="colour3" draggable="true">COLOUR3</button>
+                        <button class="feature-button" data-feature="lexicon" draggable="true">LEXICON</button>
+                        <button class="feature-button" data-feature="consonant" draggable="true">Consonants</button>
+                        <button class="feature-button" data-feature="vowel" draggable="true">VOWEL</button>
+                        <button class="feature-button" data-feature="shape" draggable="true">SHAPE</button>
                     </div>
                 </div>
                 
                 <div class="selected-features">
                     <h3>Selected Features</h3>
-                    <div id="selectedFeaturesList" class="selected-features-list">
+                    <div id="selectedFeaturesList" class="selected-features-list" ondragover="event.preventDefault();" ondrop="event.preventDefault();">
                         <!-- Selected features will be displayed here -->
                     </div>
                 </div>

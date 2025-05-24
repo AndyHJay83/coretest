@@ -74,24 +74,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     initializeWorkflowDropdown();
     
     // Set up drag and drop for feature buttons
-    const featureButtons = document.querySelectorAll('.feature-button');
+    const availableFeatures = document.getElementById('availableFeatures');
+    const selectedFeaturesList = document.getElementById('selectedFeaturesList');
     
-    featureButtons.forEach(button => {
-        button.setAttribute('draggable', 'true');
+    if (availableFeatures) {
+        const featureButtons = availableFeatures.querySelectorAll('.feature-button');
         
-        button.addEventListener('dragstart', (e) => {
-            e.dataTransfer.setData('text/plain', button.dataset.feature);
-            button.classList.add('dragging');
+        featureButtons.forEach(button => {
+            button.addEventListener('dragstart', (e) => {
+                console.log('Drag started:', button.dataset.feature);
+                e.dataTransfer.setData('text/plain', button.dataset.feature);
+                e.dataTransfer.effectAllowed = 'move';
+                button.classList.add('dragging');
+            });
+            
+            button.addEventListener('dragend', () => {
+                console.log('Drag ended');
+                button.classList.remove('dragging');
+            });
         });
-        
-        button.addEventListener('dragend', () => {
-            button.classList.remove('dragging');
-        });
-    });
+    }
     
     if (selectedFeaturesList) {
         selectedFeaturesList.addEventListener('dragover', (e) => {
             e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
             selectedFeaturesList.classList.add('drag-over');
         });
         
@@ -104,6 +111,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             selectedFeaturesList.classList.remove('drag-over');
             
             const feature = e.dataTransfer.getData('text/plain');
+            console.log('Dropped feature:', feature);
+            
             if (feature) {
                 // Check if feature is already selected
                 const existingFeature = selectedFeaturesList.querySelector(`[data-feature="${feature}"]`);
@@ -126,6 +135,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     // Add drag and drop for reordering
                     featureItem.addEventListener('dragstart', (e) => {
                         e.dataTransfer.setData('text/plain', feature);
+                        e.dataTransfer.effectAllowed = 'move';
                         featureItem.classList.add('dragging');
                     });
                     
