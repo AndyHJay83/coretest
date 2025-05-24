@@ -192,15 +192,13 @@ function reinitializeWorkflowDropdown() {
 
 // Show workflow creation page
 function showWorkflowCreation() {
-    document.getElementById('homepage').style.display = 'none';
-    document.getElementById('workflowExecution').style.display = 'none';
-    document.getElementById('workflowCreation').style.display = 'block';
+    const homepage = document.getElementById('homepage');
+    const workflowExecution = document.getElementById('workflowExecution');
+    const workflowCreation = document.getElementById('workflowCreation');
     
-    // Hide saved workflows initially
-    const savedWorkflows = document.getElementById('savedWorkflows');
-    if (savedWorkflows) {
-        savedWorkflows.style.display = 'none';
-    }
+    if (homepage) homepage.style.display = 'none';
+    if (workflowExecution) workflowExecution.style.display = 'none';
+    if (workflowCreation) workflowCreation.style.display = 'block';
     
     // Initialize info buttons
     initializeInfoButtons();
@@ -947,191 +945,49 @@ async function executeWorkflow(steps) {
             workflowExecution.style.height = '100vh';
         }
 
-        // Add home button if it doesn't exist
-        let homeButton = document.getElementById('homeButton');
-        if (!homeButton) {
-            homeButton = document.createElement('button');
-            homeButton.id = 'homeButton';
-            homeButton.className = 'home-button';
-            homeButton.innerHTML = '⌂';
-            homeButton.title = 'Return to Home';
-            
-            // Function to handle home button action
-            const handleHomeAction = () => {
-                // Hide workflow execution
-                if (workflowExecution) {
-                    workflowExecution.style.display = 'none';
-                }
-                // Show homepage
-                if (homepage) {
-                    homepage.style.display = 'block';
-                }
-                // Remove reset button if it exists
-                const resetButton = document.getElementById('resetWorkflowButton');
-                if (resetButton) {
-                    resetButton.remove();
-                }
-                // Remove home button
-                homeButton.remove();
-            };
-            
-            // Add both click and touch events
-            homeButton.addEventListener('click', handleHomeAction);
-            homeButton.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                handleHomeAction();
-            }, { passive: false });
-            
-            // Insert home button next to the header
-            const header = document.querySelector('.header');
-            if (header) {
-                header.insertBefore(homeButton, header.firstChild);
-            }
-        }
-
-        // Add reset button if it doesn't exist
-        let resetButton = document.getElementById('resetWorkflowButton');
-        if (!resetButton) {
-            resetButton = document.createElement('button');
-            resetButton.id = 'resetWorkflowButton';
-            resetButton.className = 'reset-workflow-button';
-            resetButton.innerHTML = '↺';
-            resetButton.title = 'Reset Workflow';
-            
-            // Function to handle reset action
-            const handleResetAction = () => {
-                if (currentWorkflow) {
-                    executeWorkflow(currentWorkflow.steps);
-                }
-            };
-            
-            // Add both click and touch events
-            resetButton.addEventListener('click', handleResetAction);
-            resetButton.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                handleResetAction();
-            }, { passive: false });
-            
-            document.body.appendChild(resetButton);
-        }
-        
-        // Store current workflow for reset functionality
-        currentWorkflow = { steps };
-        
-        // Create feature elements if they don't exist
-        const featureElements = {
-            position1Feature: createPosition1Feature(),
-            vowelFeature: createVowelFeature(),
-            oFeature: createOFeature(),
-            lexiconFeature: createLexiconFeature(),
-            eeeFeature: createEeeFeature(),
-            originalLexFeature: createOriginalLexFeature(),
-            consonantFeature: createConsonantQuestion(), // Changed from consonantQuestion to consonantFeature
-            colour3Feature: createColour3Feature(),
-            shapeFeature: createShapeFeature(),
-            curvedFeature: createCurvedFeature()
-        };
-        
-        // Add all feature elements to the document body (they'll be moved to feature area when needed)
-        Object.values(featureElements).forEach(element => {
-            if (element) {
-                // Remove from any existing parent
-                if (element.parentNode) {
-                    element.parentNode.removeChild(element);
-                }
-                // Add to document body
-                document.body.appendChild(element);
-                // Hide initially
-                element.style.display = 'none';
-            }
-        });
-        
-        // Get or create the feature area and results container
-        let featureArea = document.getElementById('featureArea');
-        let resultsContainer = document.getElementById('results');
-        
-        if (!featureArea) {
-            featureArea = document.createElement('div');
-            featureArea.id = 'featureArea';
-            featureArea.className = 'feature-area';
-            workflowExecution.insertBefore(featureArea, workflowExecution.firstChild);
-        }
-        
-        if (!resultsContainer) {
-            resultsContainer = document.createElement('div');
-            resultsContainer.id = 'results';
-            resultsContainer.className = 'results-container';
-            workflowExecution.appendChild(resultsContainer);
-        }
-        
-        // Set up the layout
-        featureArea.style.flex = '0 0 33vh';
-        featureArea.style.minHeight = '200px';
-        featureArea.style.padding = '20px';
-        featureArea.style.backgroundColor = '#f5f5f5';
-        featureArea.style.borderBottom = '1px solid #ddd';
-        
-        resultsContainer.style.flex = '1';
-        resultsContainer.style.overflowY = 'auto';
-        resultsContainer.style.padding = '20px';
-        resultsContainer.style.backgroundColor = '#fff';
-        
-        // Clear any existing content in both areas
-        featureArea.innerHTML = '';
-        resultsContainer.innerHTML = '';
-        
-        console.log('Feature area:', featureArea);
-        console.log('Results container:', resultsContainer);
-        
-        // Display initial wordlist in the results container
-        displayResults(currentFilteredWords);
-        
-        // Execute each step in sequence
+        // Execute each step in the workflow
         for (const step of steps) {
-            console.log('Executing step:', step);
-            
-            // Get the feature ID from the step object
-            const featureId = step.feature + 'Feature';
-            console.log('Looking for feature element with ID:', featureId);
-            
-            // Get the feature element
-            const featureElement = featureElements[featureId];
-            if (!featureElement) {
-                console.error(`Feature element not found for step: ${featureId}`);
-                continue;
+            const feature = step.feature;
+            switch (feature) {
+                case 'position1':
+                    await createPosition1Feature();
+                    break;
+                case 'vowel':
+                    await createVowelFeature();
+                    break;
+                case 'o':
+                    await createOFeature();
+                    break;
+                case 'lexicon':
+                    await createLexiconFeature();
+                    break;
+                case 'eee':
+                    await createEeeFeature();
+                    break;
+                case 'originalLex':
+                    await createOriginalLexFeature();
+                    break;
+                case 'consonant':
+                    await createConsonantQuestion();
+                    break;
+                case 'colour3':
+                    await createColour3Feature();
+                    break;
+                case 'shape':
+                    await createShapeFeature();
+                    break;
+                case 'curved':
+                    await createCurvedFeature();
+                    break;
             }
-            
-            // Move the feature to the feature area
-            featureArea.innerHTML = '';
-            featureArea.appendChild(featureElement);
-            featureElement.style.display = 'block';
-            console.log(`Showing feature: ${featureId}`);
-            
-            // Set up event listeners for this feature
-            setupFeatureListeners(step.feature, (filteredWords) => {
-                currentFilteredWords = filteredWords;
-                // Update wordlist in the results container
-                displayResults(currentFilteredWords);
-            });
-            
-            // Wait for user interaction
-            await new Promise((resolve) => {
-                const handleFeatureComplete = () => {
-                    featureElement.classList.add('completed');
-                    featureElement.style.display = 'none';
-                    resolve();
-                };
-                
-                // Add event listener for feature completion
-                featureElement.addEventListener('completed', handleFeatureComplete, { once: true });
-            });
         }
         
-        // Show final results in the results container
+        // Display final results
         displayResults(currentFilteredWords);
+        
     } catch (error) {
         console.error('Error executing workflow:', error);
-        throw error;
+        alert('There was an error executing the workflow. Please try again.');
     }
 }
 
@@ -3330,7 +3186,6 @@ function initializeHomepageDropdowns() {
     const performButton = document.getElementById('performButton');
     
     let selectedWorkflow = null;
-    let selectedWordlist = 'enuk'; // Default to ENUK wordlist
     
     // Initialize workflow cards
     function initializeWorkflowCards() {
@@ -3383,39 +3238,10 @@ function initializeHomepageDropdowns() {
         }
     }
     
-    // Handle wordlist selection
-    function selectWordlist(value) {
-        // Remove selected class from all wordlist cards
-        wordlistGrid.querySelectorAll('.selection-card').forEach(card => {
-            card.classList.remove('selected');
-        });
-        
-        // Add selected class to clicked card
-        const selectedCard = wordlistGrid.querySelector(`[data-value="${value}"]`);
-        if (selectedCard) {
-            selectedCard.classList.add('selected');
-        }
-        
-        selectedWordlist = value;
-        updatePerformButton();
-    }
-    
     // Update perform button state
     function updatePerformButton() {
         performButton.disabled = !selectedWorkflow || selectedWorkflow === 'create-new';
     }
-    
-    // Initialize wordlist cards
-    wordlistGrid.querySelectorAll('.selection-card').forEach(card => {
-        card.addEventListener('click', () => selectWordlist(card.dataset.value));
-        card.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            selectWordlist(card.dataset.value);
-        }, { passive: false });
-    });
-    
-    // Set initial wordlist selection
-    selectWordlist('enuk');
     
     // Initialize workflow cards
     initializeWorkflowCards();
@@ -3429,6 +3255,18 @@ function initializeHomepageDropdowns() {
             }
         }
     });
+    
+    // Handle create new workflow card click
+    const createNewCard = workflowGrid.querySelector('[data-value="create-new"]');
+    if (createNewCard) {
+        createNewCard.addEventListener('click', () => {
+            showWorkflowCreation();
+        });
+        createNewCard.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            showWorkflowCreation();
+        }, { passive: false });
+    }
 }
 
 // Update the reinitialize function
