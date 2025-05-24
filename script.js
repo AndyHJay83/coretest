@@ -2892,7 +2892,7 @@ document.head.appendChild(buttonStyles);
 // Add CSS for button consistency
 const buttonConsistencyStyle = document.createElement('style');
 buttonConsistencyStyle.textContent = `
-    #createWorkflowButton {
+    #createWorkflowButton, #performButton {
         width: 200px;
         height: 40px;
         font-size: 16px;
@@ -2909,14 +2909,25 @@ buttonConsistencyStyle.textContent = `
         align-items: center;
         justify-content: center;
         text-align: center;
+        box-sizing: border-box;
+        line-height: 1;
+        white-space: nowrap;
     }
     
-    #createWorkflowButton:hover {
+    #createWorkflowButton:hover, #performButton:hover {
         background-color: #45a049;
     }
     
-    #createWorkflowButton:active {
+    #createWorkflowButton:active, #performButton:active {
         transform: scale(0.98);
+    }
+
+    /* Ensure the button container doesn't affect button size */
+    .button-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
     }
 `;
 document.head.appendChild(buttonConsistencyStyle);
