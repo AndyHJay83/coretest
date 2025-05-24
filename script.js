@@ -102,7 +102,7 @@ function initializeWorkflowDropdown() {
                 width: 100%;
                 cursor: pointer;
                 background: white;
-                z-index: 1000;
+                z-index: 9999;
             }
             .selected-text {
                 padding: 8px 12px;
@@ -110,7 +110,7 @@ function initializeWorkflowDropdown() {
                 border: 1px solid #ccc;
                 border-radius: 4px;
                 position: relative;
-                z-index: 1001;
+                z-index: 9999;
             }
             .selected-text:after {
                 content: '▼';
@@ -130,11 +130,12 @@ function initializeWorkflowDropdown() {
                 background: white;
                 border: 1px solid #ccc;
                 border-radius: 4px;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
                 max-height: 200px;
                 overflow-y: auto;
-                z-index: 1002;
+                z-index: 10000;
                 display: none;
+                pointer-events: auto;
             }
             .options-list.show {
                 display: block !important;
@@ -144,6 +145,10 @@ function initializeWorkflowDropdown() {
                 cursor: pointer;
                 transition: background-color 0.2s;
                 background: white;
+                border-bottom: 1px solid #eee;
+            }
+            .option:last-child {
+                border-bottom: none;
             }
             .option:hover {
                 background: #f0f0f0;
