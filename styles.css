@@ -1536,12 +1536,19 @@ input:checked + .slider:before {
     padding: 1rem;
     background: #f5f5f5;
     border-radius: 8px;
+    max-height: 300px;
+    overflow-y: auto;
 }
 
 .saved-workflows h3 {
     margin: 0 0 1rem 0;
     color: #333;
     font-size: 1.2rem;
+    position: sticky;
+    top: 0;
+    background: #f5f5f5;
+    padding: 0.5rem 0;
+    z-index: 1;
 }
 
 .saved-workflow-list {
@@ -1570,6 +1577,11 @@ input:checked + .slider:before {
 .workflow-name {
     font-weight: 500;
     color: #333;
+    flex: 1;
+    margin-right: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .delete-workflow {
@@ -1581,10 +1593,26 @@ input:checked + .slider:before {
     padding: 0.25rem 0.5rem;
     border-radius: 4px;
     transition: all 0.2s ease;
+    flex-shrink: 0;
 }
 
 .delete-workflow:hover {
     background: #ffeeee;
+}
+
+@media (max-width: 600px) {
+    .saved-workflows {
+        max-height: 200px;
+        margin-top: 1rem;
+    }
+    
+    .saved-workflow-item {
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .workflow-name {
+        font-size: 0.9rem;
+    }
 }
 
 /* Workflow Creation Layout */
