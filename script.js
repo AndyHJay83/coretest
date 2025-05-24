@@ -1227,25 +1227,24 @@ async function executeWorkflow(steps) {
             workflowExecution.style.display = 'block';
         }
         
-        // Hide all features initially
-        const allFeatures = [
-            'originalLexFeature',
-            'eeeFeature',
-            'lexiconFeature',
-            'consonantQuestion',
-            'position1Feature',
-            'vowelFeature',
-            'colour3Feature',
-            'shapeFeature',
-            'oFeature',
-            'curvedFeature'
-        ];
+        // Create feature elements if they don't exist
+        const featureElements = {
+            position1Feature: createPosition1Feature(),
+            vowelFeature: createVowelFeature(),
+            oFeature: createOFeature(),
+            lexiconFeature: createLexiconFeature(),
+            eeeFeature: createEeeFeature(),
+            originalLexFeature: createOriginalLexFeature(),
+            consonantQuestion: createConsonantQuestion(),
+            colour3Feature: createColour3Feature(),
+            shapeFeature: createShapeFeature(),
+            curvedFeature: createCurvedFeature()
+        };
         
-        allFeatures.forEach(featureId => {
-            const feature = document.getElementById(featureId);
-            if (feature) {
-                feature.style.display = 'none';
-                feature.classList.remove('completed');
+        // Add all feature elements to the document body (they'll be moved to feature area when needed)
+        Object.values(featureElements).forEach(element => {
+            if (element && !document.body.contains(element)) {
+                document.body.appendChild(element);
             }
         });
         
@@ -1282,8 +1281,8 @@ async function executeWorkflow(steps) {
             const featureId = step.feature + 'Feature';
             console.log('Looking for feature element with ID:', featureId);
             
-            // Show the appropriate feature in the feature area
-            const featureElement = document.getElementById(featureId);
+            // Get the feature element
+            const featureElement = featureElements[featureId];
             if (!featureElement) {
                 console.error(`Feature element not found for step: ${featureId}`);
                 continue;
@@ -1321,6 +1320,165 @@ async function executeWorkflow(steps) {
         console.error('Error executing workflow:', error);
         throw error;
     }
+}
+
+// Helper functions to create feature elements
+function createPosition1Feature() {
+    const div = document.createElement('div');
+    div.id = 'position1Feature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">POSITION 1</h2>
+        <div class="position-input">
+            <input type="text" id="position1Input" placeholder="Enter a word">
+            <button id="position1Button">SUBMIT</button>
+            <button id="position1DoneButton">DONE</button>
+        </div>
+    `;
+    return div;
+}
+
+function createVowelFeature() {
+    const div = document.createElement('div');
+    div.id = 'vowelFeature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">VOWEL</h2>
+        <div class="vowel-content">
+            <span class="vowel-letter"></span>
+        </div>
+        <div class="vowel-buttons">
+            <button class="vowel-btn yes-btn">YES</button>
+            <button class="vowel-btn no-btn">NO</button>
+        </div>
+    `;
+    return div;
+}
+
+function createOFeature() {
+    const div = document.createElement('div');
+    div.id = 'oFeature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">O?</h2>
+        <div class="button-container">
+            <button id="oYesBtn" class="yes-btn">YES</button>
+            <button id="oNoBtn" class="no-btn">NO</button>
+            <button id="oSkipBtn" class="skip-button">SKIP</button>
+        </div>
+    `;
+    return div;
+}
+
+function createLexiconFeature() {
+    const div = document.createElement('div');
+    div.id = 'lexiconFeature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">LEXICON</h2>
+        <div class="lexicon-input">
+            <input type="text" id="lexiconInput" placeholder="Enter positions (e.g., 123)">
+            <button id="lexiconButton">SUBMIT</button>
+            <button id="lexiconSkipButton" class="skip-button">SKIP</button>
+        </div>
+    `;
+    return div;
+}
+
+function createEeeFeature() {
+    const div = document.createElement('div');
+    div.id = 'eeeFeature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">EEE?</h2>
+        <div class="button-container">
+            <button id="eeeButton">E</button>
+            <button id="eeeYesBtn" class="yes-btn">YES</button>
+            <button id="eeeNoBtn" class="no-btn">NO</button>
+        </div>
+    `;
+    return div;
+}
+
+function createOriginalLexFeature() {
+    const div = document.createElement('div');
+    div.id = 'originalLexFeature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">ORIGINAL LEX</h2>
+        <div class="lexicon-input">
+            <input type="text" id="originalLexInput" placeholder="Enter a word">
+            <button id="originalLexButton">SUBMIT</button>
+            <button id="originalLexSkipButton" class="skip-button">SKIP</button>
+        </div>
+    `;
+    return div;
+}
+
+function createConsonantQuestion() {
+    const div = document.createElement('div');
+    div.id = 'consonantQuestion';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">CONSONANTS TOGETHER?</h2>
+        <div class="button-container">
+            <button id="consonantYesBtn" class="yes-btn">YES</button>
+            <button id="consonantNoBtn" class="no-btn">NO</button>
+        </div>
+    `;
+    return div;
+}
+
+function createColour3Feature() {
+    const div = document.createElement('div');
+    div.id = 'colour3Feature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">COLOUR3</h2>
+        <div class="button-container">
+            <button id="colour3YesBtn" class="yes-btn">YES</button>
+            <button id="colour3SkipButton" class="skip-button">SKIP</button>
+        </div>
+    `;
+    return div;
+}
+
+function createShapeFeature() {
+    const div = document.createElement('div');
+    div.id = 'shapeFeature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">SHAPE</h2>
+        <div class="shape-display">
+            <div class="position-display"></div>
+            <div class="category-buttons"></div>
+        </div>
+    `;
+    return div;
+}
+
+function createCurvedFeature() {
+    const div = document.createElement('div');
+    div.id = 'curvedFeature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">CURVED</h2>
+        <div class="curved-buttons">
+            <button class="curved-btn">B</button>
+            <button class="curved-btn">C</button>
+            <button class="curved-btn">D</button>
+            <button class="curved-btn">G</button>
+            <button class="curved-btn">J</button>
+            <button class="curved-btn">O</button>
+            <button class="curved-btn">P</button>
+            <button class="curved-btn">Q</button>
+            <button class="curved-btn">R</button>
+            <button class="curved-btn">S</button>
+            <button class="curved-btn">U</button>
+        </div>
+        <button id="curvedSkipBtn" class="skip-button">SKIP</button>
+    `;
+    return div;
 }
 
 // Function to setup feature listeners
