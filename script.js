@@ -2456,17 +2456,23 @@ modalStyle.textContent = `
         width: 100%;
         height: 100%;
         background-color: rgba(0, 0, 0, 0.5);
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
     }
 
     .modal-content {
         background-color: #fefefe;
-        margin: 15% auto;
+        margin: 10% auto;
         padding: 20px;
         border: 1px solid #888;
-        width: 80%;
+        width: 90%;
         max-width: 600px;
-        border-radius: 8px;
+        border-radius: 12px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        position: relative;
+        max-height: 80vh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     .modal-header {
@@ -2476,38 +2482,56 @@ modalStyle.textContent = `
         margin-bottom: 20px;
         padding-bottom: 10px;
         border-bottom: 1px solid #eee;
+        position: sticky;
+        top: 0;
+        background-color: #fefefe;
+        z-index: 1;
     }
 
     .modal-header h2 {
         margin: 0;
         color: #333;
+        font-size: 1.5rem;
     }
 
     .close-button {
         background: none;
         border: none;
-        font-size: 24px;
+        font-size: 28px;
         cursor: pointer;
         color: #666;
-        padding: 0 8px;
+        padding: 8px;
+        min-width: 44px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
     }
 
     .close-button:hover {
         color: #333;
     }
 
+    .close-button:active {
+        transform: scale(0.95);
+    }
+
     .workflow-item {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 12px;
+        padding: 16px;
         margin: 8px 0;
         background-color: #f8f9fa;
-        border-radius: 4px;
+        border-radius: 8px;
         transition: background-color 0.2s;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
     }
 
-    .workflow-item:hover {
+    .workflow-item:active {
         background-color: #e9ecef;
     }
 
@@ -2515,41 +2539,234 @@ modalStyle.textContent = `
         display: flex;
         flex-direction: column;
         gap: 4px;
+        flex: 1;
+        margin-right: 12px;
     }
 
     .workflow-name {
         font-weight: bold;
         color: #333;
+        font-size: 1.1rem;
     }
 
     .workflow-steps {
         font-size: 0.9em;
         color: #666;
+        word-break: break-word;
     }
 
     .delete-workflow {
         background: none;
         border: none;
         color: #dc3545;
-        font-size: 20px;
+        font-size: 24px;
         cursor: pointer;
-        padding: 4px 8px;
-        border-radius: 4px;
-        transition: background-color 0.2s;
+        padding: 8px;
+        min-width: 44px;
+        min-height: 44px;
+        border-radius: 8px;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
     }
 
-    .delete-workflow:hover {
+    .delete-workflow:active {
         background-color: #dc3545;
         color: white;
+        transform: scale(0.95);
     }
 
     .no-workflows {
         text-align: center;
         color: #666;
         padding: 20px;
+        font-size: 1.1rem;
+    }
+
+    /* Add safe area insets for modern mobile browsers */
+    @supports (padding: max(0px)) {
+        .modal-content {
+            padding-left: max(20px, env(safe-area-inset-left));
+            padding-right: max(20px, env(safe-area-inset-right));
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
+        }
+    }
+
+    /* Improve scrolling on iOS */
+    .modal-content {
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
     }
 `;
 document.head.appendChild(modalStyle);
+
+// Update the toggle button style for better PWA support
+const toggleButtonStyle = document.createElement('style');
+toggleButtonStyle.textContent = `
+    .toggle-saved-workflows {
+        width: 200px;
+        height: 44px;
+        font-size: 16px;
+        font-weight: bold;
+        padding: 8px 16px;
+        margin: 10px;
+        border-radius: 8px;
+        background-color: #2196F3;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        box-sizing: border-box;
+        line-height: 1;
+        white-space: nowrap;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+        user-select: none;
+    }
+    
+    .toggle-saved-workflows:active {
+        background-color: #1976D2;
+        transform: scale(0.98);
+    }
+
+    /* Add safe area insets for modern mobile browsers */
+    @supports (padding: max(0px)) {
+        .toggle-saved-workflows {
+            padding-left: max(16px, env(safe-area-inset-left));
+            padding-right: max(16px, env(safe-area-inset-right));
+        }
+    }
+`;
+document.head.appendChild(toggleButtonStyle);
+
+// Update the toggleSavedWorkflows function to handle PWA-specific behaviors
+function toggleSavedWorkflows() {
+    console.log('Toggle saved workflows called');
+    
+    // Create modal if it doesn't exist
+    let modal = document.getElementById('savedWorkflowsModal');
+    if (!modal) {
+        console.log('Creating new modal');
+        modal = document.createElement('div');
+        modal.id = 'savedWorkflowsModal';
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Saved Workflows</h2>
+                    <button class="close-button" aria-label="Close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="savedWorkflowsList"></div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        // Add close button functionality
+        const closeButton = modal.querySelector('.close-button');
+        closeButton.onclick = (e) => {
+            e.preventDefault();
+            modal.style.display = 'none';
+        };
+
+        // Close modal when clicking outside
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Prevent body scrolling when modal is open
+        modal.addEventListener('touchmove', (e) => {
+            if (e.target === modal) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+    }
+
+    // Display the modal
+    modal.style.display = 'block';
+    console.log('Modal displayed');
+
+    // Update the workflows list
+    const workflowsList = document.getElementById('savedWorkflowsList');
+    workflowsList.innerHTML = '';
+
+    if (workflows.length === 0) {
+        workflowsList.innerHTML = '<p class="no-workflows">No saved workflows yet.</p>';
+        return;
+    }
+
+    // Create list of workflows
+    workflows.forEach(workflow => {
+        const workflowItem = document.createElement('div');
+        workflowItem.className = 'workflow-item';
+        workflowItem.setAttribute('role', 'button');
+        workflowItem.setAttribute('tabindex', '0');
+        
+        const workflowInfo = document.createElement('div');
+        workflowInfo.className = 'workflow-info';
+        
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'workflow-name';
+        nameSpan.textContent = workflow.name;
+        
+        const stepsSpan = document.createElement('span');
+        stepsSpan.className = 'workflow-steps';
+        stepsSpan.textContent = workflow.steps.map(step => step.feature).join(' → ');
+        
+        workflowInfo.appendChild(nameSpan);
+        workflowInfo.appendChild(stepsSpan);
+        
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'delete-workflow';
+        deleteButton.textContent = '×';
+        deleteButton.setAttribute('aria-label', `Delete workflow ${workflow.name}`);
+        deleteButton.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (confirm(`Are you sure you want to delete "${workflow.name}"?`)) {
+                // Remove from workflows array
+                const index = workflows.findIndex(w => w.name === workflow.name);
+                if (index !== -1) {
+                    workflows.splice(index, 1);
+                    
+                    // Update localStorage
+                    localStorage.setItem('workflows', JSON.stringify(workflows));
+                    
+                    // Update workflow select dropdown
+                    const workflowSelect = document.getElementById('workflowSelect');
+                    if (workflowSelect) {
+                        const option = workflowSelect.querySelector(`option[value="${workflow.name}"]`);
+                        if (option) {
+                            option.remove();
+                        }
+                    }
+                    
+                    // Remove the workflow item from the list
+                    workflowItem.remove();
+                    
+                    // If no workflows left, show message
+                    if (workflows.length === 0) {
+                        workflowsList.innerHTML = '<p class="no-workflows">No saved workflows yet.</p>';
+                    }
+                }
+            }
+        };
+        
+        workflowItem.appendChild(workflowInfo);
+        workflowItem.appendChild(deleteButton);
+        workflowsList.appendChild(workflowItem);
+    });
+}
 
 // Function to edit a workflow
 function editWorkflow(workflow) {
@@ -3137,40 +3354,3 @@ buttonConsistencyStyle.textContent = `
     }
 `;
 document.head.appendChild(buttonConsistencyStyle);
-
-// Add CSS for the toggle button
-const toggleButtonStyle = document.createElement('style');
-toggleButtonStyle.textContent = `
-    .toggle-saved-workflows {
-        width: 200px;
-        height: 40px;
-        font-size: 16px;
-        font-weight: bold;
-        padding: 8px 16px;
-        margin: 10px;
-        border-radius: 4px;
-        background-color: #2196F3;
-        color: white;
-        border: none;
-        cursor: pointer;
-        transition: background-color 0.2s;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        box-sizing: border-box;
-        line-height: 1;
-        white-space: nowrap;
-        -webkit-tap-highlight-color: transparent;
-        touch-action: manipulation;
-    }
-    
-    .toggle-saved-workflows:hover {
-        background-color: #1976D2;
-    }
-    
-    .toggle-saved-workflows:active {
-        transform: scale(0.98);
-    }
-`;
-document.head.appendChild(toggleButtonStyle);
