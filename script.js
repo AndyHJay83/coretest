@@ -207,6 +207,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     throw new Error('Selected workflow not found');
                 }
                 
+                // Hide the homepage elements
+                document.getElementById('homepage').style.display = 'none';
+                
                 // Show the workflow execution area
                 document.getElementById('workflowExecution').style.display = 'block';
                 
