@@ -138,8 +138,12 @@ async function performWorkflow() {
         featureArea.innerHTML = '';
         resultsContainer.innerHTML = '';
         
+        // Get the features from the workflow
+        const features = workflow.selectedFeatures || [];
+        console.log('Workflow features:', features);
+        
         // Create and display each feature section
-        workflow.features.forEach(feature => {
+        features.forEach(feature => {
             const featureSection = document.createElement('div');
             featureSection.className = 'feature-section';
             featureSection.id = `${feature.toLowerCase()}Feature`;
@@ -191,8 +195,8 @@ async function performWorkflow() {
         updateWordCount(currentFilteredWords.length);
         
         // Set up event listeners for the first feature
-        if (workflow.features.length > 0) {
-            const firstFeature = workflow.features[0].toLowerCase();
+        if (features.length > 0) {
+            const firstFeature = features[0].toLowerCase();
             setupFeatureListeners(firstFeature, (filteredWords) => {
                 currentFilteredWords = filteredWords;
                 displayResults(filteredWords);
