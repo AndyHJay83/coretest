@@ -2262,6 +2262,10 @@ function initializeDropdowns() {
         const selectedText = customSelect.querySelector('.selected-text');
         const optionsList = customSelect.querySelector('.options-list');
         
+        // Add max-height and overflow-y to make options list scrollable
+        optionsList.style.maxHeight = '200px';
+        optionsList.style.overflowY = 'auto';
+        
         // Clear existing options
         optionsList.innerHTML = '';
         
@@ -2278,6 +2282,9 @@ function initializeDropdowns() {
                 selectedText.textContent = option.textContent;
                 optionsList.classList.remove('show');
                 select.dispatchEvent(new Event('change'));
+                
+                // Close dropdown after selection
+                optionsList.style.display = 'none';
             });
             
             // Add touch handler for mobile
@@ -2287,6 +2294,9 @@ function initializeDropdowns() {
                 selectedText.textContent = option.textContent;
                 optionsList.classList.remove('show');
                 select.dispatchEvent(new Event('change'));
+                
+                // Close dropdown after selection
+                optionsList.style.display = 'none';
             }, { passive: false });
             
             optionsList.appendChild(customOption);
@@ -2299,6 +2309,7 @@ function initializeDropdowns() {
         customSelect.addEventListener('click', (e) => {
             e.stopPropagation();
             optionsList.classList.toggle('show');
+            optionsList.style.display = optionsList.classList.contains('show') ? 'block' : 'none';
         });
         
         // Add touch handler for mobile
@@ -2306,12 +2317,14 @@ function initializeDropdowns() {
             e.preventDefault();
             e.stopPropagation();
             optionsList.classList.toggle('show');
+            optionsList.style.display = optionsList.classList.contains('show') ? 'block' : 'none';
         }, { passive: false });
         
         // Close dropdown when clicking outside
         document.addEventListener('click', (e) => {
             if (!customSelect.contains(e.target)) {
                 optionsList.classList.remove('show');
+                optionsList.style.display = 'none';
             }
         });
         
@@ -2319,6 +2332,7 @@ function initializeDropdowns() {
         document.addEventListener('touchstart', (e) => {
             if (!customSelect.contains(e.target)) {
                 optionsList.classList.remove('show');
+                optionsList.style.display = 'none';
             }
         }, { passive: false });
     });
