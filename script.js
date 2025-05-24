@@ -164,20 +164,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initialize all dropdowns
     initializeDropdowns();
     
-    // Add toggle button for saved workflows
-    const savedWorkflowsSection = document.querySelector('.saved-workflows');
-    if (savedWorkflowsSection) {
+    // Add toggle button for saved workflows after the save workflow button
+    const saveWorkflowButton = document.getElementById('saveWorkflowButton');
+    if (saveWorkflowButton) {
         const toggleButton = document.createElement('button');
         toggleButton.id = 'toggleSavedWorkflows';
         toggleButton.className = 'toggle-saved-workflows';
         toggleButton.textContent = 'Show Saved Workflows';
         toggleButton.onclick = toggleSavedWorkflows;
         
-        // Insert the button before the saved workflows container
-        const savedWorkflows = document.getElementById('savedWorkflows');
-        if (savedWorkflows) {
-            savedWorkflowsSection.insertBefore(toggleButton, savedWorkflows);
-        }
+        // Insert the button after the save workflow button
+        saveWorkflowButton.parentNode.insertBefore(toggleButton, saveWorkflowButton.nextSibling);
     }
     
     // Display saved workflows
@@ -190,7 +187,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initialize workflow creation functionality
     const createWorkflowButton = document.getElementById('createWorkflowButton');
     const cancelWorkflowButton = document.getElementById('cancelWorkflowButton');
-    const saveWorkflowButton = document.getElementById('saveWorkflowButton');
     const workflowNameInput = document.getElementById('workflowName');
     
     if (createWorkflowButton) {
@@ -2923,3 +2919,38 @@ buttonConsistencyStyle.textContent = `
     }
 `;
 document.head.appendChild(buttonConsistencyStyle);
+
+// Add CSS for the toggle button
+const toggleButtonStyle = document.createElement('style');
+toggleButtonStyle.textContent = `
+    .toggle-saved-workflows {
+        width: 200px;
+        height: 40px;
+        font-size: 16px;
+        font-weight: bold;
+        padding: 8px 16px;
+        margin: 10px;
+        border-radius: 4px;
+        background-color: #2196F3;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        box-sizing: border-box;
+        line-height: 1;
+        white-space: nowrap;
+    }
+    
+    .toggle-saved-workflows:hover {
+        background-color: #1976D2;
+    }
+    
+    .toggle-saved-workflows:active {
+        transform: scale(0.98);
+    }
+`;
+document.head.appendChild(toggleButtonStyle);
