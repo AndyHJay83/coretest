@@ -1216,9 +1216,16 @@ async function executeWorkflow(steps) {
         currentFilteredWords = [...wordList]; // Start with the full wordlist
         
         // Hide homepage and show workflow execution
-        document.getElementById('homepage').style.display = 'none';
+        const homepage = document.getElementById('homepage');
         const workflowExecution = document.getElementById('workflowExecution');
-        workflowExecution.style.display = 'block';
+        
+        if (homepage) {
+            homepage.style.display = 'none';
+        }
+        
+        if (workflowExecution) {
+            workflowExecution.style.display = 'block';
+        }
         
         // Hide all features initially
         const allFeatures = [
@@ -1243,7 +1250,9 @@ async function executeWorkflow(steps) {
         });
         
         // Clear any existing content in the workflow execution area
-        workflowExecution.innerHTML = '';
+        if (workflowExecution) {
+            workflowExecution.innerHTML = '';
+        }
         
         // Create feature area container in the top third
         const featureArea = document.createElement('div');

@@ -84,6 +84,11 @@ body {
     overflow-y: auto;
     padding: 20px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: none; /* Hide by default */
+}
+
+#homepage {
+    display: block; /* Show homepage by default */
 }
 
 /* Results Area (Bottom Two Thirds) */
@@ -115,12 +120,9 @@ body {
 
 /* Feature Area Styling */
 .feature-area {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
     padding: 20px;
+    background: #fff;
+    border-bottom: 1px solid #eee;
 }
 
 .feature-section {
