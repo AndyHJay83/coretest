@@ -1806,14 +1806,14 @@ function showNextFeature() {
     else if (isVowelMode && !document.getElementById('vowelFeature').classList.contains('completed')) {
         document.getElementById('vowelFeature').style.display = 'block';
     }
-    else if (!document.getElementById('oFeature').classList.contains('completed')) {
-        document.getElementById('oFeature').style.display = 'block';
-    }
     else if (!lexiconCompleted) {
         document.getElementById('lexiconFeature').style.display = 'block';
     }
     else if (!originalLexCompleted) {
         document.getElementById('originalLexFeature').style.display = 'block';
+    }
+    else if (!document.getElementById('oFeature').classList.contains('completed')) {
+        document.getElementById('oFeature').style.display = 'block';
     }
     else if (!eeeCompleted) {
         document.getElementById('eeeFeature').style.display = 'block';
