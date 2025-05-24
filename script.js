@@ -88,6 +88,47 @@ function initializeWorkflowDropdown() {
         // Clear existing options
         optionsList.innerHTML = '';
         
+        // Add CSS for options list
+        const style = document.createElement('style');
+        style.textContent = `
+            .custom-select {
+                position: relative;
+                width: 100%;
+                cursor: pointer;
+            }
+            .selected-text {
+                padding: 8px 12px;
+                background: white;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+            }
+            .options-list {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                margin-top: 4px;
+                max-height: 200px;
+                overflow-y: auto;
+                z-index: 1000;
+            }
+            .options-list.show {
+                display: block;
+            }
+            .option {
+                padding: 8px 12px;
+                cursor: pointer;
+            }
+            .option:hover {
+                background: #f0f0f0;
+            }
+        `;
+        document.head.appendChild(style);
+        
         console.log('Adding options to custom dropdown');
         // Add options to custom dropdown
         Array.from(workflowSelect.options).forEach(option => {
@@ -162,16 +203,20 @@ function initializeWorkflowDropdown() {
         const toggleClickHandler = (e) => {
             e.stopPropagation();
             console.log('Custom select clicked');
+            const isVisible = optionsList.classList.contains('show');
             optionsList.classList.toggle('show');
-            optionsList.style.display = optionsList.classList.contains('show') ? 'block' : 'none';
+            optionsList.style.display = isVisible ? 'none' : 'block';
+            console.log('Options list display:', optionsList.style.display);
         };
         
         const toggleTouchHandler = (e) => {
             e.preventDefault();
             e.stopPropagation();
             console.log('Custom select touched');
+            const isVisible = optionsList.classList.contains('show');
             optionsList.classList.toggle('show');
-            optionsList.style.display = optionsList.classList.contains('show') ? 'block' : 'none';
+            optionsList.style.display = isVisible ? 'none' : 'block';
+            console.log('Options list display:', optionsList.style.display);
         };
         
         // Store toggle handlers on the custom select element
