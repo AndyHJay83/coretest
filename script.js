@@ -2547,9 +2547,6 @@ function initializeDropdowns() {
                 selectedText.textContent = option.textContent;
                 optionsList.classList.remove('show');
                 select.dispatchEvent(new Event('change'));
-                
-                // Close dropdown after selection
-                optionsList.style.display = 'none';
             });
             
             // Add touch handler for mobile
@@ -2559,9 +2556,6 @@ function initializeDropdowns() {
                 selectedText.textContent = option.textContent;
                 optionsList.classList.remove('show');
                 select.dispatchEvent(new Event('change'));
-                
-                // Close dropdown after selection
-                optionsList.style.display = 'none';
             }, { passive: false });
             
             optionsList.appendChild(customOption);
@@ -2574,7 +2568,6 @@ function initializeDropdowns() {
         customSelect.addEventListener('click', (e) => {
             e.stopPropagation();
             optionsList.classList.toggle('show');
-            optionsList.style.display = optionsList.classList.contains('show') ? 'block' : 'none';
         });
         
         // Add touch handler for mobile
@@ -2582,14 +2575,12 @@ function initializeDropdowns() {
             e.preventDefault();
             e.stopPropagation();
             optionsList.classList.toggle('show');
-            optionsList.style.display = optionsList.classList.contains('show') ? 'block' : 'none';
         }, { passive: false });
         
         // Close dropdown when clicking outside
         document.addEventListener('click', (e) => {
             if (!customSelect.contains(e.target)) {
                 optionsList.classList.remove('show');
-                optionsList.style.display = 'none';
             }
         });
         
@@ -2597,7 +2588,6 @@ function initializeDropdowns() {
         document.addEventListener('touchstart', (e) => {
             if (!customSelect.contains(e.target)) {
                 optionsList.classList.remove('show');
-                optionsList.style.display = 'none';
             }
         }, { passive: false });
     });
