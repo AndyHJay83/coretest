@@ -28,36 +28,47 @@
         <!-- Homepage Content -->
         <div id="homepage" class="homepage-content">
             <div class="selection-container">
-                <div class="dropdown-group">
-                    <label for="workflowSelect">Select Workflow:</label>
-                    <div class="dropdown">
-                        <select id="workflowSelect">
-                            <option value="">Select a workflow...</option>
-                            <option value="create-new">New Workflow</option>
-                        </select>
-                        <div class="custom-select">
-                            <div class="selected-text">Select a workflow...</div>
-                            <div class="options-list"></div>
-                        </div>
-                    </div>
+                <div class="selection-group">
+                    <h3>Workflow</h3>
+                    <button id="workflowButton" class="selection-button">
+                        <span class="selected-text">Select Workflow</span>
+                    </button>
                 </div>
-                
-                <div class="dropdown-group">
-                    <label for="wordlistSelect">Select Wordlist:</label>
-                    <div class="dropdown">
-                        <select id="wordlistSelect">
-                            <option value="enuk" selected>ENUK Wordlist</option>
-                        </select>
-                        <div class="custom-select">
-                            <div class="selected-text">ENUK Wordlist</div>
-                            <div class="options-list"></div>
-                        </div>
-                    </div>
+                <div class="selection-group">
+                    <h3>Word List</h3>
+                    <button id="wordlistButton" class="selection-button">
+                        <span class="selected-text">Select Word List</span>
+                    </button>
                 </div>
             </div>
-            
-            <button id="performButton" class="perform-button">PERFORM</button>
-            <button id="createWorkflowButton" class="create-button">New Workflow</button>
+            <button id="performButton" class="perform-button" disabled>PERFORM</button>
+            <button id="createWorkflowButton" class="create-workflow-button">NEW WORKFLOW</button>
+        </div>
+
+        <!-- Workflow Selection Modal -->
+        <div id="workflowModal" class="selection-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Select Workflow</h2>
+                    <button class="close-button">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="workflowList" class="selection-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Word List Selection Modal -->
+        <div id="wordlistModal" class="selection-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Select Word List</h2>
+                    <button class="close-button">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="wordlistList" class="selection-list"></div>
+                </div>
+            </div>
         </div>
 
         <!-- Workflow Creation Page -->
