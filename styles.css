@@ -1704,7 +1704,7 @@ input:checked + .slider:before {
 .feature-group {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 4px;
     margin-bottom: 8px;
 }
 
@@ -1713,15 +1713,17 @@ input:checked + .slider:before {
     border: none;
     color: #666;
     cursor: pointer;
-    padding: 4px;
-    font-size: 16px;
-    transition: color 0.2s;
+    padding: 2px;
+    font-size: 12px;
+    transition: all 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
+    min-width: 18px;
+    min-height: 18px;
 }
 
 .info-button:hover {
@@ -1730,7 +1732,8 @@ input:checked + .slider:before {
 }
 
 .info-button i {
-    font-size: 16px;
+    font-size: 12px;
+    line-height: 1;
 }
 
 /* Feature Info Modal Styles */
