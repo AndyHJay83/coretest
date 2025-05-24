@@ -873,6 +873,8 @@ async function executeWorkflow(steps) {
         currentFilteredWordsForVowels = [];
         currentPosition1Word = '';
         
+        console.log('Starting workflow with steps:', steps);
+        
         // Hide homepage and show workflow execution
         const homepage = document.getElementById('homepage');
         const workflowExecution = document.getElementById('workflowExecution');
@@ -1059,8 +1061,16 @@ async function executeWorkflow(steps) {
             // Wait for user interaction
             await new Promise((resolve) => {
                 const handleFeatureComplete = () => {
+                    console.log(`Feature ${featureId} completed`);
                     featureElement.classList.add('completed');
                     featureElement.style.display = 'none';
+                    
+                    // If this was the vowel feature, ensure originalLexCompleted is false
+                    if (featureId === 'vowelFeature') {
+                        console.log('Vowel feature completed, resetting originalLexCompleted');
+                        originalLexCompleted = false;
+                    }
+                    
                     resolve();
                 };
                 
