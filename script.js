@@ -1173,17 +1173,22 @@ function setupFeatureListeners(feature, callback) {
         case 'position1':
             const position1Button = document.getElementById('position1Button');
             const position1DoneButton = document.getElementById('position1DoneButton');
+            const position1Input = document.getElementById('position1Input');
             
             if (position1Button) {
                 position1Button.onclick = () => {
-                    const input = document.getElementById('position1Input')?.value.trim();
+                    const input = position1Input?.value.trim();
                     if (input) {
                         const consonants = getConsonantsInOrder(input);
                         if (consonants.length >= 2) {
                             const filteredWords = filterWordsByPosition1(currentFilteredWords, consonants);
                             callback(filteredWords);
                             document.getElementById('position1Feature').dispatchEvent(new Event('completed'));
+                        } else {
+                            alert('Please enter a word with at least 2 consonants');
                         }
+                    } else {
+                        alert('Please enter a word');
                     }
                 };
             }
@@ -1193,6 +1198,21 @@ function setupFeatureListeners(feature, callback) {
                     callback(currentFilteredWords);
                     document.getElementById('position1Feature').dispatchEvent(new Event('completed'));
                 };
+            }
+
+            // Add touch events for mobile
+            if (position1Button) {
+                position1Button.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    position1Button.click();
+                }, { passive: false });
+            }
+
+            if (position1DoneButton) {
+                position1DoneButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    position1DoneButton.click();
+                }, { passive: false });
             }
             break;
             
