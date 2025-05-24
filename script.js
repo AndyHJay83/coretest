@@ -2612,9 +2612,11 @@ function initializeDropdowns() {
             customOption.className = 'option';
             customOption.textContent = option.textContent;
             customOption.setAttribute('data-value', option.value);
+            customOption.setAttribute('role', 'option');
+            customOption.setAttribute('tabindex', '0');
             
-            // Add touch handler for mobile
-            customOption.addEventListener('touchend', (e) => {
+            // Add touch handler for mobile/PWA
+            customOption.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 selectOption(option.value, option.textContent, customOption);
@@ -2634,7 +2636,7 @@ function initializeDropdowns() {
         selectedText.textContent = nativeSelect.options[nativeSelect.selectedIndex].text;
         
         // Add touch handler for the custom select
-        customSelect.addEventListener('touchend', (e) => {
+        customSelect.addEventListener('touchstart', (e) => {
             e.preventDefault();
             e.stopPropagation();
             toggleDropdown(optionsList, customSelect);
@@ -2660,7 +2662,6 @@ function initializeDropdowns() {
         // Add keyboard navigation for options
         const options = optionsList.querySelectorAll('.option');
         options.forEach((option, index) => {
-            option.setAttribute('tabindex', '0');
             option.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
@@ -2701,7 +2702,7 @@ function initializeDropdowns() {
     }
     
     // Add global event listeners
-    document.addEventListener('touchend', handleGlobalTouch, { passive: false });
+    document.addEventListener('touchstart', handleGlobalTouch, { passive: false });
     document.addEventListener('click', handleGlobalClick);
     
     // Helper functions
