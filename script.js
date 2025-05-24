@@ -1224,7 +1224,9 @@ async function executeWorkflow(steps) {
         }
         
         if (workflowExecution) {
-            workflowExecution.style.display = 'block';
+            workflowExecution.style.display = 'flex';
+            workflowExecution.style.flexDirection = 'column';
+            workflowExecution.style.height = '100vh';
         }
         
         // Create feature elements if they don't exist
@@ -1273,9 +1275,24 @@ async function executeWorkflow(steps) {
             workflowExecution.appendChild(resultsContainer);
         }
         
+        // Set up the layout
+        featureArea.style.flex = '0 0 33vh';
+        featureArea.style.minHeight = '200px';
+        featureArea.style.padding = '20px';
+        featureArea.style.backgroundColor = '#f5f5f5';
+        featureArea.style.borderBottom = '1px solid #ddd';
+        
+        resultsContainer.style.flex = '1';
+        resultsContainer.style.overflowY = 'auto';
+        resultsContainer.style.padding = '20px';
+        resultsContainer.style.backgroundColor = '#fff';
+        
         // Clear any existing content in both areas
         featureArea.innerHTML = '';
         resultsContainer.innerHTML = '';
+        
+        console.log('Feature area:', featureArea);
+        console.log('Results container:', resultsContainer);
         
         // Display initial wordlist in the results container
         displayResults(currentFilteredWords);
@@ -1715,6 +1732,8 @@ function displayResults(words) {
         return;
     }
     
+    console.log('Displaying results in container:', resultsContainer);
+    
     // Clear the results container
     resultsContainer.innerHTML = '';
     
@@ -1741,6 +1760,10 @@ function displayResults(words) {
     const featureArea = document.getElementById('featureArea');
     if (featureArea) {
         featureArea.style.display = 'block';
+        // Clear any wordlist that might have been accidentally added to the feature area
+        if (featureArea.querySelector('.word-list')) {
+            featureArea.innerHTML = '';
+        }
     }
 }
 
