@@ -91,15 +91,26 @@ function initializeWorkflowDropdown() {
         // Add CSS for options list
         const style = document.createElement('style');
         style.textContent = `
+            .selection-container {
+                position: relative;
+                width: 100%;
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+            .dropdown-group {
+                position: relative;
+                width: 100%;
+                max-width: 300px;
+                margin: 0 auto 20px;
+            }
             .dropdown {
                 position: relative;
                 width: 100%;
                 max-width: 300px;
                 margin: 0 auto;
                 z-index: 9999;
-                display: inline-block;
-                left: 0;
-                right: 0;
+                display: block;
             }
             .custom-select {
                 position: relative;
@@ -256,6 +267,14 @@ function initializeWorkflowDropdown() {
             const isVisible = optionsList.classList.contains('show');
             optionsList.classList.toggle('show');
             optionsList.style.display = isVisible ? 'none' : 'block';
+            if (!isVisible) {
+                // Ensure proper positioning when showing
+                const customSelectRect = customSelect.getBoundingClientRect();
+                optionsList.style.position = 'absolute';
+                optionsList.style.top = `${customSelectRect.height}px`;
+                optionsList.style.left = '0';
+                optionsList.style.width = `${customSelectRect.width}px`;
+            }
             console.log('Options list display:', optionsList.style.display);
             console.log('Options list classList:', optionsList.classList.toString());
             console.log('Options list position:', optionsList.getBoundingClientRect());
@@ -268,6 +287,14 @@ function initializeWorkflowDropdown() {
             const isVisible = optionsList.classList.contains('show');
             optionsList.classList.toggle('show');
             optionsList.style.display = isVisible ? 'none' : 'block';
+            if (!isVisible) {
+                // Ensure proper positioning when showing
+                const customSelectRect = customSelect.getBoundingClientRect();
+                optionsList.style.position = 'absolute';
+                optionsList.style.top = `${customSelectRect.height}px`;
+                optionsList.style.left = '0';
+                optionsList.style.width = `${customSelectRect.width}px`;
+            }
             console.log('Options list display:', optionsList.style.display);
             console.log('Options list classList:', optionsList.classList.toString());
             console.log('Options list position:', optionsList.getBoundingClientRect());
@@ -2895,16 +2922,36 @@ function initializeDropdowns() {
         // Add click handler for the custom select
         customSelect.addEventListener('click', (e) => {
             e.stopPropagation();
+            const isVisible = optionsList.classList.contains('show');
             optionsList.classList.toggle('show');
-            optionsList.style.display = optionsList.classList.contains('show') ? 'block' : 'none';
+            optionsList.style.display = isVisible ? 'none' : 'block';
+            
+            if (!isVisible) {
+                // Ensure proper positioning when showing
+                const customSelectRect = customSelect.getBoundingClientRect();
+                optionsList.style.position = 'absolute';
+                optionsList.style.top = `${customSelectRect.height}px`;
+                optionsList.style.left = '0';
+                optionsList.style.width = `${customSelectRect.width}px`;
+            }
         });
         
         // Add touch handler for mobile
         customSelect.addEventListener('touchstart', (e) => {
             e.preventDefault();
             e.stopPropagation();
+            const isVisible = optionsList.classList.contains('show');
             optionsList.classList.toggle('show');
-            optionsList.style.display = optionsList.classList.contains('show') ? 'block' : 'none';
+            optionsList.style.display = isVisible ? 'none' : 'block';
+            
+            if (!isVisible) {
+                // Ensure proper positioning when showing
+                const customSelectRect = customSelect.getBoundingClientRect();
+                optionsList.style.position = 'absolute';
+                optionsList.style.top = `${customSelectRect.height}px`;
+                optionsList.style.left = '0';
+                optionsList.style.width = `${customSelectRect.width}px`;
+            }
         }, { passive: false });
         
         // Close dropdown when clicking outside
