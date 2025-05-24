@@ -2318,20 +2318,215 @@ function displaySavedWorkflows() {
 
 // Function to toggle saved workflows visibility
 function toggleSavedWorkflows() {
-    const savedWorkflows = document.getElementById('savedWorkflows');
-    const toggleButton = document.getElementById('toggleSavedWorkflows');
-    
-    if (savedWorkflows && toggleButton) {
-        if (savedWorkflows.style.display === 'none') {
-            savedWorkflows.style.display = 'block';
-            toggleButton.textContent = 'Hide Saved Workflows';
-            displaySavedWorkflows(); // Refresh the list
-        } else {
-            savedWorkflows.style.display = 'none';
-            toggleButton.textContent = 'Show Saved Workflows';
-        }
+    // Create modal if it doesn't exist
+    let modal = document.getElementById('savedWorkflowsModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'savedWorkflowsModal';
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Saved Workflows</h2>
+                    <button class="close-button">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="savedWorkflowsList"></div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        // Add close button functionality
+        const closeButton = modal.querySelector('.close-button');
+        closeButton.onclick = () => {
+            modal.style.display = 'none';
+        };
+
+        // Close modal when clicking outside
+        window.onclick = (event) => {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        };
     }
+
+    // Display the modal
+    modal.style.display = 'block';
+
+    // Update the workflows list
+    const workflowsList = document.getElementById('savedWorkflowsList');
+    workflowsList.innerHTML = '';
+
+    if (workflows.length === 0) {
+        workflowsList.innerHTML = '<p class="no-workflows">No saved workflows yet.</p>';
+        return;
+    }
+
+    // Create list of workflows
+    workflows.forEach(workflow => {
+        const workflowItem = document.createElement('div');
+        workflowItem.className = 'workflow-item';
+        
+        const workflowInfo = document.createElement('div');
+        workflowInfo.className = 'workflow-info';
+        
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'workflow-name';
+        nameSpan.textContent = workflow.name;
+        
+        const stepsSpan = document.createElement('span');
+        stepsSpan.className = 'workflow-steps';
+        stepsSpan.textContent = workflow.steps.map(step => step.feature).join(' → ');
+        
+        workflowInfo.appendChild(nameSpan);
+        workflowInfo.appendChild(stepsSpan);
+        
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'delete-workflow';
+        deleteButton.textContent = '×';
+        deleteButton.onclick = (e) => {
+            e.stopPropagation();
+            if (confirm(`Are you sure you want to delete "${workflow.name}"?`)) {
+                // Remove from workflows array
+                const index = workflows.findIndex(w => w.name === workflow.name);
+                if (index !== -1) {
+                    workflows.splice(index, 1);
+                    
+                    // Update localStorage
+                    localStorage.setItem('workflows', JSON.stringify(workflows));
+                    
+                    // Update workflow select dropdown
+                    const workflowSelect = document.getElementById('workflowSelect');
+                    if (workflowSelect) {
+                        const option = workflowSelect.querySelector(`option[value="${workflow.name}"]`);
+                        if (option) {
+                            option.remove();
+                        }
+                    }
+                    
+                    // Remove the workflow item from the list
+                    workflowItem.remove();
+                    
+                    // If no workflows left, show message
+                    if (workflows.length === 0) {
+                        workflowsList.innerHTML = '<p class="no-workflows">No saved workflows yet.</p>';
+                    }
+                }
+            }
+        };
+        
+        workflowItem.appendChild(workflowInfo);
+        workflowItem.appendChild(deleteButton);
+        workflowsList.appendChild(workflowItem);
+    });
 }
+
+// Add CSS for the modal
+const modalStyle = document.createElement('style');
+modalStyle.textContent = `
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 600px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .modal-header h2 {
+        margin: 0;
+        color: #333;
+    }
+
+    .close-button {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #666;
+    }
+
+    .close-button:hover {
+        color: #333;
+    }
+
+    .workflow-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px;
+        margin: 8px 0;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+    }
+
+    .workflow-item:hover {
+        background-color: #e9ecef;
+    }
+
+    .workflow-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .workflow-name {
+        font-weight: bold;
+        color: #333;
+    }
+
+    .workflow-steps {
+        font-size: 0.9em;
+        color: #666;
+    }
+
+    .delete-workflow {
+        background: none;
+        border: none;
+        color: #dc3545;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+    }
+
+    .delete-workflow:hover {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .no-workflows {
+        text-align: center;
+        color: #666;
+        padding: 20px;
+    }
+`;
+document.head.appendChild(modalStyle);
 
 // Function to edit a workflow
 function editWorkflow(workflow) {
