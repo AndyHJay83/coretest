@@ -910,6 +910,25 @@ async function executeWorkflow(steps) {
             workflowExecution.style.flexDirection = 'column';
             workflowExecution.style.height = '100vh';
         }
+
+        // Add reset button if it doesn't exist
+        let resetButton = document.getElementById('resetWorkflowButton');
+        if (!resetButton) {
+            resetButton = document.createElement('button');
+            resetButton.id = 'resetWorkflowButton';
+            resetButton.className = 'reset-workflow-button';
+            resetButton.innerHTML = '↺';
+            resetButton.title = 'Reset Workflow';
+            resetButton.onclick = () => {
+                if (currentWorkflow) {
+                    executeWorkflow(currentWorkflow.steps);
+                }
+            };
+            document.body.appendChild(resetButton);
+        }
+        
+        // Store current workflow for reset functionality
+        currentWorkflow = { steps };
         
         // Create feature elements if they don't exist
         const featureElements = {
@@ -2698,3 +2717,35 @@ originalLexStyle.textContent = `
     }
 `;
 document.head.appendChild(originalLexStyle);
+
+// Add CSS for reset button
+const resetButtonStyle = document.createElement('style');
+resetButtonStyle.textContent = `
+    .reset-workflow-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: rgba(0, 0, 0, 0.75);
+        color: white;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        transition: background-color 0.2s;
+    }
+    
+    .reset-workflow-button:hover {
+        background-color: rgba(0, 0, 0, 0.9);
+    }
+    
+    .reset-workflow-button:active {
+        transform: scale(0.95);
+    }
+`;
+document.head.appendChild(resetButtonStyle);
