@@ -2233,3 +2233,88 @@ document.addEventListener('DOMContentLoaded', function() {
 function reinitializeDragAndDrop() {
     initializeDragAndDrop();
 }
+
+// Initialize feature selection functionality
+function initializeFeatureSelection() {
+    const availableFeatures = document.getElementById('availableFeatures');
+    const selectedFeaturesList = document.getElementById('selectedFeaturesList');
+    
+    if (availableFeatures) {
+        const featureButtons = availableFeatures.querySelectorAll('.feature-button');
+        
+        featureButtons.forEach(button => {
+            // Remove drag events
+            button.draggable = false;
+            
+            // Add click event
+            button.addEventListener('click', () => {
+                const featureType = button.dataset.feature;
+                if (!isFeatureAlreadySelected(featureType)) {
+                    addFeatureToSelected(featureType);
+                }
+            });
+            
+            // Add touch event for mobile
+            button.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const featureType = button.dataset.feature;
+                if (!isFeatureAlreadySelected(featureType)) {
+                    addFeatureToSelected(featureType);
+                }
+            }, { passive: false });
+        });
+    }
+}
+
+function isFeatureAlreadySelected(featureType) {
+    const selectedFeatures = document.getElementById('selectedFeaturesList');
+    return selectedFeatures.querySelector(`[data-feature="${featureType}"]`) !== null;
+}
+
+function addFeatureToSelected(featureType) {
+    const selectedFeatures = document.getElementById('selectedFeaturesList');
+    const featureButton = document.querySelector(`.feature-button[data-feature="${featureType}"]`);
+    
+    const selectedFeature = document.createElement('div');
+    selectedFeature.className = 'selected-feature-item';
+    selectedFeature.dataset.feature = featureType;
+    
+    selectedFeature.innerHTML = `
+        <span>${featureButton.textContent}</span>
+        <button class="remove-feature" onclick="removeFeature('${featureType}')">×</button>
+    `;
+    
+    // Add click event to move feature back to available
+    selectedFeature.addEventListener('click', (e) => {
+        if (e.target !== selectedFeature.querySelector('.remove-feature')) {
+            removeFeature(featureType);
+        }
+    });
+    
+    // Add touch event for mobile
+    selectedFeature.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (e.target !== selectedFeature.querySelector('.remove-feature')) {
+            removeFeature(featureType);
+        }
+    }, { passive: false });
+    
+    selectedFeatures.appendChild(selectedFeature);
+}
+
+function removeFeature(featureType) {
+    const selectedFeature = document.querySelector(`.selected-feature-item[data-feature="${featureType}"]`);
+    if (selectedFeature) {
+        selectedFeature.remove();
+    }
+}
+
+// Initialize feature selection when the DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    initializeFeatureSelection();
+});
+
+// Re-initialize feature selection when new content is added
+function reinitializeFeatureSelection() {
+    initializeFeatureSelection();
+}
