@@ -152,6 +152,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Load word list
     await loadWordList();
     
+    // Load saved workflows from localStorage
+    const savedWorkflows = localStorage.getItem('workflows');
+    if (savedWorkflows) {
+        workflows = JSON.parse(savedWorkflows);
+    }
+    
     // Initialize workflow dropdown
     initializeWorkflowDropdown();
     
@@ -173,6 +179,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             savedWorkflowsSection.insertBefore(toggleButton, savedWorkflows);
         }
     }
+    
+    // Display saved workflows
+    displaySavedWorkflows();
     
     // Set up drag and drop for feature buttons
     const availableFeatures = document.getElementById('availableFeatures');
