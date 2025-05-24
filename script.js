@@ -88,13 +88,22 @@ function showWorkflowCreation() {
     document.getElementById('workflowName').focus();
 }
 
-function performWorkflow(workflowId) {
-    console.log('Performing workflow with ID:', workflowId); // Debug log
+function performWorkflow() {
+    const workflowSelect = document.getElementById('workflowSelect');
+    if (!workflowSelect) return;
+
+    const selectedWorkflowId = workflowSelect.value;
+    console.log('Performing workflow with ID:', selectedWorkflowId); // Debug log
+    
+    if (!selectedWorkflowId || selectedWorkflowId === 'create-new') {
+        alert('Please select a workflow first');
+        return;
+    }
     
     const workflows = JSON.parse(localStorage.getItem('workflows') || '[]');
     console.log('Available workflows:', workflows); // Debug log
     
-    const workflow = workflows.find(w => w.id === workflowId);
+    const workflow = workflows.find(w => w.id === selectedWorkflowId);
     console.log('Found workflow:', workflow); // Debug log
     
     if (!workflow) {
@@ -103,15 +112,12 @@ function performWorkflow(workflowId) {
         return;
     }
     
-    // Store the selected workflow ID
-    localStorage.setItem('selectedWorkflowId', workflowId);
-    
     // Show the workflow execution page
     document.getElementById('homepage').style.display = 'none';
     document.getElementById('workflowExecution').style.display = 'block';
     
-    // Initialize the workflow execution
-    initializeWorkflowExecution(workflow);
+    // Execute the workflow
+    executeWorkflow(workflow.steps);
 }
 
 // Add this to ensure dropdown is initialized when the page loads
@@ -204,7 +210,7 @@ function addFeatureToList(feature) {
 function setupButtonListeners() {
     // Create Workflow button
     const createWorkflowButton = document.getElementById('createWorkflowButton');
-    if (createWorkflowButton) {
+    if (createButton) {
         createWorkflowButton.addEventListener('click', showWorkflowCreation);
         createWorkflowButton.addEventListener('touchstart', (e) => {
             e.preventDefault();
