@@ -1215,6 +1215,11 @@ async function executeWorkflow(steps) {
         await loadWordList();
         currentFilteredWords = [...wordList]; // Start with the full wordlist
         
+        // Hide homepage and show workflow execution
+        document.getElementById('homepage').style.display = 'none';
+        const workflowExecution = document.getElementById('workflowExecution');
+        workflowExecution.style.display = 'block';
+        
         // Hide all features initially
         const allFeatures = [
             'originalLexFeature',
@@ -1234,12 +1239,11 @@ async function executeWorkflow(steps) {
             if (feature) {
                 feature.style.display = 'none';
                 feature.classList.remove('completed');
-                console.log(`Hiding feature: ${featureId}`);
             }
         });
         
-        // Show the workflow execution area
-        document.getElementById('workflowExecution').style.display = 'block';
+        // Display initial wordlist
+        displayResults(currentFilteredWords);
         
         // Execute each step in sequence
         for (const step of steps) {
