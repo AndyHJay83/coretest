@@ -2888,3 +2888,35 @@ buttonStyles.textContent = `
     }
 `;
 document.head.appendChild(buttonStyles);
+
+// Add CSS for button consistency
+const buttonConsistencyStyle = document.createElement('style');
+buttonConsistencyStyle.textContent = `
+    #createWorkflowButton {
+        width: 200px;
+        height: 40px;
+        font-size: 16px;
+        font-weight: bold;
+        padding: 8px 16px;
+        margin: 10px;
+        border-radius: 4px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+    
+    #createWorkflowButton:hover {
+        background-color: #45a049;
+    }
+    
+    #createWorkflowButton:active {
+        transform: scale(0.98);
+    }
+`;
+document.head.appendChild(buttonConsistencyStyle);
