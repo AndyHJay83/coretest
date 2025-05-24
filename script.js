@@ -911,6 +911,38 @@ async function executeWorkflow(steps) {
             workflowExecution.style.height = '100vh';
         }
 
+        // Add home button if it doesn't exist
+        let homeButton = document.getElementById('homeButton');
+        if (!homeButton) {
+            homeButton = document.createElement('button');
+            homeButton.id = 'homeButton';
+            homeButton.className = 'home-button';
+            homeButton.innerHTML = '⌂';
+            homeButton.title = 'Return to Home';
+            homeButton.onclick = () => {
+                // Hide workflow execution
+                if (workflowExecution) {
+                    workflowExecution.style.display = 'none';
+                }
+                // Show homepage
+                if (homepage) {
+                    homepage.style.display = 'block';
+                }
+                // Remove reset button if it exists
+                const resetButton = document.getElementById('resetWorkflowButton');
+                if (resetButton) {
+                    resetButton.remove();
+                }
+                // Remove home button
+                homeButton.remove();
+            };
+            // Insert home button next to the header
+            const header = document.querySelector('.header');
+            if (header) {
+                header.insertBefore(homeButton, header.firstChild);
+            }
+        }
+
         // Add reset button if it doesn't exist
         let resetButton = document.getElementById('resetWorkflowButton');
         if (!resetButton) {
@@ -2749,3 +2781,30 @@ resetButtonStyle.textContent = `
     }
 `;
 document.head.appendChild(resetButtonStyle);
+
+// Add CSS for home button
+const homeButtonStyle = document.createElement('style');
+homeButtonStyle.textContent = `
+    .home-button {
+        background: none;
+        border: none;
+        color: #333;
+        font-size: 24px;
+        cursor: pointer;
+        padding: 0 10px;
+        margin-right: 10px;
+        transition: color 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .home-button:hover {
+        color: #666;
+    }
+    
+    .home-button:active {
+        transform: scale(0.95);
+    }
+`;
+document.head.appendChild(homeButtonStyle);
