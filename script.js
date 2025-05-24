@@ -1775,26 +1775,29 @@ function filterWordsByColour3(words) {
 
 // Function to show next feature
 function showNextFeature() {
-    // First hide all features
-    const allFeatures = [
-        'originalLexFeature',
-        'eeeFeature',
-        'lexiconFeature',
+    // Hide all features first
+    const features = [
         'consonantQuestion',
         'position1Feature',
         'vowelFeature',
         'colour3Feature',
         'shapeFeature',
         'oFeature',
-        'curvedFeature'
+        'curvedFeature',
+        'lexiconFeature',
+        'originalLexFeature',
+        'eeeFeature'
     ];
     
-    allFeatures.forEach(featureId => {
-        document.getElementById(featureId).style.display = 'none';
+    features.forEach(featureId => {
+        const feature = document.getElementById(featureId);
+        if (feature) {
+            feature.style.display = 'none';
+        }
     });
-    
-    // Then show the appropriate feature based on the current state
-    if (hasAdjacentConsonants === null) {
+
+    // Show the next incomplete feature
+    if (!document.getElementById('consonantQuestion').classList.contains('completed')) {
         document.getElementById('consonantQuestion').style.display = 'block';
     }
     else if (!document.getElementById('position1Feature').classList.contains('completed')) {
@@ -1845,7 +1848,10 @@ function resetApp() {
     selectedCurvedLetter = null;
     hasO = null;
     currentFilteredWordsForVowels = [];
-    currentPosition1Word = ''; // Reset the Position 1 word
+    currentPosition1Word = '';
+    originalLexCompleted = false;
+    lexiconCompleted = false;
+    eeeCompleted = false;
     
     // Clear all results and show full wordlist
     displayResults(originalFilteredWords);
@@ -1858,7 +1864,10 @@ function resetApp() {
         'colour3Feature',
         'shapeFeature',
         'oFeature',
-        'curvedFeature'
+        'curvedFeature',
+        'lexiconFeature',
+        'originalLexFeature',
+        'eeeFeature'
     ];
     
     features.forEach(featureId => {
@@ -1871,6 +1880,8 @@ function resetApp() {
     
     // Reset all input fields
     document.getElementById('position1Input').value = '';
+    document.getElementById('originalLexInput').value = '';
+    document.getElementById('lexiconInput').value = '';
     
     // Show the first feature (consonant question)
     document.getElementById('consonantQuestion').style.display = 'block';
