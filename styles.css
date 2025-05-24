@@ -1369,6 +1369,10 @@ input:checked + .slider:before {
     transition: all 0.2s ease;
     overflow: hidden;
     position: relative;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .selection-card:hover {
@@ -1380,6 +1384,8 @@ input:checked + .slider:before {
 .selection-card.selected {
     border-color: #4CAF50;
     background-color: #f1f8e9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .card-content {
@@ -1389,10 +1395,11 @@ input:checked + .slider:before {
     align-items: center;
     gap: 12px;
     text-align: center;
+    width: 100%;
 }
 
 .card-content i {
-    font-size: 24px;
+    font-size: 32px;
     color: #4CAF50;
 }
 
@@ -1421,7 +1428,7 @@ input:checked + .slider:before {
     }
     
     .card-content i {
-        font-size: 20px;
+        font-size: 24px;
     }
     
     .card-content span {
@@ -1438,13 +1445,6 @@ input:checked + .slider:before {
 }
 
 /* Button styles */
-.button-container {
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
 .perform-button {
     width: 100%;
     padding: 16px;
@@ -1458,15 +1458,14 @@ input:checked + .slider:before {
     transition: all 0.2s ease;
 }
 
-.perform-button:hover {
+.perform-button:hover:not(:disabled) {
     background-color: #45a049;
 }
 
-.perform-button:active {
+.perform-button:active:not(:disabled) {
     transform: scale(0.98);
 }
 
-/* Disabled state */
 .perform-button:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
