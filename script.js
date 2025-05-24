@@ -158,28 +158,65 @@ function initializeWorkflowDropdown() {
         document._workflowDropdownClickHandler = clickHandler;
         document._workflowDropdownTouchHandler = touchHandler;
         
-        // Add click handler for the custom select
-        customSelect.addEventListener('click', (e) => {
+        // Create toggle handlers
+        const toggleClickHandler = (e) => {
             e.stopPropagation();
             console.log('Custom select clicked');
             optionsList.classList.toggle('show');
             optionsList.style.display = optionsList.classList.contains('show') ? 'block' : 'none';
-        });
+        };
         
-        // Add touch handler for mobile
-        customSelect.addEventListener('touchstart', (e) => {
+        const toggleTouchHandler = (e) => {
             e.preventDefault();
             e.stopPropagation();
             console.log('Custom select touched');
             optionsList.classList.toggle('show');
             optionsList.style.display = optionsList.classList.contains('show') ? 'block' : 'none';
-        }, { passive: false });
+        };
+        
+        // Store toggle handlers on the custom select element
+        customSelect._toggleClickHandler = toggleClickHandler;
+        customSelect._toggleTouchHandler = toggleTouchHandler;
+        
+        // Add click handler for the custom select
+        customSelect.addEventListener('click', toggleClickHandler);
+        
+        // Add touch handler for mobile
+        customSelect.addEventListener('touchstart', toggleTouchHandler, { passive: false });
         
         // Add document-level handlers
         document.addEventListener('click', clickHandler);
         document.addEventListener('touchstart', touchHandler, { passive: false });
+        
+        // Store reference to custom select for cleanup
+        workflowDropdown._customSelect = customSelect;
     } else {
         console.error('Workflow dropdown container not found');
+    }
+}
+
+// Function to cleanup workflow dropdown
+function cleanupWorkflowDropdown() {
+    const workflowDropdown = document.querySelector('.dropdown');
+    if (workflowDropdown) {
+        const customSelect = workflowDropdown._customSelect;
+        if (customSelect) {
+            // Remove toggle handlers
+            if (customSelect._toggleClickHandler) {
+                customSelect.removeEventListener('click', customSelect._toggleClickHandler);
+            }
+            if (customSelect._toggleTouchHandler) {
+                customSelect.removeEventListener('touchstart', customSelect._toggleTouchHandler);
+            }
+        }
+        
+        // Remove document handlers
+        if (document._workflowDropdownClickHandler) {
+            document.removeEventListener('click', document._workflowDropdownClickHandler);
+        }
+        if (document._workflowDropdownTouchHandler) {
+            document.removeEventListener('touchstart', document._workflowDropdownTouchHandler);
+        }
     }
 }
 
@@ -848,30 +885,11 @@ function saveWorkflow() {
         // Hide workflow creation and show homepage
         hideWorkflowCreation();
         
+        // Cleanup existing dropdown before reinitializing
+        cleanupWorkflowDropdown();
+        
         // Force a complete reinitialization of the dropdown
         console.log('Reinitializing dropdowns after save');
-        const workflowSelect = document.getElementById('workflowSelect');
-        if (workflowSelect) {
-            const dropdown = workflowSelect.closest('.dropdown');
-            if (dropdown) {
-                // Remove existing custom select
-                const existingCustomSelect = dropdown.querySelector('.custom-select');
-                if (existingCustomSelect) {
-                    existingCustomSelect.remove();
-                }
-                
-                // Create new custom select
-                const newCustomSelect = document.createElement('div');
-                newCustomSelect.className = 'custom-select';
-                newCustomSelect.innerHTML = `
-                    <div class="selected-text">Select a workflow</div>
-                    <div class="options-list"></div>
-                `;
-                dropdown.insertBefore(newCustomSelect, workflowSelect);
-            }
-        }
-        
-        // Reinitialize all dropdowns
         initializeWorkflowDropdown();
         initializeDropdowns();
         
