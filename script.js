@@ -2039,3 +2039,79 @@ function deleteWorkflow(workflow) {
         }
     }
 }
+
+// Enhanced dropdown functionality for PWA mode
+function initializeDropdowns() {
+    const dropdowns = document.querySelectorAll('.dropdown');
+    
+    dropdowns.forEach(dropdown => {
+        const select = dropdown.querySelector('select');
+        const customSelect = dropdown.querySelector('.custom-select');
+        const selectedText = customSelect.querySelector('.selected-text');
+        const optionsList = customSelect.querySelector('.options-list');
+        const options = customSelect.querySelectorAll('.option');
+        
+        // Update selected text when select changes
+        select.addEventListener('change', () => {
+            selectedText.textContent = select.options[select.selectedIndex].text;
+            optionsList.classList.remove('show');
+        });
+        
+        // Toggle options list on click
+        customSelect.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            optionsList.classList.toggle('show');
+        });
+        
+        // Handle option selection
+        options.forEach(option => {
+            option.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const value = option.getAttribute('data-value');
+                select.value = value;
+                selectedText.textContent = option.textContent;
+                optionsList.classList.remove('show');
+                select.dispatchEvent(new Event('change'));
+            });
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!customSelect.contains(e.target)) {
+                optionsList.classList.remove('show');
+            }
+        });
+        
+        // Handle touch events for mobile
+        customSelect.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            optionsList.classList.toggle('show');
+        }, { passive: false });
+        
+        options.forEach(option => {
+            option.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const value = option.getAttribute('data-value');
+                select.value = value;
+                selectedText.textContent = option.textContent;
+                optionsList.classList.remove('show');
+                select.dispatchEvent(new Event('change'));
+            }, { passive: false });
+        });
+    });
+}
+
+// Initialize dropdowns when the DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    initializeDropdowns();
+    // ... existing initialization code ...
+});
+
+// Re-initialize dropdowns when new content is added
+function reinitializeDropdowns() {
+    initializeDropdowns();
+}
