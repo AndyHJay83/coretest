@@ -1302,7 +1302,7 @@ input:checked + .slider:before {
     background: #fff;
     border: 1px solid #ddd;
     border-radius: 6px;
-    cursor: pointer;
+    cursor: grab;
     user-select: none;
     -webkit-user-select: none;
     touch-action: none;
@@ -1318,6 +1318,23 @@ input:checked + .slider:before {
 .feature-button.dragging {
     opacity: 0.5;
     background: #e0e0e0;
+    cursor: grabbing;
+}
+
+/* Selected features container */
+.selected-features {
+    background: #f5f5f5;
+    padding: 15px;
+    border-radius: 6px;
+    min-height: 200px;
+    height: 100%;
+    border: 2px dashed #ccc;
+    transition: all 0.3s ease;
+}
+
+.selected-features.drag-over {
+    border-color: #4CAF50;
+    background: rgba(76, 175, 80, 0.1);
 }
 
 /* Selected feature items */
@@ -1330,14 +1347,23 @@ input:checked + .slider:before {
     background: #fff;
     border: 1px solid #ddd;
     border-radius: 6px;
+    cursor: grab;
     user-select: none;
     -webkit-user-select: none;
     touch-action: none;
+    transition: all 0.2s ease;
+}
+
+.selected-feature-item:hover {
+    background: #f8f8f8;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .selected-feature-item.dragging {
     opacity: 0.5;
     background: #e0e0e0;
+    cursor: grabbing;
 }
 
 .remove-feature {
@@ -1347,6 +1373,7 @@ input:checked + .slider:before {
     font-size: 1.2rem;
     cursor: pointer;
     padding: 0 8px;
+    transition: color 0.2s ease;
 }
 
 .remove-feature:hover {
@@ -1378,8 +1405,14 @@ input:checked + .slider:before {
     }
     
     .feature-button, .selected-feature-item {
-        padding: 12px;
-        margin: 8px 0;
+        padding: 15px;
+        margin: 10px 0;
+        font-size: 16px;
+    }
+    
+    .remove-feature {
+        font-size: 1.4rem;
+        padding: 0 12px;
     }
     
     .workflow-name-input {

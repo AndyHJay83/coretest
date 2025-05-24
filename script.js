@@ -2133,3 +2133,103 @@ document.addEventListener('DOMContentLoaded', () => {
 function reinitializeDropdowns() {
     initializeDropdowns();
 }
+
+// Initialize drag and drop functionality
+function initializeDragAndDrop() {
+    const availableFeatures = document.getElementById('availableFeatures');
+    const selectedFeatures = document.getElementById('selectedFeaturesList');
+    
+    // Add drag events to available features
+    const featureButtons = availableFeatures.querySelectorAll('.feature-button');
+    featureButtons.forEach(button => {
+        button.addEventListener('dragstart', handleDragStart);
+        button.addEventListener('dragend', handleDragEnd);
+    });
+
+    // Add drop events to selected features container
+    selectedFeatures.addEventListener('dragover', handleDragOver);
+    selectedFeatures.addEventListener('dragenter', handleDragEnter);
+    selectedFeatures.addEventListener('dragleave', handleDragLeave);
+    selectedFeatures.addEventListener('drop', handleDrop);
+}
+
+function handleDragStart(e) {
+    e.dataTransfer.setData('text/plain', e.target.dataset.feature);
+    e.target.classList.add('dragging');
+}
+
+function handleDragEnd(e) {
+    e.target.classList.remove('dragging');
+}
+
+function handleDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+}
+
+function handleDragEnter(e) {
+    e.preventDefault();
+    const selectedFeatures = document.getElementById('selectedFeaturesList');
+    selectedFeatures.classList.add('drag-over');
+}
+
+function handleDragLeave(e) {
+    const selectedFeatures = document.getElementById('selectedFeaturesList');
+    selectedFeatures.classList.remove('drag-over');
+}
+
+function handleDrop(e) {
+    e.preventDefault();
+    const selectedFeatures = document.getElementById('selectedFeaturesList');
+    selectedFeatures.classList.remove('drag-over');
+    
+    const featureType = e.dataTransfer.getData('text/plain');
+    const featureButton = document.querySelector(`.feature-button[data-feature="${featureType}"]`);
+    
+    if (featureButton && !isFeatureAlreadySelected(featureType)) {
+        addFeatureToSelected(featureType);
+    }
+}
+
+function isFeatureAlreadySelected(featureType) {
+    const selectedFeatures = document.getElementById('selectedFeaturesList');
+    return selectedFeatures.querySelector(`[data-feature="${featureType}"]`) !== null;
+}
+
+function addFeatureToSelected(featureType) {
+    const selectedFeatures = document.getElementById('selectedFeaturesList');
+    const featureButton = document.querySelector(`.feature-button[data-feature="${featureType}"]`);
+    
+    const selectedFeature = document.createElement('div');
+    selectedFeature.className = 'selected-feature-item';
+    selectedFeature.draggable = true;
+    selectedFeature.dataset.feature = featureType;
+    
+    selectedFeature.innerHTML = `
+        <span>${featureButton.textContent}</span>
+        <button class="remove-feature" onclick="removeFeature('${featureType}')">×</button>
+    `;
+    
+    // Add drag events to the new selected feature
+    selectedFeature.addEventListener('dragstart', handleDragStart);
+    selectedFeature.addEventListener('dragend', handleDragEnd);
+    
+    selectedFeatures.appendChild(selectedFeature);
+}
+
+function removeFeature(featureType) {
+    const selectedFeature = document.querySelector(`.selected-feature-item[data-feature="${featureType}"]`);
+    if (selectedFeature) {
+        selectedFeature.remove();
+    }
+}
+
+// Initialize drag and drop when the DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    initializeDragAndDrop();
+});
+
+// Re-initialize drag and drop when new content is added
+function reinitializeDragAndDrop() {
+    initializeDragAndDrop();
+}
