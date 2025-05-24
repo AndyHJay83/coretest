@@ -126,7 +126,7 @@ function performWorkflow() {
     document.getElementById('workflowExecution').style.display = 'block';
     
     // Execute the workflow
-    executeWorkflow(workflow.steps);
+    executeWorkflow(workflow);
 }
 
 // Add this to ensure dropdown is initialized when the page loads
@@ -757,664 +757,101 @@ async function loadWordList() {
 }
 
 // Function to execute workflow
-async function executeWorkflow(steps) {
-    try {
-        console.log('Executing workflow steps:', steps); // Debug log
+function executeWorkflow(workflow) {
+    console.log('Executing workflow:', workflow);
+    
+    // Clear previous content
+    const featureArea = document.getElementById('featureArea');
+    const resultsContainer = document.getElementById('results');
+    featureArea.innerHTML = '';
+    resultsContainer.innerHTML = '';
+    
+    // Show the workflow execution page
+    document.getElementById('workflowExecution').style.display = 'flex';
+    
+    // Create and display each feature section
+    workflow.features.forEach(feature => {
+        const featureSection = document.createElement('div');
+        featureSection.className = 'feature-section';
+        featureSection.id = `${feature.toLowerCase()}Feature`;
         
-        // Load the wordlist first
-        await loadWordList();
-        currentFilteredWords = [...wordList]; // Start with the full wordlist
+        const featureTitle = document.createElement('div');
+        featureTitle.className = 'feature-title';
+        featureTitle.textContent = feature;
+        featureSection.appendChild(featureTitle);
         
-        // Hide homepage and show workflow execution
-        const homepage = document.getElementById('homepage');
-        const workflowExecution = document.getElementById('workflowExecution');
-        
-        if (homepage) {
-            homepage.style.display = 'none';
-        }
-        
-        if (workflowExecution) {
-            workflowExecution.style.display = 'flex';
-            workflowExecution.style.flexDirection = 'column';
-            workflowExecution.style.height = '100vh';
-        }
-
-        // Clear any existing features
-        const featureArea = document.getElementById('featureArea');
-        if (featureArea) {
-            featureArea.innerHTML = '';
-        }
-
-        // Execute each step in the workflow
-        for (const step of steps) {
-            console.log('Executing step:', step); // Debug log
-            const feature = step.feature;
-            
-            // Create and show the feature element
-            let featureElement;
-            switch (feature) {
-                case 'position1':
-                    featureElement = createPosition1Feature();
-                    break;
-                case 'vowel':
-                    featureElement = createVowelFeature();
-                    break;
-                case 'o':
-                    featureElement = createOFeature();
-                    break;
-                case 'lexicon':
-                    featureElement = createLexiconFeature();
-                    break;
-                case 'eee':
-                    featureElement = createEeeFeature();
-                    break;
-                case 'originalLex':
-                    featureElement = createOriginalLexFeature();
-                    break;
-                case 'consonant':
-                    featureElement = createConsonantQuestion();
-                    break;
-                case 'colour3':
-                    featureElement = createColour3Feature();
-                    break;
-                case 'shape':
-                    featureElement = createShapeFeature();
-                    break;
-                case 'curved':
-                    featureElement = createCurvedFeature();
-                    break;
-            }
-
-            if (featureElement) {
-                // Add the feature to the feature area
-                featureArea.appendChild(featureElement);
-                
-                // Set up the feature's event listeners
-                setupFeatureListeners(feature, (filteredWords) => {
-                    currentFilteredWords = filteredWords;
-                    displayResults(filteredWords);
-                });
-
-                // Wait for the feature to complete
-                await new Promise(resolve => {
-                    featureElement.addEventListener('completed', () => {
-                        resolve();
-                    }, { once: true });
-                });
-            }
+        // Add feature-specific content based on the feature type
+        switch(feature.toLowerCase()) {
+            case 'original lex':
+                addOriginalLexContent(featureSection);
+                break;
+            case 'eee?':
+                addEeeContent(featureSection);
+                break;
+            case 'o?':
+                addOContent(featureSection);
+                break;
+            case 'curved':
+                addCurvedContent(featureSection);
+                break;
+            case 'colour3':
+                addColour3Content(featureSection);
+                break;
+            case 'lexicon':
+                addLexiconContent(featureSection);
+                break;
+            case 'consonant':
+                addConsonantContent(featureSection);
+                break;
+            case 'position 1':
+                addPosition1Content(featureSection);
+                break;
+            case 'vowel':
+                addVowelContent(featureSection);
+                break;
+            case 'shape':
+                addShapeContent(featureSection);
+                break;
         }
         
-        // Display final results
-        displayResults(currentFilteredWords);
-        
-    } catch (error) {
-        console.error('Error executing workflow:', error);
-        alert('There was an error executing the workflow. Please try again.');
-    }
+        featureArea.appendChild(featureSection);
+    });
 }
 
-// Helper functions to create feature elements
-function createPosition1Feature() {
-    const div = document.createElement('div');
-    div.id = 'position1Feature';
-    div.className = 'feature-section';
-    div.innerHTML = `
-        <h2 class="feature-title">POSITION 1</h2>
-        <div class="position-input">
-            <input type="text" id="position1Input" placeholder="Enter a word">
-            <button id="position1Button">SUBMIT</button>
-            <button id="position1DoneButton">DONE</button>
-        </div>
+// Helper functions to add feature-specific content
+function addOriginalLexContent(container) {
+    const display = document.createElement('div');
+    display.className = 'original-lex-display';
+    display.innerHTML = `
+        <div class="position-display">Position <span id="originalLexPosition">-</span></div>
+        <div class="letters-display">Letters: <span id="originalLexLetters">-</span></div>
     `;
-    return div;
-}
-
-function createVowelFeature() {
-    const div = document.createElement('div');
-    div.id = 'vowelFeature';
-    div.className = 'feature-section';
-    div.innerHTML = `
-        <h2 class="feature-title">VOWEL</h2>
-        <div class="vowel-content">
-            <span class="vowel-letter"></span>
-        </div>
-        <div class="vowel-buttons">
-            <button class="vowel-btn yes-btn">YES</button>
-            <button class="vowel-btn no-btn">NO</button>
-        </div>
+    container.appendChild(display);
+    
+    const inputGroup = document.createElement('div');
+    inputGroup.className = 'input-group';
+    inputGroup.innerHTML = `
+        <input type="text" id="originalLexInput" placeholder="Enter a word...">
+        <button id="originalLexButton">DONE</button>
+        <button id="originalLexSkipButton" class="skip-button">SKIP</button>
     `;
-    return div;
+    container.appendChild(inputGroup);
 }
 
-function createOFeature() {
-    const div = document.createElement('div');
-    div.id = 'oFeature';
-    div.className = 'feature-section';
-    div.innerHTML = `
-        <h2 class="feature-title">O?</h2>
-        <div class="button-container">
-            <button id="oYesBtn" class="yes-btn">YES</button>
-            <button id="oNoBtn" class="no-btn">NO</button>
-            <button id="oSkipBtn" class="skip-button">SKIP</button>
-        </div>
+function addEeeContent(container) {
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'button-container';
+    buttonContainer.innerHTML = `
+        <button id="eeeButton" class="yes-btn">E</button>
+        <button id="eeeYesBtn" class="yes-btn">YES</button>
+        <button id="eeeNoBtn" class="no-btn">NO</button>
     `;
-    return div;
+    container.appendChild(buttonContainer);
 }
 
-function createLexiconFeature() {
-    const div = document.createElement('div');
-    div.id = 'lexiconFeature';
-    div.className = 'feature-section';
-    div.innerHTML = `
-        <h2 class="feature-title">LEXICON</h2>
-        <div class="lexicon-input">
-            <input type="text" id="lexiconInput" placeholder="Enter positions (e.g., 123)">
-            <button id="lexiconButton">SUBMIT</button>
-            <button id="lexiconSkipButton" class="skip-button">SKIP</button>
-        </div>
-    `;
-    return div;
-}
+// ... Add other feature content helper functions as needed ...
 
-function createEeeFeature() {
-    const div = document.createElement('div');
-    div.id = 'eeeFeature';
-    div.className = 'feature-section';
-    div.innerHTML = `
-        <h2 class="feature-title">EEE?</h2>
-        <div class="button-container">
-            <button id="eeeButton">E</button>
-            <button id="eeeYesBtn" class="yes-btn">YES</button>
-            <button id="eeeNoBtn" class="no-btn">NO</button>
-        </div>
-    `;
-    return div;
-}
-
-function createOriginalLexFeature() {
-    const div = document.createElement('div');
-    div.id = 'originalLexFeature';
-    div.className = 'feature-section';
-    div.innerHTML = `
-        <h2 class="feature-title">ORIGINAL LEX</h2>
-        <div class="position-info">
-            <div class="position-display">Position: <span class="position-number">1</span></div>
-            <div class="possible-letters">Possible letters: <span class="letters-list"></span></div>
-        </div>
-        <div class="lexicon-input">
-            <input type="text" id="originalLexInput" placeholder="Enter a word">
-            <button id="originalLexButton">SUBMIT</button>
-            <button id="originalLexSkipButton" class="skip-button">SKIP</button>
-        </div>
-    `;
-    return div;
-}
-
-function createConsonantQuestion() {
-    const div = document.createElement('div');
-    div.id = 'consonantQuestion';
-    div.className = 'feature-section';
-    div.innerHTML = `
-        <h2 class="feature-title">CONSONANTS TOGETHER?</h2>
-        <div class="button-container">
-            <button id="consonantYesBtn" class="yes-btn">YES</button>
-            <button id="consonantNoBtn" class="no-btn">NO</button>
-        </div>
-    `;
-    return div;
-}
-
-function createColour3Feature() {
-    const div = document.createElement('div');
-    div.id = 'colour3Feature';
-    div.className = 'feature-section';
-    div.innerHTML = `
-        <h2 class="feature-title">COLOUR3</h2>
-        <div class="button-container">
-            <button id="colour3YesBtn" class="yes-btn">YES</button>
-            <button id="colour3SkipButton" class="skip-button">SKIP</button>
-        </div>
-    `;
-    return div;
-}
-
-function createShapeFeature() {
-    const div = document.createElement('div');
-    div.id = 'shapeFeature';
-    div.className = 'feature-section';
-    div.innerHTML = `
-        <h2 class="feature-title">SHAPE</h2>
-        <div class="shape-display">
-            <div class="position-display"></div>
-            <div class="category-buttons"></div>
-        </div>
-    `;
-    return div;
-}
-
-function createCurvedFeature() {
-    const div = document.createElement('div');
-    div.id = 'curvedFeature';
-    div.className = 'feature-section';
-    div.innerHTML = `
-        <h2 class="feature-title">CURVED</h2>
-        <div class="curved-buttons">
-            <button class="curved-btn">B</button>
-            <button class="curved-btn">C</button>
-            <button class="curved-btn">D</button>
-            <button class="curved-btn">G</button>
-            <button class="curved-btn">J</button>
-            <button class="curved-btn">O</button>
-            <button class="curved-btn">P</button>
-            <button class="curved-btn">Q</button>
-            <button class="curved-btn">R</button>
-            <button class="curved-btn">S</button>
-            <button class="curved-btn">U</button>
-        </div>
-        <button id="curvedSkipBtn" class="skip-button">SKIP</button>
-    `;
-    return div;
-}
-
-// Function to setup feature listeners
-function setupFeatureListeners(feature, callback) {
-    switch (feature) {
-        case 'position1': {
-            const position1Button = document.getElementById('position1Button');
-            const position1DoneButton = document.getElementById('position1DoneButton');
-            const position1Input = document.getElementById('position1Input');
-            
-            if (position1Button) {
-                position1Button.onclick = () => {
-                    const input = position1Input?.value.trim();
-                    if (input) {
-                        const consonants = getConsonantsInOrder(input);
-                        if (consonants.length >= 2) {
-                            const filteredWords = filterWordsByPosition1(currentFilteredWords, consonants);
-                            // Store the input word for vowel feature
-                            currentPosition1Word = input.toUpperCase(); // Ensure it's uppercase
-                            callback(filteredWords);
-                            document.getElementById('position1Feature').dispatchEvent(new Event('completed'));
-    } else {
-                            alert('Please enter a word with at least 2 consonants');
-                        }
-                    } else {
-                        alert('Please enter a word');
-                    }
-                };
-                
-                // Add touch event for mobile
-                position1Button.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    position1Button.click();
-                }, { passive: false });
-            }
-            
-            if (position1DoneButton) {
-                position1DoneButton.onclick = () => {
-                    callback(currentFilteredWords);
-                    document.getElementById('position1Feature').dispatchEvent(new Event('completed'));
-                };
-                
-                // Add touch event for mobile
-                position1DoneButton.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    position1DoneButton.click();
-                }, { passive: false });
-            }
-            break;
-        }
-            
-        case 'vowel': {
-            const vowelYesBtn = document.querySelector('#vowelFeature .yes-btn');
-            const vowelNoBtn = document.querySelector('#vowelFeature .no-btn');
-            
-            // Initialize vowel processing with current words
-            currentFilteredWordsForVowels = [...currentFilteredWords];
-            originalFilteredWords = [...currentFilteredWords];
-            currentVowelIndex = 0;
-            
-            // Get vowels from Position 1 word in order
-            const vowels = new Set(['a', 'e', 'i', 'o', 'u']);
-            uniqueVowels = [];
-            if (currentPosition1Word) {
-                for (const char of currentPosition1Word.toLowerCase()) {
-                    if (vowels.has(char)) {
-                        uniqueVowels.push(char);
-                    }
-                }
-            }
-            
-            // Set up the vowel display
-        const vowelFeature = document.getElementById('vowelFeature');
-        const vowelLetter = vowelFeature.querySelector('.vowel-letter');
-            if (uniqueVowels.length > 0) {
-        vowelLetter.textContent = uniqueVowels[0].toUpperCase();
-        vowelLetter.style.display = 'inline-block';
-            }
-            
-            if (vowelYesBtn) {
-                vowelYesBtn.onclick = () => {
-                    handleVowelSelection(true);
-                    callback(currentFilteredWordsForVowels);
-                };
-                
-                // Add touch event for mobile
-                vowelYesBtn.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    vowelYesBtn.click();
-                }, { passive: false });
-            }
-            
-            if (vowelNoBtn) {
-                vowelNoBtn.onclick = () => {
-                    handleVowelSelection(false);
-                    callback(currentFilteredWordsForVowels);
-                };
-                
-                // Add touch event for mobile
-                vowelNoBtn.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    vowelNoBtn.click();
-                }, { passive: false });
-            }
-            break;
-        }
-            
-        case 'o': {
-            const oYesBtn = document.getElementById('oYesBtn');
-            const oNoBtn = document.getElementById('oNoBtn');
-            const oSkipBtn = document.getElementById('oSkipBtn');
-            
-            if (oYesBtn) {
-                oYesBtn.onclick = () => {
-                    const filteredWords = filterWordsByO(currentFilteredWords, true);
-                    callback(filteredWords);
-                    document.getElementById('oFeature').dispatchEvent(new Event('completed'));
-                };
-                
-                // Add touch event for mobile
-                oYesBtn.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    oYesBtn.click();
-                }, { passive: false });
-            }
-            
-            if (oNoBtn) {
-                oNoBtn.onclick = () => {
-                    const filteredWords = filterWordsByO(currentFilteredWords, false);
-                    callback(filteredWords);
-                    document.getElementById('oFeature').dispatchEvent(new Event('completed'));
-                };
-                
-                // Add touch event for mobile
-                oNoBtn.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    oNoBtn.click();
-                }, { passive: false });
-            }
-            
-            if (oSkipBtn) {
-                oSkipBtn.onclick = () => {
-                    callback(currentFilteredWords);
-                    document.getElementById('oFeature').dispatchEvent(new Event('completed'));
-                };
-                
-                // Add touch event for mobile
-                oSkipBtn.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    oSkipBtn.click();
-                }, { passive: false });
-            }
-            break;
-        }
-            
-        case 'curved': {
-            const curvedButtons = document.querySelectorAll('.curved-btn');
-            const curvedSkipBtn = document.getElementById('curvedSkipBtn');
-            
-            curvedButtons.forEach(button => {
-                button.onclick = () => {
-                    const letter = button.textContent;
-                    const filteredWords = filterWordsByCurvedPositions(currentFilteredWords, letter);
-                    callback(filteredWords);
-                    document.getElementById('curvedFeature').dispatchEvent(new Event('completed'));
-                };
-                
-                // Add touch event for mobile
-                button.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    button.click();
-                }, { passive: false });
-            });
-            
-            if (curvedSkipBtn) {
-                curvedSkipBtn.onclick = () => {
-                    callback(currentFilteredWords);
-                    document.getElementById('curvedFeature').dispatchEvent(new Event('completed'));
-                };
-                
-                // Add touch event for mobile
-                curvedSkipBtn.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    curvedSkipBtn.click();
-                }, { passive: false });
-            }
-            break;
-        }
-            
-        case 'colour3': {
-            const colour3YesBtn = document.getElementById('colour3YesBtn');
-            const colour3SkipButton = document.getElementById('colour3SkipButton');
-            
-            if (colour3YesBtn) {
-                colour3YesBtn.onclick = () => {
-                    const filteredWords = filterWordsByColour3(currentFilteredWords);
-                    callback(filteredWords);
-                    document.getElementById('colour3Feature').dispatchEvent(new Event('completed'));
-                };
-                
-                // Add touch event for mobile
-                colour3YesBtn.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    colour3YesBtn.click();
-                }, { passive: false });
-            }
-            
-            if (colour3SkipButton) {
-                colour3SkipButton.onclick = () => {
-                    callback(currentFilteredWords);
-                    document.getElementById('colour3Feature').dispatchEvent(new Event('completed'));
-                };
-                
-                // Add touch event for mobile
-                colour3SkipButton.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    colour3SkipButton.click();
-                }, { passive: false });
-            }
-            break;
-        }
-            
-        case 'lexicon': {
-            const lexiconButton = document.getElementById('lexiconButton');
-            const lexiconSkipButton = document.getElementById('lexiconSkipButton');
-            
-            if (lexiconButton) {
-                lexiconButton.onclick = () => {
-                    const input = document.getElementById('lexiconInput')?.value.trim();
-                    if (input) {
-                        const filteredWords = filterWordsByLexicon(currentFilteredWords, input);
-                        callback(filteredWords);
-                        document.getElementById('lexiconFeature').dispatchEvent(new Event('completed'));
-                    } else {
-                        alert('Please enter positions (e.g., 123)');
-                    }
-                };
-                
-                // Add touch event for mobile
-                lexiconButton.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    lexiconButton.click();
-                }, { passive: false });
-            }
-            
-            if (lexiconSkipButton) {
-                lexiconSkipButton.onclick = () => {
-                    callback(currentFilteredWords);
-                    document.getElementById('lexiconFeature').dispatchEvent(new Event('completed'));
-                };
-                
-                // Add touch event for mobile
-                lexiconSkipButton.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    lexiconSkipButton.click();
-                }, { passive: false });
-            }
-            break;
-        }
-            
-        case 'consonant': {
-            const consonantYesBtn = document.getElementById('consonantYesBtn');
-            const consonantNoBtn = document.getElementById('consonantNoBtn');
-            
-            if (consonantYesBtn) {
-                consonantYesBtn.onclick = () => {
-                    hasAdjacentConsonants = true;
-                    const filteredWords = currentFilteredWords.filter(word => hasWordAdjacentConsonants(word));
-                    callback(filteredWords);
-                    document.getElementById('consonantQuestion').dispatchEvent(new Event('completed'));
-                };
-                
-                // Add touch event for mobile
-                consonantYesBtn.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    consonantYesBtn.click();
-                }, { passive: false });
-            }
-            
-            if (consonantNoBtn) {
-                consonantNoBtn.onclick = () => {
-                    hasAdjacentConsonants = false;
-                    const filteredWords = currentFilteredWords.filter(word => !hasWordAdjacentConsonants(word));
-                    callback(filteredWords);
-                    document.getElementById('consonantQuestion').dispatchEvent(new Event('completed'));
-                };
-                
-                // Add touch event for mobile
-                consonantNoBtn.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    consonantNoBtn.click();
-                }, { passive: false });
-            }
-            break;
-        }
-            
-        case 'eee': {
-            const eeeButton = document.getElementById('eeeButton');
-            const eeeYesBtn = document.getElementById('eeeYesBtn');
-            const eeeNoBtn = document.getElementById('eeeNoBtn');
-            
-            if (eeeButton) {
-                eeeButton.onclick = () => {
-                    const filteredWords = filterWordsByEee(currentFilteredWords, 'E');
-                    callback(filteredWords);
-                    document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
-                };
-                
-                // Add touch event for mobile
-                eeeButton.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    eeeButton.click();
-                }, { passive: false });
-            }
-            
-            if (eeeYesBtn) {
-                eeeYesBtn.onclick = () => {
-                    const filteredWords = filterWordsByEee(currentFilteredWords, 'YES');
-                    callback(filteredWords);
-                    document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
-                };
-                
-                // Add touch event for mobile
-                eeeYesBtn.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    eeeYesBtn.click();
-                }, { passive: false });
-            }
-            
-            if (eeeNoBtn) {
-                eeeNoBtn.onclick = () => {
-                    const filteredWords = filterWordsByEee(currentFilteredWords, 'NO');
-                    callback(filteredWords);
-                    document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
-                };
-                
-                // Add touch event for mobile
-                eeeNoBtn.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    eeeNoBtn.click();
-                }, { passive: false });
-            }
-            break;
-        }
-        
-        case 'originalLex': {
-            const originalLexButton = document.getElementById('originalLexButton');
-            const originalLexSkipButton = document.getElementById('originalLexSkipButton');
-            const originalLexInput = document.getElementById('originalLexInput');
-            
-            // Find position with most variance and update display
-            const { position, letters } = findPositionWithMostVariance(currentFilteredWords);
-            originalLexPosition = position;
-            
-            // Update position display
-            const positionNumber = document.querySelector('#originalLexFeature .position-number');
-            if (positionNumber) {
-                positionNumber.textContent = position + 1; // Convert to 1-based position
-            }
-            
-            // Update possible letters display
-            const lettersList = document.querySelector('#originalLexFeature .letters-list');
-            if (lettersList) {
-                lettersList.textContent = letters.join(', ');
-            }
-            
-            if (originalLexButton) {
-                originalLexButton.onclick = () => {
-                    const input = originalLexInput?.value.trim();
-                    if (input) {
-                        const filteredWords = filterWordsByOriginalLex(currentFilteredWords, originalLexPosition, input);
-                        callback(filteredWords);
-                        document.getElementById('originalLexFeature').dispatchEvent(new Event('completed'));
-                    } else {
-                        alert('Please enter a word');
-                    }
-                };
-                
-                // Add touch event for mobile
-                originalLexButton.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    originalLexButton.click();
-                }, { passive: false });
-            }
-            
-            if (originalLexSkipButton) {
-                originalLexSkipButton.onclick = () => {
-                    callback(currentFilteredWords);
-                    document.getElementById('originalLexFeature').dispatchEvent(new Event('completed'));
-                };
-                
-                // Add touch event for mobile
-                originalLexSkipButton.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    originalLexSkipButton.click();
-                }, { passive: false });
-            }
-            break;
-        }
-    }
-}
+// ... existing code ...
 
 // Function to display results
 function displayResults(words) {
