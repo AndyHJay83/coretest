@@ -1774,6 +1774,11 @@ function handleVowelSelection(includeVowel) {
         lexiconCompleted = false;
         originalLexCompleted = false;
         
+        // Dispatch the completed event
+        console.log('Dispatching vowel feature completed event');
+        const completedEvent = new Event('completed');
+        vowelFeature.dispatchEvent(completedEvent);
+        
         // Show next feature
         showNextFeature();
     }
@@ -1806,6 +1811,16 @@ function filterWordsByColour3(words) {
 
 // Function to show next feature
 function showNextFeature() {
+    console.log('Showing next feature');
+    console.log('Current states:', {
+        originalLexCompleted,
+        lexiconCompleted,
+        eeeCompleted,
+        isVowelMode,
+        isColour3Mode,
+        isShapeMode
+    });
+    
     // Hide all features first
     const features = [
         'consonantQuestion',
@@ -1838,6 +1853,7 @@ function showNextFeature() {
         document.getElementById('vowelFeature').style.display = 'block';
     }
     else if (!originalLexCompleted) {
+        console.log('Showing originalLex feature');
         document.getElementById('originalLexFeature').style.display = 'block';
     }
     else if (!lexiconCompleted) {
