@@ -146,7 +146,7 @@ async function performWorkflow() {
         features.forEach(feature => {
             const featureSection = document.createElement('div');
             featureSection.className = 'feature-section';
-            featureSection.id = `${feature.toLowerCase()}Feature`;
+            featureSection.id = `${feature.toLowerCase().replace(/\s+/g, '')}Feature`;
             featureSection.style.display = 'block'; // Ensure feature is visible
             
             const featureTitle = document.createElement('div');
@@ -197,7 +197,7 @@ async function performWorkflow() {
         
         // Set up event listeners for the first feature
         if (features.length > 0) {
-            const firstFeature = features[0].toLowerCase();
+            const firstFeature = features[0].toLowerCase().replace(/\s+/g, '');
             setupFeatureListeners(firstFeature, (filteredWords) => {
                 currentFilteredWords = filteredWords;
                 displayResults(filteredWords);
