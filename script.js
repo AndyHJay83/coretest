@@ -2393,10 +2393,23 @@ function filterWordsByPosition1(words, consonants) {
 
 // Function to display saved workflows in the workflow builder
 function displaySavedWorkflows() {
-    const savedWorkflowsContainer = document.getElementById('savedWorkflows');
+    let savedWorkflowsContainer = document.getElementById('savedWorkflows');
+    
+    // Create the container if it doesn't exist
     if (!savedWorkflowsContainer) {
-        console.error('Saved workflows container not found');
-        return;
+        console.log('Creating saved workflows container');
+        savedWorkflowsContainer = document.createElement('div');
+        savedWorkflowsContainer.id = 'savedWorkflows';
+        savedWorkflowsContainer.className = 'saved-workflows-container';
+        
+        // Find the workflow creation container and append the saved workflows container
+        const workflowCreation = document.getElementById('workflowCreation');
+        if (workflowCreation) {
+            workflowCreation.appendChild(savedWorkflowsContainer);
+        } else {
+            console.error('Workflow creation container not found');
+            return;
+        }
     }
     
     // Clear existing content
@@ -2433,6 +2446,56 @@ function displaySavedWorkflows() {
     
     savedWorkflowsContainer.appendChild(workflowList);
 }
+
+// Add CSS for saved workflows container
+const savedWorkflowsStyle = document.createElement('style');
+savedWorkflowsStyle.textContent = `
+    .saved-workflows-container {
+        margin-top: 20px;
+        padding: 10px;
+        background-color: #f5f5f5;
+        border-radius: 4px;
+    }
+    
+    .saved-workflow-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .saved-workflow-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 12px;
+        background-color: white;
+        border-radius: 4px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .workflow-name {
+        cursor: pointer;
+        font-weight: 500;
+    }
+    
+    .workflow-name:hover {
+        color: #4169E1;
+    }
+    
+    .delete-workflow {
+        background: none;
+        border: none;
+        color: #ff4444;
+        font-size: 18px;
+        cursor: pointer;
+        padding: 0 8px;
+    }
+    
+    .delete-workflow:hover {
+        color: #cc0000;
+    }
+`;
+document.head.appendChild(savedWorkflowsStyle);
 
 // Function to toggle saved workflows visibility
 function toggleSavedWorkflows() {
