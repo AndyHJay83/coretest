@@ -1249,21 +1249,26 @@ async function executeWorkflow(steps) {
             }
         });
         
-        // Clear any existing content in the workflow execution area
-        if (workflowExecution) {
-            workflowExecution.innerHTML = '';
+        // Get or create the feature area and results container
+        let featureArea = document.getElementById('featureArea');
+        let resultsContainer = document.getElementById('results');
+        
+        if (!featureArea) {
+            featureArea = document.createElement('div');
+            featureArea.id = 'featureArea';
+            featureArea.className = 'feature-area';
+            workflowExecution.insertBefore(featureArea, workflowExecution.firstChild);
         }
         
-        // Create feature area container in the top third
-        const featureArea = document.createElement('div');
-        featureArea.className = 'feature-area';
-        workflowExecution.appendChild(featureArea);
-        
-        // Display initial wordlist in the results area (bottom two-thirds)
-        const resultsContainer = document.getElementById('results');
-        if (resultsContainer) {
-            displayResults(currentFilteredWords);
+        if (!resultsContainer) {
+            resultsContainer = document.createElement('div');
+            resultsContainer.id = 'results';
+            resultsContainer.className = 'results-container';
+            workflowExecution.appendChild(resultsContainer);
         }
+        
+        // Display initial wordlist in the results area
+        displayResults(currentFilteredWords);
         
         // Execute each step in sequence
         for (const step of steps) {
@@ -1289,7 +1294,7 @@ async function executeWorkflow(steps) {
             // Set up event listeners for this feature
             setupFeatureListeners(step.feature, (filteredWords) => {
                 currentFilteredWords = filteredWords;
-                // Update wordlist in the results area (bottom two-thirds)
+                // Update wordlist in the results area
                 displayResults(currentFilteredWords);
             });
             
@@ -1306,7 +1311,7 @@ async function executeWorkflow(steps) {
             });
         }
         
-        // Show final results in the results area (bottom two-thirds)
+        // Show final results in the results area
         displayResults(currentFilteredWords);
     } catch (error) {
         console.error('Error executing workflow:', error);
