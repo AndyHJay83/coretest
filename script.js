@@ -143,6 +143,22 @@ document.addEventListener('DOMContentLoaded', async () => {
                         featureItem.classList.remove('dragging');
                     });
                     
+                    // Add drop handling for reordering
+                    featureItem.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                        e.dataTransfer.dropEffect = 'move';
+                        const draggingItem = selectedFeaturesList.querySelector('.dragging');
+                        if (draggingItem !== featureItem) {
+                            const rect = featureItem.getBoundingClientRect();
+                            const offset = e.clientY - rect.top;
+                            if (offset < rect.height / 2) {
+                                featureItem.parentNode.insertBefore(draggingItem, featureItem);
+                            } else {
+                                featureItem.parentNode.insertBefore(draggingItem, featureItem.nextSibling);
+                            }
+                        }
+                    });
+                    
                     selectedFeaturesList.appendChild(featureItem);
                 }
             }
@@ -1108,8 +1124,8 @@ document.getElementById('createWorkflowButton').addEventListener('click', () => 
 // Function to save workflow
 function saveWorkflow() {
     const workflowName = document.getElementById('workflowName').value.trim();
-    const selectedFeatures = Array.from(document.querySelectorAll('.feature-checkbox:checked'))
-        .map(checkbox => checkbox.value);
+    const selectedFeatures = Array.from(document.querySelectorAll('#selectedFeaturesList .selected-feature-item'))
+        .map(item => item.dataset.feature);
     
     if (!workflowName) {
         alert('Please enter a workflow name');
@@ -1146,9 +1162,7 @@ function saveWorkflow() {
     
     // Clear form
     document.getElementById('workflowName').value = '';
-    document.querySelectorAll('.feature-checkbox').forEach(checkbox => {
-        checkbox.checked = false;
-    });
+    document.getElementById('selectedFeaturesList').innerHTML = '';
 }
 
 // Handle cancel workflow creation
