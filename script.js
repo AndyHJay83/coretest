@@ -1606,6 +1606,7 @@ function displayResults(words) {
     
     if (words.length === 0) {
         resultsContainer.innerHTML = '<p>No words match the current criteria.</p>';
+        updateWordCount(0);
         return;
     }
     
@@ -1623,11 +1624,8 @@ function displayResults(words) {
     // Add the word list to the results container
     resultsContainer.appendChild(wordList);
     
-    // Add word count display
-    const wordCountDisplay = document.createElement('div');
-    wordCountDisplay.className = 'word-count-display';
-    wordCountDisplay.textContent = `${words.length} words`;
-    resultsContainer.appendChild(wordCountDisplay);
+    // Update word count
+    updateWordCount(words.length);
     
     // Ensure the feature area is empty and visible
     const featureArea = document.getElementById('featureArea');
@@ -1638,6 +1636,21 @@ function displayResults(words) {
             featureArea.innerHTML = '';
         }
     }
+}
+
+// Function to update word count
+function updateWordCount(count) {
+    let wordCountDisplay = document.getElementById('wordCountDisplay');
+    
+    // Create the display if it doesn't exist
+    if (!wordCountDisplay) {
+        wordCountDisplay = document.createElement('div');
+        wordCountDisplay.id = 'wordCountDisplay';
+        wordCountDisplay.className = 'word-count-display';
+        document.body.appendChild(wordCountDisplay);
+    }
+    
+    wordCountDisplay.textContent = count;
 }
 
 // Add CSS for word count display
@@ -1652,8 +1665,11 @@ style.textContent = `
         color: white;
         padding: 8px 16px;
         border-radius: 20px;
-        font-size: 14px;
+        font-size: 16px;
+        font-weight: bold;
         z-index: 1000;
+        min-width: 40px;
+        text-align: center;
     }
 `;
 document.head.appendChild(style);
@@ -2132,14 +2148,6 @@ function findLeastCommonVowel(words, vowels) {
     });
 
     return leastCommonVowel;
-}
-
-// Function to update word count
-function updateWordCount(count) {
-    const wordCountElement = document.getElementById('wordCount');
-    if (wordCountElement) {
-        wordCountElement.textContent = count;
-    }
 }
 
 // Function to toggle mode
