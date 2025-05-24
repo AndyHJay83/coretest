@@ -147,6 +147,36 @@ function initializeWorkflowDropdown() {
                 e.preventDefault();
             }
         }, { passive: false });
+        
+        // Add keyboard navigation
+        newCustomSelect.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                newOptionsList.classList.toggle('show');
+            } else if (e.key === 'Escape') {
+                newOptionsList.classList.remove('show');
+            }
+        });
+        
+        // Add keyboard navigation for options
+        const options = newOptionsList.querySelectorAll('.option');
+        options.forEach((option, index) => {
+            option.setAttribute('tabindex', '0');
+            option.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    option.click();
+                } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    const nextOption = options[index + 1];
+                    if (nextOption) nextOption.focus();
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    const prevOption = options[index - 1];
+                    if (prevOption) prevOption.focus();
+                }
+            });
+        });
     }
 }
 
@@ -2582,9 +2612,12 @@ function initializeDropdowns() {
             customOption.className = 'option';
             customOption.textContent = option.textContent;
             customOption.setAttribute('data-value', option.value);
+            customOption.setAttribute('tabindex', '0');
             
             // Add click handler for desktop
-            customOption.addEventListener('click', () => {
+            customOption.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 select.value = option.value;
                 selectedText.textContent = option.textContent;
                 optionsList.classList.remove('show');
@@ -2594,11 +2627,20 @@ function initializeDropdowns() {
             // Add touch handler for mobile
             customOption.addEventListener('touchstart', (e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 select.value = option.value;
                 selectedText.textContent = option.textContent;
                 optionsList.classList.remove('show');
                 select.dispatchEvent(new Event('change'));
             }, { passive: false });
+            
+            // Add keyboard navigation
+            customOption.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    customOption.click();
+                }
+            });
             
             optionsList.appendChild(customOption);
         });
@@ -2608,6 +2650,7 @@ function initializeDropdowns() {
         
         // Add click handler for the custom select
         customSelect.addEventListener('click', (e) => {
+            e.preventDefault();
             e.stopPropagation();
             optionsList.classList.toggle('show');
         });
@@ -2619,17 +2662,30 @@ function initializeDropdowns() {
             optionsList.classList.toggle('show');
         }, { passive: false });
         
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!customSelect.contains(e.target)) {
+        // Add keyboard navigation for the select
+        customSelect.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                optionsList.classList.toggle('show');
+            } else if (e.key === 'Escape') {
                 optionsList.classList.remove('show');
             }
         });
         
-        // Close dropdown when touching outside (mobile)
-        document.addEventListener('touchstart', (e) => {
+        // Close dropdown when clicking outside
+        const closeDropdown = (e) => {
             if (!customSelect.contains(e.target)) {
                 optionsList.classList.remove('show');
+            }
+        };
+        
+        document.addEventListener('click', closeDropdown);
+        document.addEventListener('touchstart', closeDropdown, { passive: false });
+        
+        // Prevent body scrolling when dropdown is open
+        optionsList.addEventListener('touchmove', (e) => {
+            if (optionsList.classList.contains('show')) {
+                e.preventDefault();
             }
         }, { passive: false });
     });
