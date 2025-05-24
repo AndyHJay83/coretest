@@ -88,13 +88,36 @@ document.addEventListener('DOMContentLoaded', async () => {
             button.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 button.classList.add('dragging');
+                // Store the feature data
+                button.dataset.touchFeature = button.dataset.feature;
+            }, { passive: false });
+            
+            button.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const element = document.elementFromPoint(touch.clientX, touch.clientY);
+                if (element && element.closest('#selectedFeaturesList')) {
+                    selectedFeaturesList.classList.add('drag-over');
+                } else {
+                    selectedFeaturesList.classList.remove('drag-over');
+                }
             }, { passive: false });
             
             button.addEventListener('touchend', (e) => {
                 e.preventDefault();
                 button.classList.remove('dragging');
+                const touch = e.changedTouches[0];
+                const element = document.elementFromPoint(touch.clientX, touch.clientY);
+                if (element && element.closest('#selectedFeaturesList')) {
+                    const feature = button.dataset.touchFeature;
+                    if (feature) {
+                        addFeatureToList(feature);
+                    }
+                }
+                selectedFeaturesList.classList.remove('drag-over');
             }, { passive: false });
             
+            // Keep existing drag events for desktop
             button.addEventListener('dragstart', (e) => {
                 e.dataTransfer.setData('text/plain', button.dataset.feature);
                 e.dataTransfer.effectAllowed = 'move';
@@ -127,6 +150,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             selectedFeaturesList.classList.remove('drag-over');
         }, { passive: false });
         
+        // Keep existing drag events for desktop
         selectedFeaturesList.addEventListener('dragover', (e) => {
             e.preventDefault();
             e.dataTransfer.dropEffect = 'move';
@@ -724,6 +748,22 @@ workflowSelect.addEventListener('change', function() {
         showWorkflowCreation();
     }
 });
+
+// Add touch event handling for workflow selection
+workflowSelect.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    // Trigger the native select dropdown
+    this.click();
+}, { passive: false });
+
+// Add touch event handling for workflow options
+workflowSelect.addEventListener('touchend', function(e) {
+    e.preventDefault();
+    const selectedOption = this.options[this.selectedIndex];
+    if (selectedOption && selectedOption.value === 'create-new') {
+        showWorkflowCreation();
+    }
+}, { passive: false });
 
 // Function to load word list
 async function loadWordList() {
