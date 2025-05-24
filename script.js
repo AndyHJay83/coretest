@@ -138,6 +138,9 @@ function showWorkflowCreation() {
     if (savedWorkflows) {
         savedWorkflows.style.display = 'none';
     }
+    
+    // Initialize info buttons
+    initializeInfoButtons();
 }
 
 // Hide workflow creation page
@@ -3028,16 +3031,20 @@ document.head.appendChild(buttonConsistencyStyle);
 
 // Feature Info Modal Functions
 function showFeatureInfo(featureId) {
+    console.log('Showing info for feature:', featureId);
     const modal = document.getElementById(`${featureId}Info`);
     if (modal) {
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
         // Prevent background scrolling
         document.body.addEventListener('touchmove', preventScroll, { passive: false });
+    } else {
+        console.error('Modal not found for feature:', featureId);
     }
 }
 
 function hideFeatureInfo(featureId) {
+    console.log('Hiding info for feature:', featureId);
     const modal = document.getElementById(`${featureId}Info`);
     if (modal) {
         modal.style.display = 'none';
@@ -3052,9 +3059,15 @@ function preventScroll(e) {
 }
 
 // Add event listeners for info buttons
-document.addEventListener('DOMContentLoaded', function() {
+function initializeInfoButtons() {
+    console.log('Initializing info buttons');
     // Info button click handlers
     document.querySelectorAll('.info-button').forEach(button => {
+        console.log('Adding listeners to button:', button);
+        // Remove any existing listeners
+        button.removeEventListener('click', handleInfoClick);
+        button.removeEventListener('touchend', handleInfoClick);
+        
         // Add both click and touch events
         button.addEventListener('click', handleInfoClick);
         button.addEventListener('touchend', handleInfoClick);
@@ -3062,6 +3075,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Close button click handlers
     document.querySelectorAll('.close-info-button').forEach(button => {
+        // Remove any existing listeners
+        button.removeEventListener('click', handleCloseClick);
+        button.removeEventListener('touchend', handleCloseClick);
+        
         // Add both click and touch events
         button.addEventListener('click', handleCloseClick);
         button.addEventListener('touchend', handleCloseClick);
@@ -3069,20 +3086,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Close modal when clicking outside
     document.querySelectorAll('.feature-info-modal').forEach(modal => {
+        // Remove any existing listeners
+        modal.removeEventListener('click', handleOutsideClick);
+        modal.removeEventListener('touchend', handleOutsideClick);
+        
         // Add both click and touch events
         modal.addEventListener('click', handleOutsideClick);
         modal.addEventListener('touchend', handleOutsideClick);
     });
-});
+}
 
 function handleInfoClick(e) {
+    console.log('Info button clicked');
     e.preventDefault();
     e.stopPropagation(); // Prevent drag start
     const featureId = this.getAttribute('data-feature');
+    console.log('Feature ID:', featureId);
     showFeatureInfo(featureId);
 }
 
 function handleCloseClick(e) {
+    console.log('Close button clicked');
     e.preventDefault();
     const modal = this.closest('.feature-info-modal');
     const featureId = modal.id.replace('Info', '');
@@ -3090,9 +3114,22 @@ function handleCloseClick(e) {
 }
 
 function handleOutsideClick(e) {
+    console.log('Outside clicked');
     e.preventDefault();
     if (e.target === this) {
         const featureId = this.id.replace('Info', '');
         hideFeatureInfo(featureId);
     }
+}
+
+// Initialize info buttons when the DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, initializing info buttons');
+    initializeInfoButtons();
+});
+
+// Also initialize info buttons when the workflow creation page is shown
+function showWorkflowCreation() {
+    // ... existing code ...
+    initializeInfoButtons();
 }
