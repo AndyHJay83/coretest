@@ -1370,7 +1370,6 @@ input:checked + .slider:before {
     width: 100%;
     box-sizing: border-box;
     overflow: visible;
-    padding: 0 20px;
 }
 
 .dropdown-group {
@@ -1405,7 +1404,7 @@ input:checked + .slider:before {
 }
 
 .selected-text {
-    padding: 12px 16px;
+    padding: 8px 12px;
     background: white;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -1414,7 +1413,6 @@ input:checked + .slider:before {
     width: 100%;
     box-sizing: border-box;
     display: block;
-    font-size: 16px;
 }
 
 .options-list {
@@ -1449,15 +1447,9 @@ input:checked + .slider:before {
 }
 
 .option {
-    padding: 12px 16px;
+    padding: 12px;
     cursor: pointer;
     transition: background-color 0.2s;
-    background: white;
-    border-bottom: 1px solid #eee;
-    position: relative;
-    z-index: 10003;
-    width: 100%;
-    box-sizing: border-box;
     font-size: 16px;
 }
 

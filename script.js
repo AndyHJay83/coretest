@@ -1959,7 +1959,7 @@ function handleVowelSelection(includeVowel) {
         currentFilteredWordsForVowels = currentFilteredWordsForVowels.filter(word => 
             word.toLowerCase().includes(currentVowel)
         );
-    } else {
+        } else {
         currentFilteredWordsForVowels = currentFilteredWordsForVowels.filter(word => 
             !word.toLowerCase().includes(currentVowel)
         );
