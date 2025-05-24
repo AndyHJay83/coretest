@@ -98,6 +98,8 @@ function initializeWorkflowDropdown() {
                 margin: 0 auto;
                 z-index: 9999;
                 display: inline-block;
+                left: 0;
+                right: 0;
             }
             .custom-select {
                 position: relative;
@@ -105,6 +107,7 @@ function initializeWorkflowDropdown() {
                 cursor: pointer;
                 background: white;
                 z-index: 10000;
+                display: block;
             }
             .selected-text {
                 padding: 8px 12px;
@@ -115,6 +118,7 @@ function initializeWorkflowDropdown() {
                 z-index: 10001;
                 width: 100%;
                 box-sizing: border-box;
+                display: block;
             }
             .selected-text:after {
                 content: '▼';
@@ -144,6 +148,7 @@ function initializeWorkflowDropdown() {
                 visibility: visible;
                 margin-top: 4px;
                 width: 100%;
+                box-sizing: border-box;
             }
             .options-list.show {
                 display: block !important;
@@ -159,6 +164,8 @@ function initializeWorkflowDropdown() {
                 border-bottom: 1px solid #eee;
                 position: relative;
                 z-index: 10003;
+                width: 100%;
+                box-sizing: border-box;
             }
             .option:last-child {
                 border-bottom: none;
