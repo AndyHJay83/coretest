@@ -65,13 +65,64 @@ function initializeWorkflowDropdown() {
         Array.from(workflowSelect.options).forEach(option => {
             const customOption = document.createElement('div');
             customOption.className = 'option';
-            customOption.setAttribute('data-value', option.value);
             customOption.textContent = option.textContent;
+            customOption.setAttribute('data-value', option.value);
+            
+            // Add click handler for desktop
+            customOption.addEventListener('click', () => {
+                workflowSelect.value = option.value;
+                selectedText.textContent = option.textContent;
+                optionsList.classList.remove('show');
+                
+                if (option.value === 'create-new') {
+                    showWorkflowCreation();
+                }
+            });
+            
+            // Add touch handler for mobile
+            customOption.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                workflowSelect.value = option.value;
+                selectedText.textContent = option.textContent;
+                optionsList.classList.remove('show');
+                
+                if (option.value === 'create-new') {
+                    showWorkflowCreation();
+                }
+            }, { passive: false });
+            
             optionsList.appendChild(customOption);
         });
         
         // Set initial selected text
         selectedText.textContent = workflowSelect.options[workflowSelect.selectedIndex].text;
+        
+        // Add click handler for the custom select
+        customSelect.addEventListener('click', (e) => {
+            e.stopPropagation();
+            optionsList.classList.toggle('show');
+        });
+        
+        // Add touch handler for mobile
+        customSelect.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            optionsList.classList.toggle('show');
+        }, { passive: false });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!customSelect.contains(e.target)) {
+                optionsList.classList.remove('show');
+            }
+        });
+        
+        // Close dropdown when touching outside (mobile)
+        document.addEventListener('touchstart', (e) => {
+            if (!customSelect.contains(e.target)) {
+                optionsList.classList.remove('show');
+            }
+        }, { passive: false });
     }
 }
 
@@ -712,7 +763,8 @@ document.getElementById('createWorkflowButton').addEventListener('click', () => 
 
 // Function to save workflow
 function saveWorkflow() {
-    const workflowName = document.getElementById('workflowName').value.trim();
+    const workflowNameInput = document.getElementById('workflowName');
+    const workflowName = workflowNameInput ? workflowNameInput.value.trim() : '';
     const selectedFeatures = Array.from(document.querySelectorAll('#selectedFeaturesList .selected-feature-item'))
         .map(item => item.dataset.feature);
     
@@ -728,7 +780,6 @@ function saveWorkflow() {
     
     // Create new workflow
     const newWorkflow = {
-        id: 'workflow_' + Date.now(),
         name: workflowName,
         steps: selectedFeatures.map(feature => ({ feature }))
     };
@@ -740,18 +791,26 @@ function saveWorkflow() {
     localStorage.setItem('workflows', JSON.stringify(workflows));
     
     // Update workflow select
-    const option = document.createElement('option');
-    option.value = newWorkflow.name;
-    option.textContent = newWorkflow.name;
-    workflowSelect.appendChild(option);
+    const workflowSelect = document.getElementById('workflowSelect');
+    if (workflowSelect) {
+        const option = document.createElement('option');
+        option.value = newWorkflow.name;
+        option.textContent = newWorkflow.name;
+        workflowSelect.appendChild(option);
+    }
     
     // Return to homepage
     document.getElementById('workflowCreation').style.display = 'none';
     document.getElementById('homepage').style.display = 'block';
     
     // Clear form
-    document.getElementById('workflowName').value = '';
+    if (workflowNameInput) {
+        workflowNameInput.value = '';
+    }
     document.getElementById('selectedFeaturesList').innerHTML = '';
+    
+    // Reinitialize dropdowns
+    initializeWorkflowDropdown();
 }
 
 // Handle cancel workflow creation
