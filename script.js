@@ -37,15 +37,12 @@ const performButton = document.getElementById('performButton');
 // Function to initialize workflow dropdown
 function initializeWorkflowDropdown() {
     const workflowSelect = document.getElementById('workflowSelect');
-    const performButton = document.getElementById('performButton');
-    const createWorkflowButton = document.getElementById('createWorkflowButton');
-    
     if (!workflowSelect) return;
-    
+
     // Load saved workflows
     const savedWorkflows = JSON.parse(localStorage.getItem('workflows') || '[]');
     
-    // Clear existing options except the first two
+    // Clear existing options except the first two (default and create new)
     while (workflowSelect.options.length > 2) {
         workflowSelect.remove(2);
     }
@@ -57,36 +54,31 @@ function initializeWorkflowDropdown() {
         option.textContent = workflow.name;
         workflowSelect.appendChild(option);
     });
-    
-    // Reset the dropdown to default state
+
+    // Reset dropdown to default state
     workflowSelect.value = '';
-    performButton.disabled = true;
-    
-    // Handle workflow selection
+
+    // Set up event listeners
     workflowSelect.addEventListener('change', function() {
-        const selectedValue = this.value;
-        if (selectedValue === 'create-new') {
+        const performButton = document.getElementById('performButton');
+        if (performButton) {
+            performButton.disabled = this.value === '' || this.value === 'create-new';
+        }
+
+        if (this.value === 'create-new') {
             showWorkflowCreation();
-        } else if (selectedValue !== '') {
-            performButton.disabled = false;
-        } else {
-            performButton.disabled = true;
         }
     });
-    
-    // Handle create workflow button
-    if (createWorkflowButton) {
-        createWorkflowButton.addEventListener('click', showWorkflowCreation);
+
+    // Set up button listeners
+    const createButton = document.getElementById('createWorkflowButton');
+    if (createButton) {
+        createButton.addEventListener('click', showWorkflowCreation);
     }
-    
-    // Handle perform button
+
+    const performButton = document.getElementById('performButton');
     if (performButton) {
-        performButton.addEventListener('click', function() {
-            const selectedWorkflow = workflowSelect.value;
-            if (selectedWorkflow && selectedWorkflow !== 'create-new') {
-                performWorkflow(selectedWorkflow);
-            }
-        });
+        performButton.addEventListener('click', performWorkflow);
     }
 }
 
