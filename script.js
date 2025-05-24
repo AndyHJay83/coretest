@@ -152,6 +152,15 @@ function hideWorkflowCreation() {
 
 // Initialize everything when the DOM is loaded
 document.addEventListener('DOMContentLoaded', async () => {
+    // Set viewport meta tag for consistent zoom level
+    let viewportMeta = document.querySelector('meta[name="viewport"]');
+    if (!viewportMeta) {
+        viewportMeta = document.createElement('meta');
+        viewportMeta.name = 'viewport';
+        document.head.appendChild(viewportMeta);
+    }
+    viewportMeta.content = 'width=device-width, initial-scale=0.75, maximum-scale=0.75, user-scalable=no';
+    
     // Load word list
     await loadWordList();
     
