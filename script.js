@@ -93,7 +93,7 @@ function showWorkflowCreation() {
     document.getElementById('workflowName').focus();
 }
 
-function performWorkflow() {
+async function performWorkflow() {
     console.log('Performing workflow...');
     
     // Get the selected workflow ID
@@ -120,65 +120,89 @@ function performWorkflow() {
         alert('Selected workflow not found');
         return;
     }
-    
-    // Hide homepage and show workflow execution
-    document.getElementById('homepage').style.display = 'none';
-    const workflowExecution = document.getElementById('workflowExecution');
-    workflowExecution.style.display = 'flex';
-    
-    // Clear previous content
-    const featureArea = document.getElementById('featureArea');
-    const resultsContainer = document.getElementById('results');
-    featureArea.innerHTML = '';
-    resultsContainer.innerHTML = '';
-    
-    // Create and display each feature section
-    workflow.features.forEach(feature => {
-        const featureSection = document.createElement('div');
-        featureSection.className = 'feature-section';
-        featureSection.id = `${feature.toLowerCase()}Feature`;
+
+    try {
+        // Load the wordlist first
+        await loadWordList();
+        currentFilteredWords = [...wordList]; // Start with the full wordlist
+        console.log('Wordlist loaded, starting with', currentFilteredWords.length, 'words');
         
-        const featureTitle = document.createElement('div');
-        featureTitle.className = 'feature-title';
-        featureTitle.textContent = feature;
-        featureSection.appendChild(featureTitle);
+        // Hide homepage and show workflow execution
+        document.getElementById('homepage').style.display = 'none';
+        const workflowExecution = document.getElementById('workflowExecution');
+        workflowExecution.style.display = 'flex';
         
-        // Add feature-specific content based on the feature type
-        switch(feature.toLowerCase()) {
-            case 'original lex':
-                addOriginalLexContent(featureSection);
-                break;
-            case 'eee?':
-                addEeeContent(featureSection);
-                break;
-            case 'o?':
-                addOContent(featureSection);
-                break;
-            case 'curved':
-                addCurvedContent(featureSection);
-                break;
-            case 'colour3':
-                addColour3Content(featureSection);
-                break;
-            case 'lexicon':
-                addLexiconContent(featureSection);
-                break;
-            case 'consonant':
-                addConsonantContent(featureSection);
-                break;
-            case 'position 1':
-                addPosition1Content(featureSection);
-                break;
-            case 'vowel':
-                addVowelContent(featureSection);
-                break;
-            case 'shape':
-                addShapeContent(featureSection);
-                break;
+        // Clear previous content
+        const featureArea = document.getElementById('featureArea');
+        const resultsContainer = document.getElementById('results');
+        featureArea.innerHTML = '';
+        resultsContainer.innerHTML = '';
+        
+        // Create and display each feature section
+        workflow.features.forEach(feature => {
+            const featureSection = document.createElement('div');
+            featureSection.className = 'feature-section';
+            featureSection.id = `${feature.toLowerCase()}Feature`;
+            featureSection.style.display = 'block'; // Ensure feature is visible
+            
+            const featureTitle = document.createElement('div');
+            featureTitle.className = 'feature-title';
+            featureTitle.textContent = feature;
+            featureSection.appendChild(featureTitle);
+            
+            // Add feature-specific content based on the feature type
+            switch(feature.toLowerCase()) {
+                case 'original lex':
+                    addOriginalLexContent(featureSection);
+                    break;
+                case 'eee?':
+                    addEeeContent(featureSection);
+                    break;
+                case 'o?':
+                    addOContent(featureSection);
+                    break;
+                case 'curved':
+                    addCurvedContent(featureSection);
+                    break;
+                case 'colour3':
+                    addColour3Content(featureSection);
+                    break;
+                case 'lexicon':
+                    addLexiconContent(featureSection);
+                    break;
+                case 'consonant':
+                    addConsonantContent(featureSection);
+                    break;
+                case 'position 1':
+                    addPosition1Content(featureSection);
+                    break;
+                case 'vowel':
+                    addVowelContent(featureSection);
+                    break;
+                case 'shape':
+                    addShapeContent(featureSection);
+                    break;
+            }
+            
+            featureArea.appendChild(featureSection);
+        });
+
+        // Display initial word count
+        updateWordCount(currentFilteredWords.length);
+        
+        // Set up event listeners for the first feature
+        if (workflow.features.length > 0) {
+            const firstFeature = workflow.features[0].toLowerCase();
+            setupFeatureListeners(firstFeature, (filteredWords) => {
+                currentFilteredWords = filteredWords;
+                displayResults(filteredWords);
+            });
         }
-        
-        featureArea.appendChild(featureSection);
-    });
+
+    } catch (error) {
+        console.error('Error executing workflow:', error);
+        alert('There was an error executing the workflow. Please try again.');
+    }
 }
 
 // Helper functions to add feature-specific content
