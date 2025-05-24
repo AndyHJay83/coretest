@@ -3035,6 +3035,7 @@ function showFeatureInfo(featureId) {
     const modal = document.getElementById(`${featureId}Info`);
     if (modal) {
         modal.style.display = 'flex';
+        modal.classList.add('active');
         document.body.style.overflow = 'hidden';
         // Prevent background scrolling
         document.body.addEventListener('touchmove', preventScroll, { passive: false });
@@ -3048,6 +3049,7 @@ function hideFeatureInfo(featureId) {
     const modal = document.getElementById(`${featureId}Info`);
     if (modal) {
         modal.style.display = 'none';
+        modal.classList.remove('active');
         document.body.style.overflow = '';
         // Re-enable background scrolling
         document.body.removeEventListener('touchmove', preventScroll);
@@ -3108,6 +3110,7 @@ function handleInfoClick(e) {
 function handleCloseClick(e) {
     console.log('Close button clicked');
     e.preventDefault();
+    e.stopPropagation();
     const modal = this.closest('.feature-info-modal');
     const featureId = modal.id.replace('Info', '');
     hideFeatureInfo(featureId);
