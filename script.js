@@ -802,7 +802,10 @@ function saveWorkflow() {
         
         // Show success message and return to homepage
         alert('Workflow saved successfully!');
-        hideWorkflowCreation();
+        
+        // Hide workflow creation page and show homepage
+        document.getElementById('workflowCreation').style.display = 'none';
+        document.getElementById('homepage').style.display = 'block';
         
     } catch (error) {
         console.error('Error saving workflow:', error);
