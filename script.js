@@ -94,40 +94,232 @@ function showWorkflowCreation() {
 }
 
 function performWorkflow() {
+    console.log('Performing workflow...');
+    
+    // Get the selected workflow ID
     const workflowSelect = document.getElementById('workflowSelect');
-    if (!workflowSelect) {
-        console.error('Workflow select element not found');
-        return;
-    }
-
     const selectedWorkflowId = workflowSelect.value;
-    console.log('Selected workflow ID:', selectedWorkflowId); // Debug log
     
+    console.log('Selected workflow ID:', selectedWorkflowId);
+    
+    // Validate selection
     if (!selectedWorkflowId || selectedWorkflowId === 'create-new') {
-        alert('Please select a workflow first');
+        alert('Please select a workflow to perform');
         return;
     }
     
+    // Get all saved workflows
     const savedWorkflows = JSON.parse(localStorage.getItem('workflows') || '[]');
-    console.log('All saved workflows:', savedWorkflows); // Debug log
+    console.log('All saved workflows:', savedWorkflows);
     
+    // Find the selected workflow
     const workflow = savedWorkflows.find(w => w.id === selectedWorkflowId);
-    console.log('Found workflow:', workflow); // Debug log
+    console.log('Found workflow:', workflow);
     
     if (!workflow) {
-        console.error('Selected workflow not found. ID:', selectedWorkflowId);
-        console.error('Available workflows:', savedWorkflows);
-        alert('Error: Selected workflow not found');
+        alert('Selected workflow not found');
         return;
     }
     
-    // Show the workflow execution page
+    // Hide homepage and show workflow execution
     document.getElementById('homepage').style.display = 'none';
-    document.getElementById('workflowExecution').style.display = 'block';
+    const workflowExecution = document.getElementById('workflowExecution');
+    workflowExecution.style.display = 'flex';
     
-    // Execute the workflow
-    executeWorkflow(workflow);
+    // Clear previous content
+    const featureArea = document.getElementById('featureArea');
+    const resultsContainer = document.getElementById('results');
+    featureArea.innerHTML = '';
+    resultsContainer.innerHTML = '';
+    
+    // Create and display each feature section
+    workflow.features.forEach(feature => {
+        const featureSection = document.createElement('div');
+        featureSection.className = 'feature-section';
+        featureSection.id = `${feature.toLowerCase()}Feature`;
+        
+        const featureTitle = document.createElement('div');
+        featureTitle.className = 'feature-title';
+        featureTitle.textContent = feature;
+        featureSection.appendChild(featureTitle);
+        
+        // Add feature-specific content based on the feature type
+        switch(feature.toLowerCase()) {
+            case 'original lex':
+                addOriginalLexContent(featureSection);
+                break;
+            case 'eee?':
+                addEeeContent(featureSection);
+                break;
+            case 'o?':
+                addOContent(featureSection);
+                break;
+            case 'curved':
+                addCurvedContent(featureSection);
+                break;
+            case 'colour3':
+                addColour3Content(featureSection);
+                break;
+            case 'lexicon':
+                addLexiconContent(featureSection);
+                break;
+            case 'consonant':
+                addConsonantContent(featureSection);
+                break;
+            case 'position 1':
+                addPosition1Content(featureSection);
+                break;
+            case 'vowel':
+                addVowelContent(featureSection);
+                break;
+            case 'shape':
+                addShapeContent(featureSection);
+                break;
+        }
+        
+        featureArea.appendChild(featureSection);
+    });
 }
+
+// Helper functions to add feature-specific content
+function addOriginalLexContent(container) {
+    const display = document.createElement('div');
+    display.className = 'original-lex-display';
+    display.innerHTML = `
+        <div class="position-display">Position <span id="originalLexPosition">-</span></div>
+        <div class="letters-display">Letters: <span id="originalLexLetters">-</span></div>
+    `;
+    container.appendChild(display);
+    
+    const inputGroup = document.createElement('div');
+    inputGroup.className = 'input-group';
+    inputGroup.innerHTML = `
+        <input type="text" id="originalLexInput" placeholder="Enter a word...">
+        <button id="originalLexButton">DONE</button>
+        <button id="originalLexSkipButton" class="skip-button">SKIP</button>
+    `;
+    container.appendChild(inputGroup);
+}
+
+function addEeeContent(container) {
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'button-container';
+    buttonContainer.innerHTML = `
+        <button id="eeeButton" class="yes-btn">E</button>
+        <button id="eeeYesBtn" class="yes-btn">YES</button>
+        <button id="eeeNoBtn" class="no-btn">NO</button>
+    `;
+    container.appendChild(buttonContainer);
+}
+
+function addOContent(container) {
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'button-container';
+    buttonContainer.innerHTML = `
+        <button id="oYesBtn" class="yes-btn">YES</button>
+        <button id="oNoBtn" class="no-btn">NO</button>
+        <button id="oSkipBtn" class="skip-button">SKIP</button>
+    `;
+    container.appendChild(buttonContainer);
+}
+
+function addCurvedContent(container) {
+    const curvedButtons = document.createElement('div');
+    curvedButtons.className = 'curved-buttons';
+    curvedButtons.innerHTML = `
+        <button class="curved-btn">B</button>
+        <button class="curved-btn">C</button>
+        <button class="curved-btn">D</button>
+        <button class="curved-btn">G</button>
+        <button class="curved-btn">J</button>
+        <button class="curved-btn">O</button>
+        <button class="curved-btn">P</button>
+        <button class="curved-btn">Q</button>
+        <button class="curved-btn">R</button>
+        <button class="curved-btn">S</button>
+        <button class="curved-btn">U</button>
+    `;
+    container.appendChild(curvedButtons);
+    
+    const skipButton = document.createElement('button');
+    skipButton.id = 'curvedSkipBtn';
+    skipButton.className = 'skip-button';
+    skipButton.textContent = 'SKIP';
+    container.appendChild(skipButton);
+}
+
+function addColour3Content(container) {
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'button-container';
+    buttonContainer.innerHTML = `
+        <button id="colour3YesBtn" class="yes-btn">YES</button>
+        <button id="colour3SkipButton" class="skip-button">SKIP</button>
+    `;
+    container.appendChild(buttonContainer);
+}
+
+function addLexiconContent(container) {
+    const inputGroup = document.createElement('div');
+    inputGroup.className = 'lexicon-input';
+    inputGroup.innerHTML = `
+        <input type="text" id="lexiconInput" placeholder="Enter positions (e.g., 14)">
+        <button id="lexiconButton">DONE</button>
+    `;
+    container.appendChild(inputGroup);
+    
+    const skipButton = document.createElement('button');
+    skipButton.id = 'lexiconSkipButton';
+    skipButton.className = 'skip-button';
+    skipButton.textContent = 'SKIP';
+    container.appendChild(skipButton);
+}
+
+function addConsonantContent(container) {
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'button-container';
+    buttonContainer.innerHTML = `
+        <button id="consonantYesBtn" class="yes-btn">YES</button>
+        <button id="consonantNoBtn" class="no-btn">NO</button>
+    `;
+    container.appendChild(buttonContainer);
+}
+
+function addPosition1Content(container) {
+    const inputGroup = document.createElement('div');
+    inputGroup.className = 'position-input';
+    inputGroup.innerHTML = `
+        <input type="text" id="position1Input" placeholder="Enter a word...">
+        <button id="position1Button">DONE</button>
+        <button id="position1DoneButton" class="skip-button">SKIP</button>
+    `;
+    container.appendChild(inputGroup);
+}
+
+function addVowelContent(container) {
+    const vowelLetter = document.createElement('div');
+    vowelLetter.className = 'vowel-letter';
+    container.appendChild(vowelLetter);
+    
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'button-container';
+    buttonContainer.innerHTML = `
+        <button class="vowel-btn yes-btn">YES</button>
+        <button class="vowel-btn no-btn">NO</button>
+    `;
+    container.appendChild(buttonContainer);
+}
+
+function addShapeContent(container) {
+    const shapeDisplay = document.createElement('div');
+    shapeDisplay.className = 'shape-display';
+    shapeDisplay.innerHTML = `
+        <div class="position-display"></div>
+        <div class="category-buttons"></div>
+    `;
+    container.appendChild(shapeDisplay);
+}
+
+// ... existing code ...
 
 // Add this to ensure dropdown is initialized when the page loads
 document.addEventListener('DOMContentLoaded', () => {
