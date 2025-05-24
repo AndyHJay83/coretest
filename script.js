@@ -756,41 +756,45 @@ function saveWorkflow() {
         return;
     }
 
-    // Create new workflow
-    const newWorkflow = {
-        name: workflowName,
-        steps: selectedFeatures.map(feature => ({ feature }))
-    };
-    
-    // Add to workflows array
-    workflows.push(newWorkflow);
-    
-    // Save to localStorage
-    localStorage.setItem('workflows', JSON.stringify(workflows));
-    
-    // Update workflow select
-    const workflowSelect = document.getElementById('workflowSelect');
-    if (workflowSelect) {
-        const option = document.createElement('option');
-        option.value = newWorkflow.name;
-        option.textContent = newWorkflow.name;
-        workflowSelect.appendChild(option);
+    try {
+        // Create new workflow
+        const newWorkflow = {
+            name: workflowName,
+            steps: selectedFeatures.map(feature => ({ feature }))
+        };
+        
+        // Add to workflows array
+        workflows.push(newWorkflow);
+        
+        // Save to localStorage
+        localStorage.setItem('workflows', JSON.stringify(workflows));
+        
+        // Update workflow select
+        const workflowSelect = document.getElementById('workflowSelect');
+        if (workflowSelect) {
+            const option = document.createElement('option');
+            option.value = newWorkflow.name;
+            option.textContent = newWorkflow.name;
+            workflowSelect.appendChild(option);
+        }
+        
+        // Clear form
+        if (workflowNameInput) {
+            workflowNameInput.value = '';
+        }
+        document.getElementById('selectedFeaturesList').innerHTML = '';
+        
+        // Reinitialize dropdowns
+        initializeDropdowns();
+        
+        // Show success message and return to homepage
+        alert('Workflow saved successfully!');
+        hideWorkflowCreation();
+        
+    } catch (error) {
+        console.error('Error saving workflow:', error);
+        alert('There was an error saving the workflow. Please try again.');
     }
-    
-    // Show success message
-    alert('Workflow saved successfully!');
-    
-    // Return to homepage
-    hideWorkflowCreation();
-    
-    // Clear form
-    if (workflowNameInput) {
-        workflowNameInput.value = '';
-    }
-    document.getElementById('selectedFeaturesList').innerHTML = '';
-    
-    // Reinitialize dropdowns
-    initializeDropdowns();
 }
 
 // Handle cancel workflow creation
