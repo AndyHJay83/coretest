@@ -40,6 +40,8 @@ function initializeWorkflowDropdown() {
     const performButton = document.getElementById('performButton');
     const createWorkflowButton = document.getElementById('createWorkflowButton');
     
+    if (!workflowSelect) return;
+    
     // Load saved workflows
     const savedWorkflows = JSON.parse(localStorage.getItem('workflows') || '[]');
     
@@ -56,10 +58,14 @@ function initializeWorkflowDropdown() {
         workflowSelect.appendChild(option);
     });
     
+    // Reset the dropdown to default state
+    workflowSelect.value = '';
+    performButton.disabled = true;
+    
     // Handle workflow selection
     workflowSelect.addEventListener('change', function() {
         const selectedValue = this.value;
-        if (selectedValue === 'create') {
+        if (selectedValue === 'create-new') {
             showWorkflowCreation();
         } else if (selectedValue !== '') {
             performButton.disabled = false;
@@ -69,15 +75,19 @@ function initializeWorkflowDropdown() {
     });
     
     // Handle create workflow button
-    createWorkflowButton.addEventListener('click', showWorkflowCreation);
+    if (createWorkflowButton) {
+        createWorkflowButton.addEventListener('click', showWorkflowCreation);
+    }
     
     // Handle perform button
-    performButton.addEventListener('click', function() {
-        const selectedWorkflow = workflowSelect.value;
-        if (selectedWorkflow && selectedWorkflow !== 'create') {
-            performWorkflow(selectedWorkflow);
-        }
-    });
+    if (performButton) {
+        performButton.addEventListener('click', function() {
+            const selectedWorkflow = workflowSelect.value;
+            if (selectedWorkflow && selectedWorkflow !== 'create-new') {
+                performWorkflow(selectedWorkflow);
+            }
+        });
+    }
 }
 
 function showWorkflowCreation() {
@@ -730,8 +740,9 @@ function saveWorkflow() {
     }
 
     try {
-        // Create new workflow
+        // Create new workflow with a unique ID
         const newWorkflow = {
+            id: Date.now().toString(), // Generate unique ID
             name: workflowName,
             steps: selectedFeatures.map(feature => ({ feature }))
         };
@@ -749,7 +760,7 @@ function saveWorkflow() {
         document.getElementById('selectedFeaturesList').innerHTML = '';
         
         // Reinitialize the workflow dropdown
-        reinitializeWorkflowDropdown();
+        initializeWorkflowDropdown();
         
         // Show success message and return to homepage
         alert('Workflow saved successfully!');
