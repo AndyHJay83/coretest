@@ -122,11 +122,11 @@ function initializeWorkflowDropdown() {
                 color: #666;
             }
             .options-list {
-                display: none;
                 position: absolute;
-                top: calc(100% + 4px);
+                top: 100%;
                 left: 0;
                 right: 0;
+                margin-top: 4px;
                 background: white;
                 border: 1px solid #ccc;
                 border-radius: 4px;
@@ -134,14 +134,10 @@ function initializeWorkflowDropdown() {
                 max-height: 200px;
                 overflow-y: auto;
                 z-index: 1002;
-                opacity: 0;
-                visibility: hidden;
-                transition: opacity 0.2s, visibility 0.2s;
+                display: none;
             }
             .options-list.show {
                 display: block !important;
-                opacity: 1 !important;
-                visibility: visible !important;
             }
             .option {
                 padding: 8px 12px;
@@ -173,8 +169,6 @@ function initializeWorkflowDropdown() {
                 selectedText.textContent = option.textContent;
                 optionsList.classList.remove('show');
                 optionsList.style.display = 'none';
-                optionsList.style.opacity = '0';
-                optionsList.style.visibility = 'hidden';
                 
                 if (option.value === 'create-new') {
                     showWorkflowCreation();
@@ -189,8 +183,6 @@ function initializeWorkflowDropdown() {
                 selectedText.textContent = option.textContent;
                 optionsList.classList.remove('show');
                 optionsList.style.display = 'none';
-                optionsList.style.opacity = '0';
-                optionsList.style.visibility = 'hidden';
                 
                 if (option.value === 'create-new') {
                     showWorkflowCreation();
@@ -218,8 +210,6 @@ function initializeWorkflowDropdown() {
             if (!customSelect.contains(e.target)) {
                 optionsList.classList.remove('show');
                 optionsList.style.display = 'none';
-                optionsList.style.opacity = '0';
-                optionsList.style.visibility = 'hidden';
             }
         };
         
@@ -227,8 +217,6 @@ function initializeWorkflowDropdown() {
             if (!customSelect.contains(e.target)) {
                 optionsList.classList.remove('show');
                 optionsList.style.display = 'none';
-                optionsList.style.opacity = '0';
-                optionsList.style.visibility = 'hidden';
             }
         };
         
@@ -243,12 +231,8 @@ function initializeWorkflowDropdown() {
             const isVisible = optionsList.classList.contains('show');
             optionsList.classList.toggle('show');
             optionsList.style.display = isVisible ? 'none' : 'block';
-            optionsList.style.opacity = isVisible ? '0' : '1';
-            optionsList.style.visibility = isVisible ? 'hidden' : 'visible';
             console.log('Options list display:', optionsList.style.display);
             console.log('Options list classList:', optionsList.classList.toString());
-            console.log('Options list opacity:', optionsList.style.opacity);
-            console.log('Options list visibility:', optionsList.style.visibility);
         };
         
         const toggleTouchHandler = (e) => {
@@ -258,12 +242,8 @@ function initializeWorkflowDropdown() {
             const isVisible = optionsList.classList.contains('show');
             optionsList.classList.toggle('show');
             optionsList.style.display = isVisible ? 'none' : 'block';
-            optionsList.style.opacity = isVisible ? '0' : '1';
-            optionsList.style.visibility = isVisible ? 'hidden' : 'visible';
             console.log('Options list display:', optionsList.style.display);
             console.log('Options list classList:', optionsList.classList.toString());
-            console.log('Options list opacity:', optionsList.style.opacity);
-            console.log('Options list visibility:', optionsList.style.visibility);
         };
         
         // Store toggle handlers on the custom select element
