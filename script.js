@@ -178,99 +178,45 @@ document.addEventListener('DOMContentLoaded', async () => {
     const availableFeatures = document.getElementById('availableFeatures');
     const selectedFeaturesList = document.getElementById('selectedFeaturesList');
     
-    if (availableFeatures) {
-        const featureButtons = availableFeatures.querySelectorAll('.feature-button');
-        
-        featureButtons.forEach(button => {
-            // Add touch event listeners for mobile
-            button.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                button.classList.add('dragging');
-                // Store the feature data
-                button.dataset.touchFeature = button.dataset.feature;
-            }, { passive: false });
-            
-            button.addEventListener('touchmove', (e) => {
-                e.preventDefault();
-                const touch = e.touches[0];
-                const element = document.elementFromPoint(touch.clientX, touch.clientY);
-                if (element && element.closest('#selectedFeaturesList')) {
-                    selectedFeaturesList.classList.add('drag-over');
-                } else {
-                    selectedFeaturesList.classList.remove('drag-over');
-                }
-            }, { passive: false });
-            
-            button.addEventListener('touchend', (e) => {
-                e.preventDefault();
-                button.classList.remove('dragging');
-                const touch = e.changedTouches[0];
-                const element = document.elementFromPoint(touch.clientX, touch.clientY);
-                if (element && element.closest('#selectedFeaturesList')) {
-                    const feature = button.dataset.touchFeature;
-                    if (feature) {
-                        addFeatureToList(feature);
-                    }
-                }
-                selectedFeaturesList.classList.remove('drag-over');
-            }, { passive: false });
-            
-            // Keep existing drag events for desktop
-            button.addEventListener('dragstart', (e) => {
-                e.dataTransfer.setData('text/plain', button.dataset.feature);
-                e.dataTransfer.effectAllowed = 'move';
-                button.classList.add('dragging');
-            });
-            
-            button.addEventListener('dragend', () => {
-                button.classList.remove('dragging');
-            });
-        });
+    // Initialize workflow creation functionality
+    const createWorkflowButton = document.getElementById('createWorkflowButton');
+    const cancelWorkflowButton = document.getElementById('cancelWorkflowButton');
+    const saveWorkflowButton = document.getElementById('saveWorkflowButton');
+    const workflowNameInput = document.getElementById('workflowName');
+    
+    if (createWorkflowButton) {
+        createWorkflowButton.addEventListener('click', showWorkflowCreation);
+        createWorkflowButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            showWorkflowCreation();
+        }, { passive: false });
     }
     
-    if (selectedFeaturesList) {
-        // Add touch event listeners for mobile
-        selectedFeaturesList.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-        }, { passive: false });
-        
-        selectedFeaturesList.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-            const touch = e.touches[0];
-            const element = document.elementFromPoint(touch.clientX, touch.clientY);
-            if (element && element.closest('.selected-feature-item')) {
-                selectedFeaturesList.classList.add('drag-over');
+    if (cancelWorkflowButton) {
+        cancelWorkflowButton.addEventListener('click', () => {
+            hideWorkflowCreation();
+            if (workflowNameInput) {
+                workflowNameInput.value = '';
             }
-        }, { passive: false });
-        
-        selectedFeaturesList.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            selectedFeaturesList.classList.remove('drag-over');
-        }, { passive: false });
-        
-        // Keep existing drag events for desktop
-        selectedFeaturesList.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'move';
-            selectedFeaturesList.classList.add('drag-over');
-        });
-        
-        selectedFeaturesList.addEventListener('dragleave', () => {
-            selectedFeaturesList.classList.remove('drag-over');
-        });
-        
-        selectedFeaturesList.addEventListener('drop', (e) => {
-            e.preventDefault();
-            selectedFeaturesList.classList.remove('drag-over');
-            
-            const feature = e.dataTransfer.getData('text/plain');
-            if (feature) {
-                addFeatureToList(feature);
+            if (selectedFeaturesList) {
+                selectedFeaturesList.innerHTML = '';
             }
         });
+        cancelWorkflowButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            cancelWorkflowButton.click();
+        }, { passive: false });
     }
     
-    // Set up event listeners for all buttons
+    if (saveWorkflowButton) {
+        saveWorkflowButton.addEventListener('click', saveWorkflow);
+        saveWorkflowButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            saveWorkflow();
+        }, { passive: false });
+    }
+    
+    // Set up button listeners
     setupButtonListeners();
 });
 
