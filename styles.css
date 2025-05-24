@@ -1698,4 +1698,114 @@ input:checked + .slider:before {
         padding: 12px;
         font-size: 16px;
     }
+}
+
+/* Feature Info Button Styles */
+.feature-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.info-button {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 4px;
+    font-size: 16px;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+}
+
+.info-button:hover {
+    color: #333;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.info-button i {
+    font-size: 16px;
+}
+
+/* Feature Info Modal Styles */
+.feature-info-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.feature-info-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 90%;
+    width: 400px;
+    position: relative;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.feature-info-content h3 {
+    margin: 0 0 12px 0;
+    color: #333;
+    font-size: 18px;
+}
+
+.feature-info-content p {
+    margin: 0;
+    color: #666;
+    line-height: 1.5;
+    font-size: 14px;
+}
+
+.close-info-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #666;
+    cursor: pointer;
+    padding: 4px;
+    line-height: 1;
+}
+
+.close-info-button:hover {
+    color: #333;
+}
+
+/* Mobile Styles for Info Modals */
+@media (max-width: 600px) {
+    .feature-info-content {
+        width: 85%;
+        margin: 20px;
+        padding: 16px;
+    }
+
+    .feature-info-content h3 {
+        font-size: 16px;
+        margin-bottom: 8px;
+    }
+
+    .feature-info-content p {
+        font-size: 13px;
+    }
+
+    .close-info-button {
+        top: 8px;
+        right: 8px;
+    }
 } 

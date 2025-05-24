@@ -3025,3 +3025,51 @@ buttonConsistencyStyle.textContent = `
     }
 `;
 document.head.appendChild(buttonConsistencyStyle);
+
+// Feature Info Modal Functions
+function showFeatureInfo(featureId) {
+    const modal = document.getElementById(`${featureId}Info`);
+    if (modal) {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function hideFeatureInfo(featureId) {
+    const modal = document.getElementById(`${featureId}Info`);
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+}
+
+// Add event listeners for info buttons
+document.addEventListener('DOMContentLoaded', function() {
+    // Info button click handlers
+    document.querySelectorAll('.info-button').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.stopPropagation(); // Prevent drag start
+            const featureId = this.getAttribute('data-feature');
+            showFeatureInfo(featureId);
+        });
+    });
+
+    // Close button click handlers
+    document.querySelectorAll('.close-info-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const modal = this.closest('.feature-info-modal');
+            const featureId = modal.id.replace('Info', '');
+            hideFeatureInfo(featureId);
+        });
+    });
+
+    // Close modal when clicking outside
+    document.querySelectorAll('.feature-info-modal').forEach(modal => {
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                const featureId = this.id.replace('Info', '');
+                hideFeatureInfo(featureId);
+            }
+        });
+    });
+});
