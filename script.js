@@ -151,6 +151,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initialize workflow dropdown
     initializeWorkflowDropdown();
     
+    // Initialize all dropdowns
+    initializeDropdowns();
+    
     // Set up drag and drop for feature buttons
     const availableFeatures = document.getElementById('availableFeatures');
     const selectedFeaturesList = document.getElementById('selectedFeaturesList');
@@ -810,7 +813,7 @@ function saveWorkflow() {
     document.getElementById('selectedFeaturesList').innerHTML = '';
     
     // Reinitialize dropdowns
-    initializeWorkflowDropdown();
+    initializeDropdowns();
 }
 
 // Handle cancel workflow creation
@@ -2132,78 +2135,66 @@ function initializeDropdowns() {
         const customSelect = dropdown.querySelector('.custom-select');
         const selectedText = customSelect.querySelector('.selected-text');
         const optionsList = customSelect.querySelector('.options-list');
-        const options = customSelect.querySelectorAll('.option');
+        
+        // Clear existing options
+        optionsList.innerHTML = '';
+        
+        // Add options to custom dropdown
+        Array.from(select.options).forEach(option => {
+            const customOption = document.createElement('div');
+            customOption.className = 'option';
+            customOption.textContent = option.textContent;
+            customOption.setAttribute('data-value', option.value);
+            
+            // Add click handler for desktop
+            customOption.addEventListener('click', () => {
+                select.value = option.value;
+                selectedText.textContent = option.textContent;
+                optionsList.classList.remove('show');
+                select.dispatchEvent(new Event('change'));
+            });
+            
+            // Add touch handler for mobile
+            customOption.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                select.value = option.value;
+                selectedText.textContent = option.textContent;
+                optionsList.classList.remove('show');
+                select.dispatchEvent(new Event('change'));
+            }, { passive: false });
+            
+            optionsList.appendChild(customOption);
+        });
         
         // Set initial selected text
-        if (select && selectedText) {
-            selectedText.textContent = select.options[select.selectedIndex].text;
-        }
+        selectedText.textContent = select.options[select.selectedIndex].text;
         
-        // Toggle options list on click/touch
-        if (customSelect) {
-            customSelect.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                optionsList.classList.toggle('show');
-            });
-            
-            // Handle touch events
-            customSelect.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                optionsList.classList.toggle('show');
-            }, { passive: false });
-        }
-        
-        // Handle option selection
-        options.forEach(option => {
-            option.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const value = option.getAttribute('data-value');
-                if (select) {
-                    select.value = value;
-                    selectedText.textContent = option.textContent;
-                    optionsList.classList.remove('show');
-                    select.dispatchEvent(new Event('change'));
-                }
-            });
-            
-            // Handle touch events for options
-            option.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const value = option.getAttribute('data-value');
-                if (select) {
-                    select.value = value;
-                    selectedText.textContent = option.textContent;
-                    optionsList.classList.remove('show');
-                    select.dispatchEvent(new Event('change'));
-                }
-            }, { passive: false });
+        // Add click handler for the custom select
+        customSelect.addEventListener('click', (e) => {
+            e.stopPropagation();
+            optionsList.classList.toggle('show');
         });
+        
+        // Add touch handler for mobile
+        customSelect.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            optionsList.classList.toggle('show');
+        }, { passive: false });
         
         // Close dropdown when clicking outside
         document.addEventListener('click', (e) => {
-            if (customSelect && !customSelect.contains(e.target)) {
+            if (!customSelect.contains(e.target)) {
                 optionsList.classList.remove('show');
             }
         });
         
-        // Close dropdown when touching outside
+        // Close dropdown when touching outside (mobile)
         document.addEventListener('touchstart', (e) => {
-            if (customSelect && !customSelect.contains(e.target)) {
+            if (!customSelect.contains(e.target)) {
                 optionsList.classList.remove('show');
             }
         }, { passive: false });
-        
-        // Update selected text when select changes
-        if (select) {
-            select.addEventListener('change', () => {
-                selectedText.textContent = select.options[select.selectedIndex].text;
-                optionsList.classList.remove('show');
-            });
-        }
     });
 }
 
