@@ -37,10 +37,14 @@ const performButton = document.getElementById('performButton');
 // Function to initialize workflow dropdown
 function initializeWorkflowDropdown() {
     const workflowSelect = document.getElementById('workflowSelect');
-    if (!workflowSelect) return;
+    if (!workflowSelect) {
+        console.error('Workflow select element not found');
+        return;
+    }
 
     // Load saved workflows
     const savedWorkflows = JSON.parse(localStorage.getItem('workflows') || '[]');
+    console.log('Initializing dropdown with workflows:', savedWorkflows); // Debug log
     
     // Clear existing options except the first two (default and create new)
     while (workflowSelect.options.length > 2) {
@@ -53,6 +57,7 @@ function initializeWorkflowDropdown() {
         option.value = workflow.id;
         option.textContent = workflow.name;
         workflowSelect.appendChild(option);
+        console.log('Added workflow to dropdown:', workflow); // Debug log
     });
 
     // Reset dropdown to default state
@@ -90,24 +95,28 @@ function showWorkflowCreation() {
 
 function performWorkflow() {
     const workflowSelect = document.getElementById('workflowSelect');
-    if (!workflowSelect) return;
+    if (!workflowSelect) {
+        console.error('Workflow select element not found');
+        return;
+    }
 
     const selectedWorkflowId = workflowSelect.value;
-    console.log('Performing workflow with ID:', selectedWorkflowId); // Debug log
+    console.log('Selected workflow ID:', selectedWorkflowId); // Debug log
     
     if (!selectedWorkflowId || selectedWorkflowId === 'create-new') {
         alert('Please select a workflow first');
         return;
     }
     
-    const workflows = JSON.parse(localStorage.getItem('workflows') || '[]');
-    console.log('Available workflows:', workflows); // Debug log
+    const savedWorkflows = JSON.parse(localStorage.getItem('workflows') || '[]');
+    console.log('All saved workflows:', savedWorkflows); // Debug log
     
-    const workflow = workflows.find(w => w.id === selectedWorkflowId);
+    const workflow = savedWorkflows.find(w => w.id === selectedWorkflowId);
     console.log('Found workflow:', workflow); // Debug log
     
     if (!workflow) {
-        console.error('Selected workflow not found');
+        console.error('Selected workflow not found. ID:', selectedWorkflowId);
+        console.error('Available workflows:', savedWorkflows);
         alert('Error: Selected workflow not found');
         return;
     }
@@ -668,7 +677,8 @@ function saveWorkflow() {
     }
     
     // Check if workflow name already exists
-    if (workflows.some(w => w.name === workflowName)) {
+    const existingWorkflows = JSON.parse(localStorage.getItem('workflows') || '[]');
+    if (existingWorkflows.some(w => w.name === workflowName)) {
         alert('A workflow with this name already exists. Please choose a different name.');
         if (workflowNameInput) {
             workflowNameInput.focus();
@@ -687,10 +697,11 @@ function saveWorkflow() {
         console.log('Saving new workflow:', newWorkflow); // Debug log
         
         // Add to workflows array
-        workflows.push(newWorkflow);
+        existingWorkflows.push(newWorkflow);
         
         // Save to localStorage
-        localStorage.setItem('workflows', JSON.stringify(workflows));
+        localStorage.setItem('workflows', JSON.stringify(existingWorkflows));
+        console.log('Saved workflows to localStorage:', existingWorkflows); // Debug log
         
         // Clear form
         if (workflowNameInput) {
