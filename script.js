@@ -300,16 +300,6 @@ function setupButtonListeners() {
         }, { passive: false });
     }
     
-    // Save Workflow button
-    const saveWorkflowButton = document.getElementById('saveWorkflowButton');
-    if (saveWorkflowButton) {
-        saveWorkflowButton.addEventListener('click', saveWorkflow);
-        saveWorkflowButton.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            saveWorkflow();
-        }, { passive: false });
-    }
-    
     // Perform button
     const performButton = document.getElementById('performButton');
     if (performButton) {
