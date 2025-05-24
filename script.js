@@ -3325,116 +3325,113 @@ function showWorkflowCreation() {
 
 // Homepage dropdown initialization
 function initializeHomepageDropdowns() {
-    const workflowDropdown = document.querySelector('#workflowSelect').closest('.dropdown');
-    const wordlistDropdown = document.querySelector('#wordlistSelect').closest('.dropdown');
+    const workflowGrid = document.getElementById('workflowGrid');
+    const wordlistGrid = document.getElementById('wordlistGrid');
+    const performButton = document.getElementById('performButton');
     
-    function setupDropdown(dropdown) {
-        const nativeSelect = dropdown.querySelector('.native-select');
-        const customSelect = dropdown.querySelector('.custom-select');
-        const selectedText = customSelect.querySelector('.selected-text');
-        const optionsList = customSelect.querySelector('.options-list');
+    let selectedWorkflow = null;
+    let selectedWordlist = 'enuk'; // Default to ENUK wordlist
+    
+    // Initialize workflow cards
+    function initializeWorkflowCards() {
+        // Clear existing cards except the "Create New" card
+        const createNewCard = workflowGrid.querySelector('[data-value="create-new"]');
+        workflowGrid.innerHTML = '';
+        workflowGrid.appendChild(createNewCard);
         
-        // Clear existing options
-        optionsList.innerHTML = '';
-        
-        // Add options to custom dropdown
-        Array.from(nativeSelect.options).forEach(option => {
-            const customOption = document.createElement('div');
-            customOption.className = 'option';
-            customOption.textContent = option.textContent;
-            customOption.setAttribute('data-value', option.value);
+        // Add saved workflows
+        workflows.forEach(workflow => {
+            const card = document.createElement('div');
+            card.className = 'selection-card';
+            card.setAttribute('data-value', workflow.name);
             
-            // Handle option selection with both click and touch
-            const handleOptionSelect = (e) => {
+            card.innerHTML = `
+                <div class="card-content">
+                    <i class="fas fa-tasks"></i>
+                    <span>${workflow.name}</span>
+                </div>
+            `;
+            
+            card.addEventListener('click', () => selectWorkflow(workflow.name));
+            card.addEventListener('touchstart', (e) => {
                 e.preventDefault();
-                e.stopPropagation();
-                nativeSelect.value = option.value;
-                selectedText.textContent = option.textContent;
-                optionsList.classList.remove('show');
-                customSelect.classList.remove('active');
-                nativeSelect.dispatchEvent(new Event('change', { bubbles: true }));
-            };
+                selectWorkflow(workflow.name);
+            }, { passive: false });
             
-            customOption.addEventListener('click', handleOptionSelect);
-            customOption.addEventListener('touchstart', handleOptionSelect, { passive: false });
-            
-            optionsList.appendChild(customOption);
-        });
-        
-        // Set initial selected text
-        selectedText.textContent = nativeSelect.options[nativeSelect.selectedIndex].text;
-        
-        // Toggle dropdown with both click and touch
-        const handleToggle = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            // Close other dropdowns
-            document.querySelectorAll('.dropdown .options-list').forEach(list => {
-                if (list !== optionsList) {
-                    list.classList.remove('show');
-                    list.closest('.custom-select').classList.remove('active');
-                }
-            });
-            
-            optionsList.classList.toggle('show');
-            customSelect.classList.toggle('active');
-            
-            // Update aria-expanded attribute
-            customSelect.setAttribute('aria-expanded', optionsList.classList.contains('show'));
-        };
-        
-        customSelect.addEventListener('click', handleToggle);
-        customSelect.addEventListener('touchstart', handleToggle, { passive: false });
-        
-        // Add keyboard navigation
-        customSelect.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                handleToggle(e);
-            } else if (e.key === 'Escape') {
-                optionsList.classList.remove('show');
-                customSelect.classList.remove('active');
-                customSelect.setAttribute('aria-expanded', 'false');
-            }
+            workflowGrid.appendChild(card);
         });
     }
     
-    // Setup both dropdowns
-    setupDropdown(workflowDropdown);
-    setupDropdown(wordlistDropdown);
-    
-    // Close dropdowns when clicking/touching outside
-    const handleOutsideClick = (e) => {
-        if (!e.target.closest('.dropdown')) {
-            document.querySelectorAll('.dropdown .options-list').forEach(list => {
-                list.classList.remove('show');
-                const customSelect = list.closest('.custom-select');
-                customSelect.classList.remove('active');
-                customSelect.setAttribute('aria-expanded', 'false');
-            });
+    // Handle workflow selection
+    function selectWorkflow(value) {
+        // Remove selected class from all workflow cards
+        workflowGrid.querySelectorAll('.selection-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        
+        // Add selected class to clicked card
+        const selectedCard = workflowGrid.querySelector(`[data-value="${value}"]`);
+        if (selectedCard) {
+            selectedCard.classList.add('selected');
         }
-    };
+        
+        selectedWorkflow = value;
+        updatePerformButton();
+        
+        if (value === 'create-new') {
+            showWorkflowCreation();
+        }
+    }
     
-    document.addEventListener('click', handleOutsideClick);
-    document.addEventListener('touchstart', handleOutsideClick, { passive: false });
+    // Handle wordlist selection
+    function selectWordlist(value) {
+        // Remove selected class from all wordlist cards
+        wordlistGrid.querySelectorAll('.selection-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        
+        // Add selected class to clicked card
+        const selectedCard = wordlistGrid.querySelector(`[data-value="${value}"]`);
+        if (selectedCard) {
+            selectedCard.classList.add('selected');
+        }
+        
+        selectedWordlist = value;
+        updatePerformButton();
+    }
     
-    // Prevent body scrolling when dropdown is open
-    document.querySelectorAll('.options-list').forEach(list => {
-        list.addEventListener('touchmove', (e) => {
-            if (list.classList.contains('show')) {
-                e.preventDefault();
-            }
+    // Update perform button state
+    function updatePerformButton() {
+        performButton.disabled = !selectedWorkflow || selectedWorkflow === 'create-new';
+    }
+    
+    // Initialize wordlist cards
+    wordlistGrid.querySelectorAll('.selection-card').forEach(card => {
+        card.addEventListener('click', () => selectWordlist(card.dataset.value));
+        card.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            selectWordlist(card.dataset.value);
         }, { passive: false });
+    });
+    
+    // Set initial wordlist selection
+    selectWordlist('enuk');
+    
+    // Initialize workflow cards
+    initializeWorkflowCards();
+    
+    // Handle perform button click
+    performButton.addEventListener('click', () => {
+        if (selectedWorkflow && selectedWorkflow !== 'create-new') {
+            const workflow = workflows.find(w => w.name === selectedWorkflow);
+            if (workflow) {
+                executeWorkflow(workflow.steps);
+            }
+        }
     });
 }
 
-// Initialize homepage dropdowns when the DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    initializeHomepageDropdowns();
-});
-
-// Reinitialize when workflow dropdown changes
+// Update the reinitialize function
 function reinitializeWorkflowDropdown() {
     initializeHomepageDropdowns();
 }

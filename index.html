@@ -28,38 +28,40 @@
         <!-- Homepage Content -->
         <div id="homepage" class="homepage-content">
             <div class="selection-container">
-                <div class="dropdown-group">
-                    <label for="workflowSelect">Select Workflow:</label>
-                    <div class="dropdown">
-                        <select id="workflowSelect" class="native-select">
-                            <option value="">Select a workflow...</option>
-                            <option value="create-new">New Workflow</option>
-                        </select>
-                        <div class="custom-select" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false">
-                            <div class="selected-text">Select a workflow...</div>
-                            <div class="options-list" role="listbox"></div>
+                <div class="selection-group">
+                    <h2>Select Workflow</h2>
+                    <div class="card-grid" id="workflowGrid">
+                        <div class="selection-card" data-value="create-new">
+                            <div class="card-content">
+                                <i class="fas fa-plus-circle"></i>
+                                <span>Create New Workflow</span>
+                            </div>
                         </div>
+                        <!-- Workflow cards will be dynamically added here -->
                     </div>
                 </div>
                 
-                <div class="dropdown-group">
-                    <label for="wordlistSelect">Select Wordlist:</label>
-                    <div class="dropdown">
-                        <select id="wordlistSelect" class="native-select">
-                            <option value="enuk" selected>ENUK Wordlist</option>
-                            <option value="custom">Custom Wordlist</option>
-                        </select>
-                        <div class="custom-select" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false">
-                            <div class="selected-text">ENUK Wordlist</div>
-                            <div class="options-list" role="listbox"></div>
+                <div class="selection-group">
+                    <h2>Select Wordlist</h2>
+                    <div class="card-grid" id="wordlistGrid">
+                        <div class="selection-card" data-value="enuk">
+                            <div class="card-content">
+                                <i class="fas fa-book"></i>
+                                <span>ENUK Wordlist</span>
+                            </div>
+                        </div>
+                        <div class="selection-card" data-value="custom">
+                            <div class="card-content">
+                                <i class="fas fa-file-alt"></i>
+                                <span>Custom Wordlist</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             
             <div class="button-container">
-                <button id="performButton" class="perform-button">PERFORM</button>
-                <button id="createWorkflowButton" class="create-button">New Workflow</button>
+                <button id="performButton" class="perform-button">Perform Workflow</button>
             </div>
         </div>
 
