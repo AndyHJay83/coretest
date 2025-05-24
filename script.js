@@ -129,11 +129,14 @@ function initializeWorkflowDropdown() {
 // Show workflow creation page
 function showWorkflowCreation() {
     document.getElementById('homepage').style.display = 'none';
-    document.getElementById('workflowCreation').style.display = 'block';
     document.getElementById('workflowExecution').style.display = 'none';
+    document.getElementById('workflowCreation').style.display = 'block';
     
-    // Display saved workflows
-    displaySavedWorkflows();
+    // Hide saved workflows initially
+    const savedWorkflows = document.getElementById('savedWorkflows');
+    if (savedWorkflows) {
+        savedWorkflows.style.display = 'none';
+    }
 }
 
 // Hide workflow creation page
@@ -153,6 +156,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Initialize all dropdowns
     initializeDropdowns();
+    
+    // Add toggle button for saved workflows
+    const savedWorkflowsSection = document.querySelector('.saved-workflows');
+    if (savedWorkflowsSection) {
+        const toggleButton = document.createElement('button');
+        toggleButton.id = 'toggleSavedWorkflows';
+        toggleButton.className = 'toggle-saved-workflows';
+        toggleButton.textContent = 'Show Saved Workflows';
+        toggleButton.onclick = toggleSavedWorkflows;
+        
+        // Insert the button before the saved workflows container
+        const savedWorkflows = document.getElementById('savedWorkflows');
+        if (savedWorkflows) {
+            savedWorkflowsSection.insertBefore(toggleButton, savedWorkflows);
+        }
+    }
     
     // Set up drag and drop for feature buttons
     const availableFeatures = document.getElementById('availableFeatures');
@@ -2140,11 +2159,6 @@ function displaySavedWorkflows() {
     // Clear existing content
     savedWorkflowsContainer.innerHTML = '';
     
-    // Add title
-    const title = document.createElement('h3');
-    title.textContent = 'Saved Workflows';
-    savedWorkflowsContainer.appendChild(title);
-    
     // Create list container
     const workflowList = document.createElement('div');
     workflowList.className = 'saved-workflow-list';
@@ -2175,6 +2189,23 @@ function displaySavedWorkflows() {
     });
     
     savedWorkflowsContainer.appendChild(workflowList);
+}
+
+// Function to toggle saved workflows visibility
+function toggleSavedWorkflows() {
+    const savedWorkflows = document.getElementById('savedWorkflows');
+    const toggleButton = document.getElementById('toggleSavedWorkflows');
+    
+    if (savedWorkflows && toggleButton) {
+        if (savedWorkflows.style.display === 'none') {
+            savedWorkflows.style.display = 'block';
+            toggleButton.textContent = 'Hide Saved Workflows';
+            displaySavedWorkflows(); // Refresh the list
+        } else {
+            savedWorkflows.style.display = 'none';
+            toggleButton.textContent = 'Show Saved Workflows';
+        }
+    }
 }
 
 // Function to edit a workflow
