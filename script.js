@@ -1315,6 +1315,27 @@ function setupFeatureListeners(feature, callback) {
             const vowelYesBtn = document.querySelector('#vowelFeature .yes-btn');
             const vowelNoBtn = document.querySelector('#vowelFeature .no-btn');
             
+            // Initialize vowel processing with current words
+            currentFilteredWordsForVowels = [...currentFilteredWords];
+            originalFilteredWords = [...currentFilteredWords];
+            currentVowelIndex = 0;
+            
+            // Get unique vowels from current word list
+            const vowels = new Set(['a', 'e', 'i', 'o', 'u']);
+            uniqueVowels = Array.from(new Set(
+                currentFilteredWords.join('').toLowerCase().split('')
+                    .filter(char => vowels.has(char))
+            ));
+            
+            // Set up the vowel display
+            const vowelFeature = document.getElementById('vowelFeature');
+            const vowelLetter = vowelFeature.querySelector('.vowel-letter');
+            if (uniqueVowels.length > 0) {
+                console.log('Setting first vowel letter to:', uniqueVowels[0].toUpperCase());
+                vowelLetter.textContent = uniqueVowels[0].toUpperCase();
+                vowelLetter.style.display = 'inline-block';
+            }
+            
             if (vowelYesBtn) {
                 vowelYesBtn.onclick = () => {
                     handleVowelSelection(true);
