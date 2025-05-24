@@ -93,6 +93,23 @@ function showWorkflowCreation() {
     document.getElementById('workflowName').focus();
 }
 
+let currentFeatureIndex = 0;
+
+function showNextFeature() {
+    const featureArea = document.getElementById('featureArea');
+    const features = featureArea.querySelectorAll('.feature-section');
+    
+    // Hide all features
+    features.forEach(feature => {
+        feature.style.display = 'none';
+    });
+    
+    // Show current feature
+    if (features[currentFeatureIndex]) {
+        features[currentFeatureIndex].style.display = 'block';
+    }
+}
+
 function setupFeatureListeners(featureId, callback) {
     console.log('Setting up listeners for feature:', featureId);
     const featureSection = document.getElementById(`${featureId}Feature`);
@@ -123,6 +140,8 @@ function setupFeatureListeners(featureId, callback) {
                     const mode = btn.dataset.mode;
                     const filteredWords = filterWordsByEee(currentFilteredWords, mode);
                     callback(filteredWords);
+                    currentFeatureIndex++;
+                    showNextFeature();
                 });
             });
             break;
@@ -134,6 +153,8 @@ function setupFeatureListeners(featureId, callback) {
                     const includeO = btn.dataset.mode === 'yes';
                     const filteredWords = filterWordsByO(currentFilteredWords, includeO);
                     callback(filteredWords);
+                    currentFeatureIndex++;
+                    showNextFeature();
                 });
             });
             break;
@@ -145,6 +166,8 @@ function setupFeatureListeners(featureId, callback) {
                     const positions = btn.dataset.positions.split(',');
                     const filteredWords = filterWordsByCurvedPositions(currentFilteredWords, positions);
                     callback(filteredWords);
+                    currentFeatureIndex++;
+                    showNextFeature();
                 });
             });
             break;
@@ -155,6 +178,8 @@ function setupFeatureListeners(featureId, callback) {
                 btn.addEventListener('click', () => {
                     const filteredWords = filterWordsByColour3(currentFilteredWords);
                     callback(filteredWords);
+                    currentFeatureIndex++;
+                    showNextFeature();
                 });
             });
             break;
@@ -168,6 +193,15 @@ function setupFeatureListeners(featureId, callback) {
                     callback(filteredWords);
                 });
             }
+            // Add a continue button for lexicon
+            const continueButton = document.createElement('button');
+            continueButton.textContent = 'Continue';
+            continueButton.className = 'continue-button';
+            continueButton.addEventListener('click', () => {
+                currentFeatureIndex++;
+                showNextFeature();
+            });
+            featureSection.appendChild(continueButton);
             break;
             
         case 'consonant':
@@ -179,6 +213,8 @@ function setupFeatureListeners(featureId, callback) {
                         hasConsonants ? hasWordAdjacentConsonants(word) : !hasWordAdjacentConsonants(word)
                     );
                     callback(filteredWords);
+                    currentFeatureIndex++;
+                    showNextFeature();
                 });
             });
             break;
@@ -192,6 +228,15 @@ function setupFeatureListeners(featureId, callback) {
                     callback(filteredWords);
                 });
             }
+            // Add a continue button for position1
+            const continueButtonPos1 = document.createElement('button');
+            continueButtonPos1.textContent = 'Continue';
+            continueButtonPos1.className = 'continue-button';
+            continueButtonPos1.addEventListener('click', () => {
+                currentFeatureIndex++;
+                showNextFeature();
+            });
+            featureSection.appendChild(continueButtonPos1);
             break;
             
         case 'vowel':
@@ -201,6 +246,8 @@ function setupFeatureListeners(featureId, callback) {
                     const includeVowel = btn.dataset.mode === 'yes';
                     const filteredWords = handleVowelSelection(includeVowel);
                     callback(filteredWords);
+                    currentFeatureIndex++;
+                    showNextFeature();
                 });
             });
             break;
@@ -213,6 +260,8 @@ function setupFeatureListeners(featureId, callback) {
                     const category = btn.dataset.category;
                     const filteredWords = filterWordsByShape(currentFilteredWords, position, category);
                     callback(filteredWords);
+                    currentFeatureIndex++;
+                    showNextFeature();
                 });
             });
             break;
@@ -225,6 +274,9 @@ function setupFeatureListeners(featureId, callback) {
 
 async function performWorkflow() {
     console.log('Performing workflow...');
+    
+    // Reset feature index
+    currentFeatureIndex = 0;
     
     // Get the selected workflow ID
     const workflowSelect = document.getElementById('workflowSelect');
@@ -281,7 +333,7 @@ async function performWorkflow() {
             const featureSection = document.createElement('div');
             featureSection.className = 'feature-section';
             featureSection.id = `${feature.toLowerCase().replace(/\s+/g, '')}Feature`;
-            featureSection.style.display = 'block'; // Ensure feature is visible
+            featureSection.style.display = 'none'; // Hide all features initially
             
             const featureTitle = document.createElement('div');
             featureTitle.className = 'feature-title';
@@ -332,9 +384,10 @@ async function performWorkflow() {
         updateWordCount(currentFilteredWords.length);
         displayResults(currentFilteredWords);
         
-        // Set up event listeners for the first feature
+        // Show first feature and set up its listeners
         if (features.length > 0) {
             const firstFeature = features[0].toLowerCase().replace(/\s+/g, '');
+            showNextFeature(); // Show first feature
             setupFeatureListeners(firstFeature, (filteredWords) => {
                 currentFilteredWords = filteredWords;
                 displayResults(filteredWords);
@@ -1360,57 +1413,17 @@ function filterWordsByColour3(words) {
 
 // Function to show next feature
 function showNextFeature() {
-    // First hide all features
-    const allFeatures = [
-        'originalLexFeature',
-        'eeeFeature',
-        'lexiconFeature',
-        'consonantQuestion',
-        'position1Feature',
-        'vowelFeature',
-        'colour3Feature',
-        'shapeFeature',
-        'oFeature',
-        'curvedFeature'
-    ];
+    const featureArea = document.getElementById('featureArea');
+    const features = featureArea.querySelectorAll('.feature-section');
     
-    allFeatures.forEach(featureId => {
-        document.getElementById(featureId).style.display = 'none';
+    // Hide all features
+    features.forEach(feature => {
+        feature.style.display = 'none';
     });
     
-    // Then show the appropriate feature based on the current state
-    if (hasAdjacentConsonants === null) {
-        document.getElementById('consonantQuestion').style.display = 'block';
-    }
-    else if (!document.getElementById('position1Feature').classList.contains('completed')) {
-        document.getElementById('position1Feature').style.display = 'block';
-    }
-    else if (isVowelMode && !document.getElementById('vowelFeature').classList.contains('completed')) {
-        document.getElementById('vowelFeature').style.display = 'block';
-    }
-    else if (!document.getElementById('oFeature').classList.contains('completed')) {
-        document.getElementById('oFeature').style.display = 'block';
-    }
-    else if (!lexiconCompleted) {
-        document.getElementById('lexiconFeature').style.display = 'block';
-    }
-    else if (!originalLexCompleted) {
-        document.getElementById('originalLexFeature').style.display = 'block';
-    }
-    else if (!eeeCompleted) {
-        document.getElementById('eeeFeature').style.display = 'block';
-    }
-    else if (isColour3Mode && !document.getElementById('colour3Feature').classList.contains('completed')) {
-        document.getElementById('colour3Feature').style.display = 'block';
-    }
-    else if (isShapeMode && !document.getElementById('shapeFeature').classList.contains('completed')) {
-        document.getElementById('shapeFeature').style.display = 'block';
-    }
-    else if (!document.getElementById('curvedFeature').classList.contains('completed')) {
-        document.getElementById('curvedFeature').style.display = 'block';
-    }
-    else {
-        expandWordList();
+    // Show current feature
+    if (features[currentFeatureIndex]) {
+        features[currentFeatureIndex].style.display = 'block';
     }
 }
 
