@@ -97,6 +97,7 @@ function initializeWorkflowDropdown() {
                 max-width: 300px;
                 margin: 0 auto;
                 z-index: 9999;
+                display: inline-block;
             }
             .custom-select {
                 position: relative;
@@ -112,6 +113,8 @@ function initializeWorkflowDropdown() {
                 border-radius: 4px;
                 position: relative;
                 z-index: 10001;
+                width: 100%;
+                box-sizing: border-box;
             }
             .selected-text:after {
                 content: '▼';
