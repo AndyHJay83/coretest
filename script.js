@@ -181,63 +181,35 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Add both click and touch events
         toggleButton.addEventListener('click', (e) => {
             e.preventDefault();
-            console.log('Toggle button clicked'); // Debug log
             toggleSavedWorkflows();
         });
         
         toggleButton.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            console.log('Toggle button touched'); // Debug log
             toggleSavedWorkflows();
         }, { passive: false });
         
         // Insert the button after the save workflow button
         saveWorkflowButton.parentNode.insertBefore(toggleButton, saveWorkflowButton.nextSibling);
-    }
-    
-    // Display saved workflows
-    displaySavedWorkflows();
-    
-    // Set up drag and drop for feature buttons
-    const availableFeatures = document.getElementById('availableFeatures');
-    const selectedFeaturesList = document.getElementById('selectedFeaturesList');
-    
-    // Initialize workflow creation functionality
-    const createWorkflowButton = document.getElementById('createWorkflowButton');
-    const cancelWorkflowButton = document.getElementById('cancelWorkflowButton');
-    const workflowNameInput = document.getElementById('workflowName');
-    
-    if (createWorkflowButton) {
-        createWorkflowButton.addEventListener('click', showWorkflowCreation);
-        createWorkflowButton.addEventListener('touchstart', (e) => {
+        
+        // Remove any existing event listeners from saveWorkflowButton
+        const newSaveButton = saveWorkflowButton.cloneNode(true);
+        saveWorkflowButton.parentNode.replaceChild(newSaveButton, saveWorkflowButton);
+        
+        // Add single event listener for both click and touch
+        newSaveButton.addEventListener('click', (e) => {
             e.preventDefault();
-            showWorkflowCreation();
-        }, { passive: false });
-    }
-    
-    if (cancelWorkflowButton) {
-        cancelWorkflowButton.addEventListener('click', () => {
-            hideWorkflowCreation();
-            if (workflowNameInput) {
-                workflowNameInput.value = '';
-            }
-            if (selectedFeaturesList) {
-                selectedFeaturesList.innerHTML = '';
-            }
+            saveWorkflow();
         });
-        cancelWorkflowButton.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            cancelWorkflowButton.click();
-        }, { passive: false });
-    }
-    
-    if (saveWorkflowButton) {
-        saveWorkflowButton.addEventListener('click', saveWorkflow);
-        saveWorkflowButton.addEventListener('touchstart', (e) => {
+        
+        newSaveButton.addEventListener('touchstart', (e) => {
             e.preventDefault();
             saveWorkflow();
         }, { passive: false });
     }
+    
+    // Display saved workflows
+    displaySavedWorkflows();
     
     // Set up button listeners
     setupButtonListeners();
@@ -760,12 +732,16 @@ function saveWorkflow() {
     const selectedFeatures = Array.from(document.querySelectorAll('#selectedFeaturesList .selected-feature-item'))
         .map(item => item.dataset.feature);
     
+    // Validate workflow name
     if (!workflowName) {
         alert('Please enter a workflow name');
-        workflowNameInput.focus();
+        if (workflowNameInput) {
+            workflowNameInput.focus();
+        }
         return;
     }
     
+    // Validate selected features
     if (selectedFeatures.length === 0) {
         alert('Please select at least one feature');
         return;
@@ -774,7 +750,9 @@ function saveWorkflow() {
     // Check if workflow name already exists
     if (workflows.some(w => w.name === workflowName)) {
         alert('A workflow with this name already exists. Please choose a different name.');
-        workflowNameInput.focus();
+        if (workflowNameInput) {
+            workflowNameInput.focus();
+        }
         return;
     }
 
@@ -799,6 +777,9 @@ function saveWorkflow() {
         workflowSelect.appendChild(option);
     }
     
+    // Show success message
+    alert('Workflow saved successfully!');
+    
     // Return to homepage
     hideWorkflowCreation();
     
@@ -810,9 +791,6 @@ function saveWorkflow() {
     
     // Reinitialize dropdowns
     initializeDropdowns();
-    
-    // Show success message
-    alert('Workflow saved successfully!');
 }
 
 // Handle cancel workflow creation
