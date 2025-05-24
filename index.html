@@ -27,36 +27,19 @@
         
         <!-- Homepage Content -->
         <div id="homepage" class="homepage-content">
-            <div class="selection-container">
-                <div class="dropdown-group">
-                    <label for="workflowSelect">Select Workflow:</label>
-                    <div class="dropdown">
-                        <select id="workflowSelect">
-                            <option value="">Select a workflow...</option>
-                            <option value="create-new">New Workflow</option>
-                        </select>
-                        <div class="custom-select">
-                            <div class="selected-text">Select a workflow...</div>
-                            <div class="options-list"></div>
-                        </div>
-                    </div>
+            <div class="workflow-selector">
+                <div class="selection-header">
+                    <h2>Select a Workflow</h2>
+                    <p>Choose a workflow to process your wordlist</p>
                 </div>
-                
-                <div class="dropdown-group">
-                    <label for="wordlistSelect">Select Wordlist:</label>
-                    <div class="dropdown">
-                        <select id="wordlistSelect">
-                            <option value="enuk" selected>ENUK Wordlist</option>
-                        </select>
-                        <div class="custom-select">
-                            <div class="selected-text">ENUK Wordlist</div>
-                            <div class="options-list"></div>
-                        </div>
-                    </div>
+                <div class="workflow-cards" id="workflowCards">
+                    <!-- Workflow cards will be dynamically inserted here -->
+                </div>
+                <div class="perform-button-container">
+                    <button id="performButton" disabled>Process Workflow</button>
                 </div>
             </div>
             
-            <button id="performButton" class="perform-button">PERFORM</button>
             <button id="createWorkflowButton" class="create-button">New Workflow</button>
         </div>
 

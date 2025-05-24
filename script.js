@@ -3168,3 +3168,84 @@ function showWorkflowCreation() {
     // ... existing code ...
     initializeInfoButtons();
 }
+
+// Function to create a workflow card
+function createWorkflowCard(workflow) {
+    const card = document.createElement('div');
+    card.className = 'workflow-card';
+    card.dataset.workflowId = workflow.id;
+    
+    const header = document.createElement('div');
+    header.className = 'workflow-card-header';
+    
+    const title = document.createElement('h3');
+    title.className = 'workflow-card-title';
+    title.textContent = workflow.name;
+    
+    const steps = document.createElement('div');
+    steps.className = 'workflow-card-steps';
+    steps.textContent = workflow.steps.map(step => step.name).join(' → ');
+    
+    header.appendChild(title);
+    card.appendChild(header);
+    card.appendChild(steps);
+    
+    // Add click handler
+    card.addEventListener('click', () => {
+        // Remove selected class from all cards
+        document.querySelectorAll('.workflow-card').forEach(c => c.classList.remove('selected'));
+        // Add selected class to clicked card
+        card.classList.add('selected');
+        // Enable perform button
+        document.getElementById('performButton').disabled = false;
+        // Store selected workflow
+        selectedWorkflow = workflow;
+    });
+    
+    return card;
+}
+
+// Function to update workflow cards
+function updateWorkflowCards() {
+    const cardsContainer = document.getElementById('workflowCards');
+    cardsContainer.innerHTML = '';
+    
+    // Add "Create New" card
+    const createNewCard = document.createElement('div');
+    createNewCard.className = 'workflow-card create-new-card';
+    createNewCard.innerHTML = '<i class="fas fa-plus"></i> Create New Workflow';
+    createNewCard.addEventListener('click', () => {
+        document.getElementById('createWorkflowButton').click();
+    });
+    cardsContainer.appendChild(createNewCard);
+    
+    // Add existing workflow cards
+    workflows.forEach(workflow => {
+        const card = createWorkflowCard(workflow);
+        cardsContainer.appendChild(card);
+    });
+}
+
+// Update the initialization code
+document.addEventListener('DOMContentLoaded', function() {
+    // ... existing initialization code ...
+    
+    // Initialize workflow cards
+    updateWorkflowCards();
+    
+    // Update perform button handler
+    document.getElementById('performButton').addEventListener('click', function() {
+        if (selectedWorkflow) {
+            // Process the selected workflow
+            processWorkflow(selectedWorkflow);
+        }
+    });
+});
+
+// Update the workflow creation success handler
+function handleWorkflowCreationSuccess(newWorkflow) {
+    workflows.push(newWorkflow);
+    saveWorkflows();
+    updateWorkflowCards();
+    showNotification('Workflow created successfully!', 'success');
+}
