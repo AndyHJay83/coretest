@@ -31,9 +31,14 @@
                 <div class="dropdown-group">
                     <label for="workflowSelect">Select Workflow:</label>
                     <div class="dropdown">
-                        <select id="workflowSelect" class="custom-select">
-                            <option value="create-new">New Workflow</option>
+                        <select id="workflowSelect">
+                            <option value="">Select a workflow...</option>
+                            <option value="create-new">Create New Workflow</option>
                         </select>
+                        <div class="custom-select">
+                            <div class="selected-text">Select a workflow...</div>
+                            <div class="options-list"></div>
+                        </div>
                     </div>
                 </div>
                 
@@ -51,7 +56,7 @@
                 </div>
             </div>
             
-            <button id="performButton" class="perform-button">Perform</button>
+            <button id="performButton" class="perform-button">PERFORM</button>
             <button id="createWorkflowButton" class="create-button">Create New Workflow</button>
         </div>
 
@@ -67,7 +72,7 @@
                 <!-- Workflow name input section -->
                 <div class="workflow-name-section">
                     <input type="text" id="workflowName" class="workflow-name-input" placeholder="Enter workflow name">
-                    <button id="saveWorkflowButton" class="save-workflow-button">Save New Workflow</button>
+                    <button id="saveWorkflowButton" class="save-workflow-button">Save Workflow</button>
                 </div>
 
                 <!-- Features section -->
@@ -82,7 +87,7 @@
                             <button class="feature-button" data-feature="lexicon" draggable="true">Lexicon</button>
                             <button class="feature-button" data-feature="eee" draggable="true">EEE?</button>
                             <button class="feature-button" data-feature="originalLex" draggable="true">Original Lex</button>
-                            <button class="feature-button" data-feature="consonant" draggable="true">Cons. Together</button>
+                            <button class="feature-button" data-feature="consonant" draggable="true">Consonants Together?</button>
                             <button class="feature-button" data-feature="colour3" draggable="true">Colour3</button>
                             <button class="feature-button" data-feature="shape" draggable="true">Shape</button>
                             <button class="feature-button" data-feature="curved" draggable="true">Curved</button>
