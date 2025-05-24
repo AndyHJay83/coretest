@@ -1242,7 +1242,7 @@ async function executeWorkflow(steps) {
             }
         });
         
-        // Display initial wordlist
+        // Display initial wordlist in the results area
         displayResults(currentFilteredWords);
         
         // Execute each step in sequence
