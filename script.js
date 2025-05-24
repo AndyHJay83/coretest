@@ -70,7 +70,9 @@ function initializeWorkflowDropdown() {
             customOption.setAttribute('data-value', option.value);
             
             // Add click handler for desktop
-            customOption.addEventListener('click', () => {
+            customOption.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 workflowSelect.value = option.value;
                 selectedText.textContent = option.textContent;
                 optionsList.classList.remove('show');
@@ -87,6 +89,7 @@ function initializeWorkflowDropdown() {
             // Add touch handler for mobile
             customOption.addEventListener('touchstart', (e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 workflowSelect.value = option.value;
                 selectedText.textContent = option.textContent;
                 optionsList.classList.remove('show');
@@ -129,16 +132,19 @@ function initializeWorkflowDropdown() {
         }, { passive: false });
         
         // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
+        const closeDropdown = (e) => {
             if (!newCustomSelect.contains(e.target)) {
                 newOptionsList.classList.remove('show');
             }
-        });
+        };
         
-        // Close dropdown when touching outside (mobile)
-        document.addEventListener('touchstart', (e) => {
-            if (!newCustomSelect.contains(e.target)) {
-                newOptionsList.classList.remove('show');
+        document.addEventListener('click', closeDropdown);
+        document.addEventListener('touchstart', closeDropdown, { passive: false });
+        
+        // Prevent body scrolling when dropdown is open
+        newOptionsList.addEventListener('touchmove', (e) => {
+            if (newOptionsList.classList.contains('show')) {
+                e.preventDefault();
             }
         }, { passive: false });
     }
