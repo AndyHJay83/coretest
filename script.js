@@ -1225,15 +1225,13 @@ function setupFeatureListeners(feature, callback) {
             originalFilteredWords = [...currentFilteredWords];
             currentVowelIndex = 0;
             
-            // Get unique vowels from Position 1 word in order
+            // Get vowels from Position 1 word in order
             const vowels = new Set(['a', 'e', 'i', 'o', 'u']);
             uniqueVowels = [];
             if (currentPosition1Word) {
-                const seenVowels = new Set();
                 for (const char of currentPosition1Word.toLowerCase()) {
-                    if (vowels.has(char) && !seenVowels.has(char)) {
+                    if (vowels.has(char)) {
                         uniqueVowels.push(char);
-                        seenVowels.add(char);
                     }
                 }
             }
@@ -1250,7 +1248,6 @@ function setupFeatureListeners(feature, callback) {
                 vowelYesBtn.onclick = () => {
                     handleVowelSelection(true);
                     callback(currentFilteredWordsForVowels);
-                    document.getElementById('vowelFeature').dispatchEvent(new Event('completed'));
                 };
                 
                 // Add touch event for mobile
@@ -1264,7 +1261,6 @@ function setupFeatureListeners(feature, callback) {
                 vowelNoBtn.onclick = () => {
                     handleVowelSelection(false);
                     callback(currentFilteredWordsForVowels);
-                    document.getElementById('vowelFeature').dispatchEvent(new Event('completed'));
                 };
                 
                 // Add touch event for mobile
@@ -1574,17 +1570,17 @@ function handleVowelSelection(includeVowel) {
         );
     }
     
-    // Remove the current vowel from uniqueVowels array
-    uniqueVowels = uniqueVowels.filter((v, index) => index !== currentVowelIndex);
+    // Move to next vowel
+    currentVowelIndex++;
     
     // Update the display with the filtered words
     displayResults(currentFilteredWordsForVowels);
     
     // If we still have vowels to process, show the next one
-    if (uniqueVowels.length > 0) {
+    if (currentVowelIndex < uniqueVowels.length) {
         const vowelFeature = document.getElementById('vowelFeature');
         const vowelLetter = vowelFeature.querySelector('.vowel-letter');
-        vowelLetter.textContent = uniqueVowels[0].toUpperCase();
+        vowelLetter.textContent = uniqueVowels[currentVowelIndex].toUpperCase();
         vowelLetter.style.display = 'inline-block';
     } else {
         // No more vowels to process, mark as completed
