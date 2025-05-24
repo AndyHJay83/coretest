@@ -1718,7 +1718,7 @@ function handleVowelSelection(includeVowel) {
         currentFilteredWordsForVowels = currentFilteredWordsForVowels.filter(word => 
             word.toLowerCase().includes(currentVowel)
         );
-        } else {
+    } else {
         currentFilteredWordsForVowels = currentFilteredWordsForVowels.filter(word => 
             !word.toLowerCase().includes(currentVowel)
         );
@@ -1738,12 +1738,18 @@ function handleVowelSelection(includeVowel) {
         vowelLetter.style.display = 'inline-block';
     } else {
         // No more vowels to process, mark as completed
-        document.getElementById('vowelFeature').classList.add('completed');
+        const vowelFeature = document.getElementById('vowelFeature');
+        vowelFeature.classList.add('completed');
         // Update currentFilteredWords with the vowel-filtered results
         currentFilteredWords = [...currentFilteredWordsForVowels];
         
-        // Hide vowel feature and show next feature
-        document.getElementById('vowelFeature').style.display = 'none';
+        // Hide vowel feature
+        vowelFeature.style.display = 'none';
+        
+        // Reset lexicon state
+        lexiconCompleted = false;
+        
+        // Show next feature
         showNextFeature();
     }
 }
