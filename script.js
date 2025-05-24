@@ -1208,7 +1208,7 @@ async function executeWorkflow(steps) {
     try {
         // Load the wordlist first
         await loadWordList();
-        let currentWordlist = [...wordList]; // Start with the full wordlist
+        currentFilteredWords = [...wordList]; // Start with the full wordlist
         
         // Hide all features initially
         const allFeatures = [
@@ -1228,6 +1228,7 @@ async function executeWorkflow(steps) {
             const feature = document.getElementById(featureId);
             if (feature) {
                 feature.style.display = 'none';
+                feature.classList.remove('completed');
                 console.log(`Hiding feature: ${featureId}`);
             }
         });
@@ -1256,31 +1257,32 @@ async function executeWorkflow(steps) {
             
             // Set up event listeners for this feature
             setupFeatureListeners(step.feature, (filteredWords) => {
-                currentWordlist = filteredWords;
-                displayResults(currentWordlist);
+                currentFilteredWords = filteredWords;
+                displayResults(currentFilteredWords);
             });
             
             // Wait for user interaction
             await new Promise((resolve) => {
                 const handleFeatureComplete = () => {
                     featureElement.classList.add('completed');
+                    featureElement.style.display = 'none';
                     resolve();
                 };
                 
                 // Add event listener for feature completion
-                featureElement.addEventListener('completed', handleFeatureComplete);
+                featureElement.addEventListener('completed', handleFeatureComplete, { once: true });
             });
         }
         
-        // Show results
-        displayResults(currentWordlist);
+        // Show final results
+        displayResults(currentFilteredWords);
     } catch (error) {
         console.error('Error executing workflow:', error);
         throw error;
     }
 }
 
-// Function to set up feature listeners
+// Function to setup feature listeners
 function setupFeatureListeners(feature, callback) {
     switch (feature) {
         case 'eee':
@@ -1412,6 +1414,7 @@ function setupFeatureListeners(feature, callback) {
             
             if (consonantYesBtn) {
                 consonantYesBtn.onclick = () => {
+                    hasAdjacentConsonants = true;
                     const filteredWords = currentFilteredWords.filter(word => hasWordAdjacentConsonants(word));
                     callback(filteredWords);
                     document.getElementById('consonantQuestion').dispatchEvent(new Event('completed'));
@@ -1420,6 +1423,7 @@ function setupFeatureListeners(feature, callback) {
             
             if (consonantNoBtn) {
                 consonantNoBtn.onclick = () => {
+                    hasAdjacentConsonants = false;
                     const filteredWords = currentFilteredWords.filter(word => !hasWordAdjacentConsonants(word));
                     callback(filteredWords);
                     document.getElementById('consonantQuestion').dispatchEvent(new Event('completed'));
