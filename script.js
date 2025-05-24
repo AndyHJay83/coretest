@@ -1242,8 +1242,11 @@ async function executeWorkflow(steps) {
             }
         });
         
-        // Display initial wordlist in the results area
-        displayResults(currentFilteredWords);
+        // Display initial wordlist in the results area (bottom two-thirds)
+        const resultsContainer = document.getElementById('results');
+        if (resultsContainer) {
+            displayResults(currentFilteredWords);
+        }
         
         // Execute each step in sequence
         for (const step of steps) {
@@ -1253,7 +1256,7 @@ async function executeWorkflow(steps) {
             const featureId = step.feature + 'Feature';
             console.log('Looking for feature element with ID:', featureId);
             
-            // Show the appropriate feature
+            // Show the appropriate feature in the top third
             const featureElement = document.getElementById(featureId);
             if (!featureElement) {
                 console.error(`Feature element not found for step: ${featureId}`);
@@ -1267,6 +1270,7 @@ async function executeWorkflow(steps) {
             // Set up event listeners for this feature
             setupFeatureListeners(step.feature, (filteredWords) => {
                 currentFilteredWords = filteredWords;
+                // Update wordlist in the results area (bottom two-thirds)
                 displayResults(currentFilteredWords);
             });
             
@@ -1283,7 +1287,7 @@ async function executeWorkflow(steps) {
             });
         }
         
-        // Show final results
+        // Show final results in the results area (bottom two-thirds)
         displayResults(currentFilteredWords);
     } catch (error) {
         console.error('Error executing workflow:', error);
