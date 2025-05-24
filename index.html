@@ -81,14 +81,38 @@
                     <div class="available-features">
                         <h3>Available Features</h3>
                         <div id="availableFeatures">
-                            <button class="feature-button" data-feature="position1" draggable="true">Position 1</button>
-                            <button class="feature-button" data-feature="vowel" draggable="true">Vowel</button>
-                            <button class="feature-button" data-feature="o" draggable="true">O?</button>
-                            <button class="feature-button" data-feature="lexicon" draggable="true">Curved Pos.</button>
-                            <button class="feature-button" data-feature="eee" draggable="true">EEE?</button>
-                            <button class="feature-button" data-feature="originalLex" draggable="true">Original Lex</button>
-                            <button class="feature-button" data-feature="consonant" draggable="true">Cons. Together</button>
-                            <button class="feature-button" data-feature="colour3" draggable="true">Colour3</button>
+                            <div class="feature-group">
+                                <button class="feature-button" data-feature="position1" draggable="true">Position 1</button>
+                                <button class="info-button" data-feature="position1"><i class="fas fa-info-circle"></i></button>
+                            </div>
+                            <div class="feature-group">
+                                <button class="feature-button" data-feature="vowel" draggable="true">Vowel</button>
+                                <button class="info-button" data-feature="vowel"><i class="fas fa-info-circle"></i></button>
+                            </div>
+                            <div class="feature-group">
+                                <button class="feature-button" data-feature="o" draggable="true">O?</button>
+                                <button class="info-button" data-feature="o"><i class="fas fa-info-circle"></i></button>
+                            </div>
+                            <div class="feature-group">
+                                <button class="feature-button" data-feature="lexicon" draggable="true">Curved Pos.</button>
+                                <button class="info-button" data-feature="lexicon"><i class="fas fa-info-circle"></i></button>
+                            </div>
+                            <div class="feature-group">
+                                <button class="feature-button" data-feature="eee" draggable="true">EEE?</button>
+                                <button class="info-button" data-feature="eee"><i class="fas fa-info-circle"></i></button>
+                            </div>
+                            <div class="feature-group">
+                                <button class="feature-button" data-feature="originalLex" draggable="true">Original Lex</button>
+                                <button class="info-button" data-feature="originalLex"><i class="fas fa-info-circle"></i></button>
+                            </div>
+                            <div class="feature-group">
+                                <button class="feature-button" data-feature="consonant" draggable="true">Cons. Together</button>
+                                <button class="info-button" data-feature="consonant"><i class="fas fa-info-circle"></i></button>
+                            </div>
+                            <div class="feature-group">
+                                <button class="feature-button" data-feature="colour3" draggable="true">Colour3</button>
+                                <button class="info-button" data-feature="colour3"><i class="fas fa-info-circle"></i></button>
+                            </div>
                         </div>
                     </div>
 
@@ -243,6 +267,66 @@
                         Enable SHAPE Feature
                     </label>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feature Info Modals -->
+    <div id="featureInfoModals" style="display: none;">
+        <div id="position1Info" class="feature-info-modal">
+            <div class="feature-info-content">
+                <h3>Position 1</h3>
+                <p>Filters words based on the first letter position. Enter a word to use its first letter as the filter.</p>
+                <button class="close-info-button">&times;</button>
+            </div>
+        </div>
+        <div id="vowelInfo" class="feature-info-modal">
+            <div class="feature-info-content">
+                <h3>Vowel</h3>
+                <p>Filters words based on vowel presence. Select whether the word should contain a specific vowel.</p>
+                <button class="close-info-button">&times;</button>
+            </div>
+        </div>
+        <div id="oInfo" class="feature-info-modal">
+            <div class="feature-info-content">
+                <h3>O?</h3>
+                <p>Filters words based on the presence of the letter 'O'. Select whether the word should contain an 'O'.</p>
+                <button class="close-info-button">&times;</button>
+            </div>
+        </div>
+        <div id="lexiconInfo" class="feature-info-modal">
+            <div class="feature-info-content">
+                <h3>Curved Pos.</h3>
+                <p>Filters words based on curved letters in specific positions. Enter the positions to check for curved letters.</p>
+                <button class="close-info-button">&times;</button>
+            </div>
+        </div>
+        <div id="eeeInfo" class="feature-info-modal">
+            <div class="feature-info-content">
+                <h3>EEE?</h3>
+                <p>Filters words based on the presence of the letter 'E'. Select whether the word should contain an 'E'.</p>
+                <button class="close-info-button">&times;</button>
+            </div>
+        </div>
+        <div id="originalLexInfo" class="feature-info-modal">
+            <div class="feature-info-content">
+                <h3>Original Lex</h3>
+                <p>Filters words based on the original lexicon position. Enter a position to filter words.</p>
+                <button class="close-info-button">&times;</button>
+            </div>
+        </div>
+        <div id="consonantInfo" class="feature-info-modal">
+            <div class="feature-info-content">
+                <h3>Cons. Together</h3>
+                <p>Filters words based on whether they have adjacent consonants. Select whether the word should have consonants together.</p>
+                <button class="close-info-button">&times;</button>
+            </div>
+        </div>
+        <div id="colour3Info" class="feature-info-modal">
+            <div class="feature-info-content">
+                <h3>Colour3</h3>
+                <p>Filters words based on the Colour3 feature. Select whether the word should match the Colour3 criteria.</p>
+                <button class="close-info-button">&times;</button>
             </div>
         </div>
     </div>
