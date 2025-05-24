@@ -1564,6 +1564,12 @@ function displayResults(words) {
     // Add the word list to the results container
     resultsContainer.appendChild(wordList);
     
+    // Add word count display
+    const wordCountDisplay = document.createElement('div');
+    wordCountDisplay.className = 'word-count-display';
+    wordCountDisplay.textContent = `${words.length} words`;
+    resultsContainer.appendChild(wordCountDisplay);
+    
     // Ensure the feature area is empty and visible
     const featureArea = document.getElementById('featureArea');
     if (featureArea) {
@@ -1574,6 +1580,24 @@ function displayResults(words) {
         }
     }
 }
+
+// Add CSS for word count display
+const style = document.createElement('style');
+style.textContent = `
+    .word-count-display {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: rgba(0, 0, 0, 0.75);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        z-index: 1000;
+    }
+`;
+document.head.appendChild(style);
 
 // Function to handle vowel selection
 function handleVowelSelection(includeVowel) {
