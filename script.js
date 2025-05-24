@@ -1760,8 +1760,9 @@ function handleVowelSelection(includeVowel) {
         // Hide vowel feature
         vowelFeature.style.display = 'none';
         
-        // Reset lexicon state
+        // Reset both lexicon states
         lexiconCompleted = false;
+        originalLexCompleted = false;
         
         // Show next feature
         showNextFeature();
@@ -1826,11 +1827,11 @@ function showNextFeature() {
     else if (isVowelMode && !document.getElementById('vowelFeature').classList.contains('completed')) {
         document.getElementById('vowelFeature').style.display = 'block';
     }
-    else if (!lexiconCompleted) {
-        document.getElementById('lexiconFeature').style.display = 'block';
-    }
     else if (!originalLexCompleted) {
         document.getElementById('originalLexFeature').style.display = 'block';
+    }
+    else if (!lexiconCompleted) {
+        document.getElementById('lexiconFeature').style.display = 'block';
     }
     else if (!document.getElementById('oFeature').classList.contains('completed')) {
         document.getElementById('oFeature').style.display = 'block';
