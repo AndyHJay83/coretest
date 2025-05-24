@@ -2336,12 +2336,8 @@ function displaySavedWorkflows() {
 
 // Function to toggle saved workflows visibility
 function toggleSavedWorkflows() {
-    console.log('Toggle saved workflows called');
-    
-    // Create modal if it doesn't exist
     let modal = document.getElementById('savedWorkflowsModal');
     if (!modal) {
-        console.log('Creating new modal');
         modal = document.createElement('div');
         modal.id = 'savedWorkflowsModal';
         modal.className = 'modal';
@@ -2358,20 +2354,27 @@ function toggleSavedWorkflows() {
         `;
         document.body.appendChild(modal);
 
-        // Add close button functionality
+        // Add close button functionality with both click and touch events
         const closeButton = modal.querySelector('.close-button');
-        closeButton.addEventListener('click', (e) => {
+        const closeModal = (e) => {
             e.preventDefault();
             e.stopPropagation();
             modal.style.display = 'none';
-        });
+            document.body.style.overflow = '';
+        };
+        closeButton.addEventListener('click', closeModal);
+        closeButton.addEventListener('touchstart', closeModal, { passive: false });
 
-        // Close modal when clicking outside
-        modal.addEventListener('click', (e) => {
+        // Close modal when clicking/touching outside
+        const closeOnOutside = (e) => {
             if (e.target === modal) {
+                e.preventDefault();
                 modal.style.display = 'none';
+                document.body.style.overflow = '';
             }
-        });
+        };
+        modal.addEventListener('click', closeOnOutside);
+        modal.addEventListener('touchstart', closeOnOutside, { passive: false });
 
         // Prevent body scrolling when modal is open
         modal.addEventListener('touchmove', (e) => {
@@ -2383,6 +2386,7 @@ function toggleSavedWorkflows() {
 
     // Display the modal
     modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
 
     // Update the workflows list
     const workflowsList = document.getElementById('savedWorkflowsList');
@@ -2419,38 +2423,33 @@ function toggleSavedWorkflows() {
         deleteButton.textContent = '×';
         deleteButton.setAttribute('aria-label', `Delete workflow ${workflow.name}`);
         
-        // Add click event listener for delete button
-        deleteButton.addEventListener('click', (e) => {
+        // Handle delete with both click and touch events
+        const handleDelete = (e) => {
             e.preventDefault();
             e.stopPropagation();
             if (confirm(`Are you sure you want to delete "${workflow.name}"?`)) {
-                // Remove from workflows array
                 const index = workflows.findIndex(w => w.name === workflow.name);
                 if (index !== -1) {
                     workflows.splice(index, 1);
-                    
-                    // Update localStorage
                     localStorage.setItem('workflows', JSON.stringify(workflows));
                     
-                    // Update workflow select dropdown
                     const workflowSelect = document.getElementById('workflowSelect');
                     if (workflowSelect) {
                         const option = workflowSelect.querySelector(`option[value="${workflow.name}"]`);
-                        if (option) {
-                            option.remove();
-                        }
+                        if (option) option.remove();
                     }
                     
-                    // Remove the workflow item from the list
                     workflowItem.remove();
                     
-                    // If no workflows left, show message
                     if (workflows.length === 0) {
                         workflowsList.innerHTML = '<p class="no-workflows">No saved workflows yet.</p>';
                     }
                 }
             }
-        });
+        };
+        
+        deleteButton.addEventListener('click', handleDelete);
+        deleteButton.addEventListener('touchstart', handleDelete, { passive: false });
         
         workflowItem.appendChild(workflowInfo);
         workflowItem.appendChild(deleteButton);
