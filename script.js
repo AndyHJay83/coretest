@@ -3322,3 +3322,92 @@ function showWorkflowCreation() {
     // ... existing code ...
     initializeInfoButtons();
 }
+
+// Homepage dropdown initialization
+function initializeHomepageDropdowns() {
+    const workflowDropdown = document.querySelector('#workflowSelect').closest('.dropdown');
+    const wordlistDropdown = document.querySelector('#wordlistSelect').closest('.dropdown');
+    
+    function setupDropdown(dropdown) {
+        const nativeSelect = dropdown.querySelector('.native-select');
+        const customSelect = dropdown.querySelector('.custom-select');
+        const selectedText = customSelect.querySelector('.selected-text');
+        const optionsList = customSelect.querySelector('.options-list');
+        
+        // Clear existing options
+        optionsList.innerHTML = '';
+        
+        // Add options to custom dropdown
+        Array.from(nativeSelect.options).forEach(option => {
+            const customOption = document.createElement('div');
+            customOption.className = 'option';
+            customOption.textContent = option.textContent;
+            customOption.setAttribute('data-value', option.value);
+            
+            // Handle option selection
+            customOption.addEventListener('click', () => {
+                nativeSelect.value = option.value;
+                selectedText.textContent = option.textContent;
+                optionsList.classList.remove('show');
+                customSelect.classList.remove('active');
+                nativeSelect.dispatchEvent(new Event('change', { bubbles: true }));
+            });
+            
+            optionsList.appendChild(customOption);
+        });
+        
+        // Set initial selected text
+        selectedText.textContent = nativeSelect.options[nativeSelect.selectedIndex].text;
+        
+        // Toggle dropdown
+        customSelect.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Close other dropdowns
+            document.querySelectorAll('.dropdown .options-list').forEach(list => {
+                if (list !== optionsList) {
+                    list.classList.remove('show');
+                    list.closest('.custom-select').classList.remove('active');
+                }
+            });
+            
+            optionsList.classList.toggle('show');
+            customSelect.classList.toggle('active');
+        });
+    }
+    
+    // Setup both dropdowns
+    setupDropdown(workflowDropdown);
+    setupDropdown(wordlistDropdown);
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.dropdown')) {
+            document.querySelectorAll('.dropdown .options-list').forEach(list => {
+                list.classList.remove('show');
+                list.closest('.custom-select').classList.remove('active');
+            });
+        }
+    });
+    
+    // Handle touch events for PWA
+    document.addEventListener('touchstart', (e) => {
+        if (!e.target.closest('.dropdown')) {
+            document.querySelectorAll('.dropdown .options-list').forEach(list => {
+                list.classList.remove('show');
+                list.closest('.custom-select').classList.remove('active');
+            });
+        }
+    }, { passive: true });
+}
+
+// Initialize homepage dropdowns when the DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    initializeHomepageDropdowns();
+});
+
+// Reinitialize when workflow dropdown changes
+function reinitializeWorkflowDropdown() {
+    initializeHomepageDropdowns();
+}
