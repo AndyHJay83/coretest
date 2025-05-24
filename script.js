@@ -84,21 +84,49 @@ document.addEventListener('DOMContentLoaded', async () => {
         const featureButtons = availableFeatures.querySelectorAll('.feature-button');
         
         featureButtons.forEach(button => {
+            // Add touch event listeners for mobile
+            button.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                button.classList.add('dragging');
+            }, { passive: false });
+            
+            button.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                button.classList.remove('dragging');
+            }, { passive: false });
+            
             button.addEventListener('dragstart', (e) => {
-                console.log('Drag started:', button.dataset.feature);
                 e.dataTransfer.setData('text/plain', button.dataset.feature);
                 e.dataTransfer.effectAllowed = 'move';
                 button.classList.add('dragging');
             });
             
             button.addEventListener('dragend', () => {
-                console.log('Drag ended');
                 button.classList.remove('dragging');
             });
         });
     }
     
     if (selectedFeaturesList) {
+        // Add touch event listeners for mobile
+        selectedFeaturesList.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+        }, { passive: false });
+        
+        selectedFeaturesList.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const element = document.elementFromPoint(touch.clientX, touch.clientY);
+            if (element && element.closest('.selected-feature-item')) {
+                selectedFeaturesList.classList.add('drag-over');
+            }
+        }, { passive: false });
+        
+        selectedFeaturesList.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            selectedFeaturesList.classList.remove('drag-over');
+        }, { passive: false });
+        
         selectedFeaturesList.addEventListener('dragover', (e) => {
             e.preventDefault();
             e.dataTransfer.dropEffect = 'move';
@@ -114,583 +142,127 @@ document.addEventListener('DOMContentLoaded', async () => {
             selectedFeaturesList.classList.remove('drag-over');
             
             const feature = e.dataTransfer.getData('text/plain');
-            console.log('Dropped feature:', feature);
-            
             if (feature) {
-                // Check if feature is already selected
-                const existingFeature = selectedFeaturesList.querySelector(`[data-feature="${feature}"]`);
-                if (!existingFeature) {
-                    const featureItem = document.createElement('div');
-                    featureItem.className = 'selected-feature-item';
-                    featureItem.setAttribute('data-feature', feature);
-                    featureItem.draggable = true;
-                    
-                    const featureName = document.createElement('span');
-                    featureName.textContent = feature.toUpperCase();
-                    featureItem.appendChild(featureName);
-                    
-                    const removeButton = document.createElement('button');
-                    removeButton.className = 'remove-feature';
-                    removeButton.textContent = '×';
-                    removeButton.onclick = () => featureItem.remove();
-                    featureItem.appendChild(removeButton);
-                    
-                    // Add drag and drop for reordering
-                    featureItem.addEventListener('dragstart', (e) => {
-                        e.dataTransfer.setData('text/plain', feature);
-                        e.dataTransfer.effectAllowed = 'move';
-                        featureItem.classList.add('dragging');
-                    });
-                    
-                    featureItem.addEventListener('dragend', () => {
-                        featureItem.classList.remove('dragging');
-                    });
-                    
-                    // Add drop handling for reordering
-                    featureItem.addEventListener('dragover', (e) => {
-                        e.preventDefault();
-                        e.dataTransfer.dropEffect = 'move';
-                        const draggingItem = selectedFeaturesList.querySelector('.dragging');
-                        if (draggingItem !== featureItem) {
-                            const rect = featureItem.getBoundingClientRect();
-                            const offset = e.clientY - rect.top;
-                            if (offset < rect.height / 2) {
-                                featureItem.parentNode.insertBefore(draggingItem, featureItem);
-                            } else {
-                                featureItem.parentNode.insertBefore(draggingItem, featureItem.nextSibling);
-                            }
-                        }
-                    });
-                    
-                    selectedFeaturesList.appendChild(featureItem);
-                }
+                addFeatureToList(feature);
             }
         });
     }
     
-    // Set up event listeners
+    // Set up event listeners for all buttons
+    setupButtonListeners();
+});
+
+// Function to add feature to selected features list
+function addFeatureToList(feature) {
+    const selectedFeaturesList = document.getElementById('selectedFeaturesList');
+    if (!selectedFeaturesList) return;
+    
+    // Check if feature is already selected
+    const existingFeature = selectedFeaturesList.querySelector(`[data-feature="${feature}"]`);
+    if (!existingFeature) {
+        const featureItem = document.createElement('div');
+        featureItem.className = 'selected-feature-item';
+        featureItem.setAttribute('data-feature', feature);
+        featureItem.draggable = true;
+        
+        const featureName = document.createElement('span');
+        featureName.textContent = feature.toUpperCase();
+        featureItem.appendChild(featureName);
+        
+        const removeButton = document.createElement('button');
+        removeButton.className = 'remove-feature';
+        removeButton.textContent = '×';
+        removeButton.onclick = (e) => {
+            e.stopPropagation();
+            featureItem.remove();
+        };
+        featureItem.appendChild(removeButton);
+        
+        // Add touch and drag events for mobile
+        featureItem.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            featureItem.classList.add('dragging');
+        }, { passive: false });
+        
+        featureItem.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            featureItem.classList.remove('dragging');
+        }, { passive: false });
+        
+        featureItem.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', feature);
+            e.dataTransfer.effectAllowed = 'move';
+            featureItem.classList.add('dragging');
+        });
+        
+        featureItem.addEventListener('dragend', () => {
+            featureItem.classList.remove('dragging');
+        });
+        
+        selectedFeaturesList.appendChild(featureItem);
+    }
+}
+
+// Function to setup button listeners
+function setupButtonListeners() {
+    // Create Workflow button
+    const createWorkflowButton = document.getElementById('createWorkflowButton');
     if (createWorkflowButton) {
         createWorkflowButton.addEventListener('click', showWorkflowCreation);
+        createWorkflowButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            showWorkflowCreation();
+        }, { passive: false });
     }
     
+    // Cancel Workflow button
+    const cancelWorkflowButton = document.getElementById('cancelWorkflowButton');
     if (cancelWorkflowButton) {
         cancelWorkflowButton.addEventListener('click', hideWorkflowCreation);
+        cancelWorkflowButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            hideWorkflowCreation();
+        }, { passive: false });
     }
     
+    // Save Workflow button
+    const saveWorkflowButton = document.getElementById('saveWorkflowButton');
     if (saveWorkflowButton) {
         saveWorkflowButton.addEventListener('click', saveWorkflow);
+        saveWorkflowButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            saveWorkflow();
+        }, { passive: false });
     }
     
-    if (backToHomeButton) {
-        backToHomeButton.addEventListener('click', hideWorkflowCreation);
-    }
-    
-    if (workflowSelect) {
-        workflowSelect.addEventListener('change', function() {
-            if (this.value === 'create-new') {
-                showWorkflowCreation();
-            }
-        });
-    }
-    
-    // Initialize perform button
+    // Perform button
+    const performButton = document.getElementById('performButton');
     if (performButton) {
         performButton.addEventListener('click', async () => {
             const selectedWorkflow = workflowSelect.value;
-            
             if (!selectedWorkflow) {
                 alert('Please select a workflow first');
                 return;
             }
-            
             try {
-                // Get the workflow steps - find by name instead of id
                 const workflow = workflows.find(w => w.name === selectedWorkflow);
                 if (!workflow) {
                     throw new Error('Selected workflow not found');
                 }
-                
-                // Hide both homepage and workflow creation sections
                 document.getElementById('homepage').style.display = 'none';
                 document.getElementById('workflowCreation').style.display = 'none';
-                
-                // Show the workflow execution area
                 const workflowExecution = document.getElementById('workflowExecution');
                 workflowExecution.style.display = 'block';
-                
-                // Execute the workflow
                 await executeWorkflow(workflow.steps);
             } catch (error) {
                 console.error('Error executing workflow:', error);
                 alert('Error executing workflow: ' + error.message);
             }
         });
-    } else {
-        console.error('Perform button not found!');
-    }
-    
-    // Share button listener
-    const shareButton = document.getElementById('shareButton');
-    if (shareButton) {
-        shareButton.addEventListener('click', exportWordlist);
-    }
-    
-    // COLOUR3 feature
-    const colour3YesBtn = document.getElementById('colour3YesBtn');
-    const colour3SkipButton = document.getElementById('colour3SkipButton');
-    
-    if (colour3YesBtn) {
-        colour3YesBtn.addEventListener('click', () => {
-            console.log('COLOUR3 YES selected');
-            const filteredWords = filterWordsByColour3(currentFilteredWords);
-            document.getElementById('colour3Feature').classList.add('completed');
-            displayResults(filteredWords);
-            showNextFeature();
-        });
-    }
-    
-    if (colour3SkipButton) {
-        colour3SkipButton.addEventListener('click', () => {
-            console.log('COLOUR3 SKIP selected');
-            document.getElementById('colour3Feature').classList.add('completed');
-            showNextFeature();
-        });
-    }
-
-    // Consonant question buttons
-    const consonantYesBtn = document.getElementById('consonantYesBtn');
-    const consonantNoBtn = document.getElementById('consonantNoBtn');
-    
-    console.log('Setting up consonant question buttons');
-    console.log('consonantYesBtn:', consonantYesBtn);
-    console.log('consonantNoBtn:', consonantNoBtn);
-    
-    if (consonantYesBtn) {
-        consonantYesBtn.addEventListener('click', () => {
-            console.log('Consonant question: YES button clicked');
-            console.log('Current word list length:', currentFilteredWords.length);
-            hasAdjacentConsonants = true;
-            
-            // Filter to keep ONLY words that have adjacent consonants
-            const vowels = new Set(['a', 'e', 'i', 'o', 'u']);
-            const filteredWords = currentFilteredWords.filter(word => {
-                const wordLower = word.toLowerCase();
-                for (let i = 0; i < wordLower.length - 1; i++) {
-                    const currentChar = wordLower[i];
-                    const nextChar = wordLower[i + 1];
-                    if (!vowels.has(currentChar) && !vowels.has(nextChar)) {
-                        console.log(`Keeping word "${word}" - has adjacent consonants "${currentChar}${nextChar}"`);
-                        return true;
-                    }
-                }
-                console.log(`Removing word "${word}" - no adjacent consonants`);
-                return false;
-            });
-            
-            console.log('Before filtering:', currentFilteredWords.length, 'words');
-            currentFilteredWords = filteredWords;
-            console.log('After filtering (keeping only words with adjacent consonants):', currentFilteredWords.length, 'words');
-            
-            // Update the display immediately
-            displayResults(currentFilteredWords);
-            
-            // Hide consonant question and show Position 1
-            document.getElementById('consonantQuestion').style.display = 'none';
-            document.getElementById('position1Feature').style.display = 'block';
-        });
-    } else {
-        console.error('Consonant YES button not found!');
-    }
-
-    if (consonantNoBtn) {
-        consonantNoBtn.addEventListener('click', () => {
-            console.log('Consonant question: NO button clicked');
-            console.log('Current word list length:', currentFilteredWords.length);
-            hasAdjacentConsonants = false;
-            
-            // Filter to keep ONLY words that do NOT have adjacent consonants
-            const vowels = new Set(['a', 'e', 'i', 'o', 'u']);
-            const filteredWords = currentFilteredWords.filter(word => {
-                const wordLower = word.toLowerCase();
-                let hasAdjacent = false;
-                
-                for (let i = 0; i < wordLower.length - 1; i++) {
-                    const currentChar = wordLower[i];
-                    const nextChar = wordLower[i + 1];
-                    if (!vowels.has(currentChar) && !vowels.has(nextChar)) {
-                        hasAdjacent = true;
-                        break;
-                    }
-                }
-                
-                if (!hasAdjacent) {
-                    console.log(`Keeping word "${word}" - no adjacent consonants`);
-                    return true;
-                } else {
-                    console.log(`Removing word "${word}" - has adjacent consonants`);
-                    return false;
-                }
-            });
-            
-            console.log('Before filtering:', currentFilteredWords.length, 'words');
-            currentFilteredWords = filteredWords;
-            console.log('After filtering (keeping only words without adjacent consonants):', currentFilteredWords.length, 'words');
-            
-            // Update the display immediately
-            displayResults(currentFilteredWords);
-            
-            // Hide consonant question and show Position 1
-            document.getElementById('consonantQuestion').style.display = 'none';
-            document.getElementById('position1Feature').style.display = 'block';
-        });
-    } else {
-        console.error('Consonant NO button not found!');
-    }
-
-    // ORIGINAL LEX feature
-    const originalLexButton = document.getElementById('originalLexButton');
-    const originalLexSkipButton = document.getElementById('originalLexSkipButton');
-    const originalLexInput = document.getElementById('originalLexInput');
-    
-    if (originalLexButton) {
-        originalLexButton.addEventListener('click', function() {
-            const input = originalLexInput?.value.trim();
-            if (input) {
-                console.log('ORIGINAL LEX input:', input);
-                const firstLetter = input[0].toUpperCase();
-                console.log('Using first letter:', firstLetter, 'for position:', originalLexPosition + 1);
-                
-                const filteredWords = filterWordsByOriginalLex(currentFilteredWords, originalLexPosition, firstLetter);
-                originalLexCompleted = true;
-                displayResults(filteredWords);
-                
-                // Hide ORIGINAL LEX and show EEE?
-                document.getElementById('originalLexFeature').style.display = 'none';
-                document.getElementById('eeeFeature').style.display = 'block';
-            }
-        });
-    }
-    
-    if (originalLexSkipButton) {
-        originalLexSkipButton.addEventListener('click', () => {
-            console.log('ORIGINAL LEX SKIP selected');
-            originalLexCompleted = true;
-            // Hide ORIGINAL LEX and show EEE?
-            document.getElementById('originalLexFeature').style.display = 'none';
-            document.getElementById('eeeFeature').style.display = 'block';
-        });
-    }
-    
-    if (originalLexInput) {
-        originalLexInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                originalLexButton?.click();
-            }
-        });
-    }
-    
-    // EEE? feature buttons
-    const eeeButton = document.getElementById('eeeButton');
-    const eeeYesBtn = document.getElementById('eeeYesBtn');
-    const eeeNoBtn = document.getElementById('eeeNoBtn');
-    
-    if (eeeButton) {
-        eeeButton.addEventListener('click', () => {
-            console.log('EEE? E button clicked');
-            const filteredWords = filterWordsByEee(currentFilteredWords, 'E');
-            eeeCompleted = true;
-            displayResults(filteredWords);
-            // Hide EEE? and show LEXICON
-            document.getElementById('eeeFeature').style.display = 'none';
-            document.getElementById('lexiconFeature').style.display = 'block';
-        });
-    }
-    
-    if (eeeYesBtn) {
-        eeeYesBtn.addEventListener('click', () => {
-            console.log('EEE? YES button clicked');
-            const filteredWords = filterWordsByEee(currentFilteredWords, 'YES');
-            eeeCompleted = true;
-            displayResults(filteredWords);
-            // Hide EEE? and show LEXICON
-            document.getElementById('eeeFeature').style.display = 'none';
-            document.getElementById('lexiconFeature').style.display = 'block';
-        });
-    }
-    
-    if (eeeNoBtn) {
-        eeeNoBtn.addEventListener('click', () => {
-            console.log('EEE? NO button clicked');
-            const filteredWords = filterWordsByEee(currentFilteredWords, 'NO');
-            eeeCompleted = true;
-            displayResults(filteredWords);
-            // Hide EEE? and show LEXICON
-            document.getElementById('eeeFeature').style.display = 'none';
-            document.getElementById('lexiconFeature').style.display = 'block';
-        });
-    }
-
-    // Position 1 feature
-    const position1Button = document.getElementById('position1Button');
-    const position1DoneButton = document.getElementById('position1DoneButton');
-    const position1Input = document.getElementById('position1Input');
-    
-    if (position1Button) {
-        position1Button.addEventListener('click', () => {
-            const input = position1Input?.value.trim();
-            if (input) {
-                const consonants = getConsonantsInOrder(input);
-                console.log('Processing Position 1 input:', input);
-                console.log('Found consonants:', consonants);
-                
-                if (consonants.length >= 2) {
-                    let filteredWords;
-                    
-                    if (hasAdjacentConsonants) {
-                        // YES to Consonants Together: look for the specific consonant pairs together
-                        filteredWords = currentFilteredWords.filter(word => {
-                            const wordLower = word.toLowerCase();
-                            
-                            // Create all possible pairs of consonants from the input word
-                            const consonantPairs = [];
-                            for (let i = 0; i < consonants.length; i++) {
-                                for (let j = i + 1; j < consonants.length; j++) {
-                                    consonantPairs.push([consonants[i], consonants[j]]);
-                                }
-                            }
-                            
-                            console.log(`Checking word "${wordLower}" for consonant pairs:`, consonantPairs);
-                            
-                            // Check if any of the consonant pairs appear together in the word
-                            for (const [con1, con2] of consonantPairs) {
-                                const pair1 = con1 + con2;
-                                const pair2 = con2 + con1;
-                                if (wordLower.includes(pair1) || wordLower.includes(pair2)) {
-                                    console.log(`Word "${wordLower}" accepted: found consonant pair "${pair1}" or "${pair2}"`);
-                                    return true;
-                                }
-                            }
-                            
-                            console.log(`Word "${wordLower}" rejected: no matching consonant pairs found`);
-                            return false;
-                        });
-                    } else {
-                        // NO to Consonants Together: look for ANY pair of consonants in middle 5/6 characters
-                        filteredWords = currentFilteredWords.filter(word => {
-                            const wordLower = word.toLowerCase();
-                            const wordLength = wordLower.length;
-                            
-                            // Determine middle section length (5 for odd, 6 for even)
-                            const middleLength = wordLength % 2 === 0 ? 6 : 5;
-                            const startPos = Math.floor((wordLength - middleLength) / 2);
-                            const middleSection = wordLower.slice(startPos, startPos + middleLength);
-                            
-                            console.log(`Word "${wordLower}": middle section "${middleSection}"`);
-                            
-                            // Create all possible pairs of consonants from the input word
-                            const consonantPairs = [];
-                            for (let i = 0; i < consonants.length; i++) {
-                                for (let j = i + 1; j < consonants.length; j++) {
-                                    consonantPairs.push([consonants[i], consonants[j]]);
-                                }
-                            }
-                            
-                            // Check if ANY pair of consonants appears in the middle section
-                            for (const [con1, con2] of consonantPairs) {
-                                if (middleSection.includes(con1) && middleSection.includes(con2)) {
-                                    console.log(`Word "${wordLower}" accepted: found consonants "${con1}" and "${con2}" in middle section`);
-                                    return true;
-                                }
-                            }
-                            
-                            console.log(`Word "${wordLower}" rejected: no consonant pairs found in middle section`);
-                            return false;
-                        });
-                    }
-                    
-                    console.log('Filtered words count:', filteredWords.length);
-                    
-                    // Update the current filtered words
-                    currentFilteredWords = filteredWords;
-                    
-                    // Mark Position 1 as completed and update the display
-                    document.getElementById('position1Feature').classList.add('completed');
-                    document.getElementById('position1Feature').style.display = 'none';
-                    displayResults(filteredWords);
-                    
-                    // Get vowels from the input word in left-to-right order
-                    const vowels = new Set(['a', 'e', 'i', 'o', 'u']);
-                    const inputLower = input.toLowerCase();
-                    uniqueVowels = [];
-                    
-                    // Collect vowels in order of appearance
-                    for (let i = 0; i < inputLower.length; i++) {
-                        const char = inputLower[i];
-                        if (vowels.has(char)) {
-                            uniqueVowels.push(char);
-                        }
-                    }
-                    
-                    console.log('Input word:', input);
-                    console.log('Vowels collected in order:', uniqueVowels);
-                    
-                    // Initialize vowel processing with the filtered words
-                    currentFilteredWordsForVowels = [...filteredWords];
-                    originalFilteredWords = [...filteredWords];
-                    currentVowelIndex = 0;
-                    
-                    // Move to VOWEL feature
-                    console.log('Moving to VOWEL feature');
-                    const vowelFeature = document.getElementById('vowelFeature');
-                    vowelFeature.style.display = 'block';
-                    
-                    // Set up the vowel display
-                    const vowelLetter = vowelFeature.querySelector('.vowel-letter');
-                    if (uniqueVowels.length > 0) {
-                        console.log('Setting first vowel letter to:', uniqueVowels[0].toUpperCase());
-                        vowelLetter.textContent = uniqueVowels[0].toUpperCase();
-                        vowelLetter.style.display = 'inline-block';
-                    }
-                } else {
-                    console.log('Not enough consonants found in input');
-                }
-            } else {
-                // If no input, just move to VOWEL feature
-                console.log('No input provided, moving to VOWEL feature');
-                document.getElementById('position1Feature').classList.add('completed');
-                document.getElementById('position1Feature').style.display = 'none';
-                
-                // Move to VOWEL feature
-                const vowelFeature = document.getElementById('vowelFeature');
-                vowelFeature.style.display = 'block';
-                
-                // Initialize vowel processing with current words
-                currentFilteredWordsForVowels = [...currentFilteredWords];
-                originalFilteredWords = [...currentFilteredWords];
-                currentVowelIndex = 0;
-                
-                // Get unique vowels from current word list
-                const vowels = new Set(['a', 'e', 'i', 'o', 'u']);
-                uniqueVowels = Array.from(new Set(
-                    currentFilteredWords.join('').toLowerCase().split('')
-                        .filter(char => vowels.has(char))
-                ));
-                
-                // Set up the vowel display
-                const vowelLetter = vowelFeature.querySelector('.vowel-letter');
-                if (uniqueVowels.length > 0) {
-                    console.log('Setting first vowel letter to:', uniqueVowels[0].toUpperCase());
-                    vowelLetter.textContent = uniqueVowels[0].toUpperCase();
-                    vowelLetter.style.display = 'inline-block';
-                }
-            }
-        });
-    }
-
-    if (position1DoneButton) {
-        position1DoneButton.addEventListener('click', () => {
-            console.log('Position 1 DONE button clicked');
-            // Mark Position 1 as completed
-            document.getElementById('position1Feature').classList.add('completed');
-            document.getElementById('position1Feature').style.display = 'none';
-            
-            // Move to VOWEL feature
-            console.log('Moving to VOWEL feature');
-            const vowelFeature = document.getElementById('vowelFeature');
-            vowelFeature.style.display = 'block';
-            
-            // Initialize vowel processing with current words
-            currentFilteredWordsForVowels = [...currentFilteredWords];
-            originalFilteredWords = [...currentFilteredWords];
-            currentVowelIndex = 0;
-            
-            // Get unique vowels from current word list
-            const vowels = new Set(['a', 'e', 'i', 'o', 'u']);
-            uniqueVowels = Array.from(new Set(
-                currentFilteredWords.join('').toLowerCase().split('')
-                    .filter(char => vowels.has(char))
-            ));
-            
-            // Set up the vowel display
-            const vowelLetter = vowelFeature.querySelector('.vowel-letter');
-            if (uniqueVowels.length > 0) {
-                console.log('Setting first vowel letter to:', uniqueVowels[0].toUpperCase());
-                vowelLetter.textContent = uniqueVowels[0].toUpperCase();
-                vowelLetter.style.display = 'inline-block';
-            }
-        });
-    }
-
-    if (position1Input) {
-        position1Input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                position1Button?.click();
-            }
-        });
-    }
-
-    // Vowel feature buttons
-    const vowelYesBtn = document.querySelector('#vowelFeature .yes-btn');
-    const vowelNoBtn = document.querySelector('#vowelFeature .no-btn');
-    
-    if (vowelYesBtn) {
-        vowelYesBtn.addEventListener('click', () => {
-            console.log('Vowel YES button clicked');
-            handleVowelSelection(true);
-        });
-    }
-    
-    if (vowelNoBtn) {
-        vowelNoBtn.addEventListener('click', () => {
-            console.log('Vowel NO button clicked');
-            handleVowelSelection(false);
-        });
-    }
-
-    // LEXICON feature
-    const lexiconButton = document.getElementById('lexiconButton');
-    const lexiconSkipButton = document.getElementById('lexiconSkipButton');
-    const lexiconInput = document.getElementById('lexiconInput');
-    
-    if (lexiconButton) {
-        lexiconButton.addEventListener('click', () => {
-            const input = lexiconInput?.value.trim();
-            if (input) {
-                console.log('LEXICON input:', input);
-                const filteredWords = filterWordsByLexicon(currentFilteredWords, input);
-                lexiconCompleted = true;
-                displayResults(filteredWords);
-                // Hide LEXICON and show next feature
-                document.getElementById('lexiconFeature').style.display = 'none';
-                showNextFeature();
-            }
-        });
-    }
-
-    if (lexiconSkipButton) {
-        lexiconSkipButton.addEventListener('click', () => {
-            console.log('LEXICON SKIP selected');
-            lexiconCompleted = true;
-            // Hide LEXICON and show next feature
-            document.getElementById('lexiconFeature').style.display = 'none';
-            showNextFeature();
-        });
-    }
-
-    if (lexiconInput) {
-        lexiconInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                lexiconButton?.click();
-            }
-        });
-    }
-
-    // Reset button - full page refresh
-    const resetButton = document.getElementById('resetButton');
-    if (resetButton) {
-        resetButton.addEventListener('click', () => {
-            window.location.reload();
-        });
+        performButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            performButton.click();
+        }, { passive: false });
     }
     
     // Settings button
@@ -699,63 +271,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         settingsButton.addEventListener('click', () => {
             document.getElementById('settingsModal').style.display = 'block';
         });
+        settingsButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            document.getElementById('settingsModal').style.display = 'block';
+        }, { passive: false });
     }
     
-    // Close settings
+    // Close settings button
     const closeButton = document.querySelector('.close-button');
     if (closeButton) {
         closeButton.addEventListener('click', () => {
             document.getElementById('settingsModal').style.display = 'none';
         });
+        closeButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            document.getElementById('settingsModal').style.display = 'none';
+        }, { passive: false });
     }
-    
-    // Close settings when clicking outside
-    window.onclick = function(event) {
-        const modal = document.getElementById('settingsModal');
-        if (event.target === modal) {
-            modal.style.display = 'none';
-        }
-    };
-
-    // O? feature buttons
-    const oYesBtn = document.getElementById('oYesBtn');
-    const oNoBtn = document.getElementById('oNoBtn');
-    const oSkipBtn = document.getElementById('oSkipBtn');
-    
-    if (oYesBtn) {
-        oYesBtn.addEventListener('click', () => {
-            console.log('O? YES selected');
-            const filteredWords = filterWordsByO(currentFilteredWords, true);
-            document.getElementById('oFeature').classList.add('completed');
-            displayResults(filteredWords);
-            // Hide O? and show LEXICON
-            document.getElementById('oFeature').style.display = 'none';
-            document.getElementById('lexiconFeature').style.display = 'block';
-        });
-    }
-    
-    if (oNoBtn) {
-        oNoBtn.addEventListener('click', () => {
-            console.log('O? NO selected');
-            const filteredWords = filterWordsByO(currentFilteredWords, false);
-            document.getElementById('oFeature').classList.add('completed');
-            displayResults(filteredWords);
-            // Hide O? and show LEXICON
-            document.getElementById('oFeature').style.display = 'none';
-            document.getElementById('lexiconFeature').style.display = 'block';
-        });
-    }
-    
-    if (oSkipBtn) {
-        oSkipBtn.addEventListener('click', () => {
-            console.log('O? SKIP selected');
-            document.getElementById('oFeature').classList.add('completed');
-            // Hide O? and show LEXICON
-            document.getElementById('oFeature').style.display = 'none';
-            document.getElementById('lexiconFeature').style.display = 'block';
-        });
-    }
-});
+}
 
 // Function to check if a letter is curved
 function isCurvedLetter(letter) {
