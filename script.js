@@ -1488,10 +1488,6 @@ function setupFeatureListeners(feature, callback) {
             
             if (eeeButton) {
                 eeeButton.onclick = () => {
-                    if (!currentPosition1Word) {
-                        alert('Please complete the Position 1 feature first');
-                        return;
-                    }
                     const filteredWords = filterWordsByEee(currentFilteredWords, 'E');
                     callback(filteredWords);
                     document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
@@ -1506,10 +1502,6 @@ function setupFeatureListeners(feature, callback) {
             
             if (eeeYesBtn) {
                 eeeYesBtn.onclick = () => {
-                    if (!currentPosition1Word) {
-                        alert('Please complete the Position 1 feature first');
-                        return;
-                    }
                     const filteredWords = filterWordsByEee(currentFilteredWords, 'YES');
                     callback(filteredWords);
                     document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
@@ -1524,10 +1516,6 @@ function setupFeatureListeners(feature, callback) {
             
             if (eeeNoBtn) {
                 eeeNoBtn.onclick = () => {
-                    if (!currentPosition1Word) {
-                        alert('Please complete the Position 1 feature first');
-                        return;
-                    }
                     const filteredWords = filterWordsByEee(currentFilteredWords, 'NO');
                     callback(filteredWords);
                     document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
