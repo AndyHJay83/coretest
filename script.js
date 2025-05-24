@@ -2593,207 +2593,75 @@ function deleteWorkflow(workflow) {
 function initializeDropdowns() {
     const dropdowns = document.querySelectorAll('.dropdown');
     
-    // Remove any existing event listeners
-    document.removeEventListener('click', handleGlobalClick);
-    document.removeEventListener('touchstart', handleGlobalTouch);
-    
     dropdowns.forEach(dropdown => {
         const nativeSelect = dropdown.querySelector('.native-select');
         const customSelect = dropdown.querySelector('.custom-select');
         const selectedText = customSelect.querySelector('.selected-text');
         const optionsList = customSelect.querySelector('.options-list');
+        const options = optionsList.querySelectorAll('.option');
         
-        // Clear existing options
-        optionsList.innerHTML = '';
-        
-        // Add options to custom dropdown
-        Array.from(nativeSelect.options).forEach(option => {
-            const customOption = document.createElement('div');
-            customOption.className = 'option';
-            customOption.textContent = option.textContent;
-            customOption.setAttribute('data-value', option.value);
-            
-            // Add click handler
-            customOption.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                selectOption(option.value, option.textContent, customOption);
-            });
-            
-            // Add touch handler for mobile
-            customOption.addEventListener('touchend', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                selectOption(option.value, option.textContent, customOption);
-            }, { passive: false });
-            
-            optionsList.appendChild(customOption);
-        });
-        
-        // Set initial selected text
+        // Initialize the selected text
         selectedText.textContent = nativeSelect.options[nativeSelect.selectedIndex].text;
         
-        // Add click handler for the custom select
+        // Toggle dropdown on click/touch
         customSelect.addEventListener('click', (e) => {
-            e.preventDefault();
             e.stopPropagation();
-            toggleDropdown(optionsList, customSelect);
-        });
-        
-        // Add touch handler for mobile
-        customSelect.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleDropdown(optionsList, customSelect);
-        }, { passive: false });
-        
-        // Add keyboard navigation
-        customSelect.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                toggleDropdown(optionsList, customSelect);
-            } else if (e.key === 'Escape') {
-                closeDropdown(optionsList, customSelect);
-            }
-        });
-        
-        // Add keyboard navigation for options
-        const options = optionsList.querySelectorAll('.option');
-        options.forEach((option, index) => {
-            option.setAttribute('tabindex', '0');
-            option.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    option.click();
-                } else if (e.key === 'ArrowDown') {
-                    e.preventDefault();
-                    const nextOption = options[index + 1];
-                    if (nextOption) nextOption.focus();
-                } else if (e.key === 'ArrowUp') {
-                    e.preventDefault();
-                    const prevOption = options[index - 1];
-                    if (prevOption) prevOption.focus();
+            const isOpen = customSelect.classList.contains('active');
+            
+            // Close all other dropdowns
+            document.querySelectorAll('.custom-select.active').forEach(d => {
+                if (d !== customSelect) {
+                    d.classList.remove('active');
+                    d.querySelector('.options-list').style.display = 'none';
                 }
             });
+            
+            // Toggle this dropdown
+            customSelect.classList.toggle('active');
+            optionsList.style.display = isOpen ? 'none' : 'block';
         });
-    });
-    
-    // Global click handler
-    function handleGlobalClick(e) {
-        dropdowns.forEach(dropdown => {
-            const customSelect = dropdown.querySelector('.custom-select');
-            const optionsList = customSelect.querySelector('.options-list');
-            if (!customSelect.contains(e.target)) {
-                closeDropdown(optionsList, customSelect);
+        
+        // Handle option selection
+        options.forEach(option => {
+            option.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const value = option.getAttribute('data-value');
+                nativeSelect.value = value;
+                selectedText.textContent = option.textContent;
+                
+                // Update selected state
+                options.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                
+                // Close dropdown
+                customSelect.classList.remove('active');
+                optionsList.style.display = 'none';
+                
+                // Trigger change event
+                nativeSelect.dispatchEvent(new Event('change'));
+            });
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', () => {
+            customSelect.classList.remove('active');
+            optionsList.style.display = 'none';
+        });
+        
+        // Prevent body scroll when dropdown is open
+        customSelect.addEventListener('touchstart', (e) => {
+            if (customSelect.classList.contains('active')) {
+                e.preventDefault();
             }
-        });
-    }
-    
-    // Global touch handler
-    function handleGlobalTouch(e) {
-        dropdowns.forEach(dropdown => {
-            const customSelect = dropdown.querySelector('.custom-select');
-            const optionsList = customSelect.querySelector('.options-list');
-            if (!customSelect.contains(e.target)) {
-                closeDropdown(optionsList, customSelect);
-            }
-        });
-    }
-    
-    // Add global event listeners
-    document.addEventListener('click', handleGlobalClick);
-    document.addEventListener('touchstart', handleGlobalTouch, { passive: false });
-    
-    // Helper functions
-    function selectOption(value, text, optionElement) {
-        const dropdown = optionElement.closest('.dropdown');
-        const nativeSelect = dropdown.querySelector('.native-select');
-        const selectedText = dropdown.querySelector('.selected-text');
-        const optionsList = dropdown.querySelector('.options-list');
-        const customSelect = dropdown.querySelector('.custom-select');
-        
-        nativeSelect.value = value;
-        selectedText.textContent = text;
-        
-        // Update selected state
-        optionsList.querySelectorAll('.option').forEach(opt => {
-            opt.classList.remove('selected');
-        });
-        optionElement.classList.add('selected');
-        
-        // Close dropdown
-        closeDropdown(optionsList, customSelect);
-        
-        // Trigger change event
-        const event = new Event('change', { bubbles: true });
-        nativeSelect.dispatchEvent(event);
-    }
-    
-    function toggleDropdown(optionsList, customSelect) {
-        const isOpen = optionsList.classList.contains('show');
-        
-        // Close all other dropdowns first
-        dropdowns.forEach(d => {
-            const otherOptionsList = d.querySelector('.options-list');
-            const otherCustomSelect = d.querySelector('.custom-select');
-            if (otherOptionsList !== optionsList) {
-                closeDropdown(otherOptionsList, otherCustomSelect);
-            }
-        });
-        
-        if (isOpen) {
-            closeDropdown(optionsList, customSelect);
-        } else {
-            openDropdown(optionsList, customSelect);
-        }
-    }
-    
-    function openDropdown(optionsList, customSelect) {
-        optionsList.classList.add('show');
-        customSelect.classList.add('active');
-        
-        // Prevent body scrolling when dropdown is open
-        document.body.style.overflow = 'hidden';
-        
-        // Add touchmove handler
-        optionsList.addEventListener('touchmove', preventScroll, { passive: false });
-    }
-    
-    function closeDropdown(optionsList, customSelect) {
-        optionsList.classList.remove('show');
-        customSelect.classList.remove('active');
-        
-        // Restore body scrolling
-        document.body.style.overflow = '';
-        
-        // Remove touchmove handler
-        optionsList.removeEventListener('touchmove', preventScroll);
-    }
-}
-
-// Prevent scroll when dropdown is open
-function preventScroll(e) {
-    if (e.target.closest('.options-list')) {
-        e.preventDefault();
-    }
-}
-
-// Initialize dropdowns when the DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    initializeDropdowns();
-    
-    // Add touch event listeners to prevent default behavior
-    document.querySelectorAll('.custom-select, .option').forEach(element => {
-        element.addEventListener('touchstart', (e) => {
-            e.preventDefault();
         }, { passive: false });
     });
-});
+}
+
+// Initialize dropdowns when DOM is loaded
+document.addEventListener('DOMContentLoaded', initializeDropdowns);
 
 // Reinitialize dropdowns when workflow dropdown changes
-function reinitializeWorkflowDropdown() {
-    initializeDropdowns();
-}
+document.getElementById('workflowSelect').addEventListener('change', initializeDropdowns);
 
 // Initialize drag and drop functionality
 function initializeDragAndDrop() {
