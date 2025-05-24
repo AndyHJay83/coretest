@@ -31,7 +31,7 @@
                 <div class="dropdown-group">
                     <label for="workflowSelect">Select Workflow:</label>
                     <div class="dropdown">
-                        <select id="workflowSelect">
+                        <select id="workflowSelect" class="native-select">
                             <option value="">Select a workflow...</option>
                             <option value="create-new">New Workflow</option>
                         </select>
@@ -45,8 +45,9 @@
                 <div class="dropdown-group">
                     <label for="wordlistSelect">Select Wordlist:</label>
                     <div class="dropdown">
-                        <select id="wordlistSelect">
+                        <select id="wordlistSelect" class="native-select">
                             <option value="enuk" selected>ENUK Wordlist</option>
+                            <option value="custom">Custom Wordlist</option>
                         </select>
                         <div class="custom-select">
                             <div class="selected-text">ENUK Wordlist</div>
@@ -56,8 +57,10 @@
                 </div>
             </div>
             
-            <button id="performButton" class="perform-button">PERFORM</button>
-            <button id="createWorkflowButton" class="create-button">New Workflow</button>
+            <div class="button-container">
+                <button id="performButton" class="perform-button">PERFORM</button>
+                <button id="createWorkflowButton" class="create-button">New Workflow</button>
+            </div>
         </div>
 
         <!-- Workflow Creation Page -->
