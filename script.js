@@ -101,15 +101,11 @@ function initializeWorkflowDropdown() {
             .dropdown-group {
                 position: relative;
                 width: 100%;
-                /* max-width: 300px; */
-                /* margin: 0 auto 20px; */
                 box-sizing: border-box;
             }
             .dropdown {
                 position: relative;
                 width: 100%;
-                /* max-width: 300px; */
-                /* margin: 0 auto; */
                 margin-bottom: 15px;
                 z-index: 9999;
                 display: block;
@@ -170,6 +166,8 @@ function initializeWorkflowDropdown() {
                 opacity: 1 !important;
                 visibility: visible !important;
                 transform: none !important;
+                position: absolute !important;
+                z-index: 10002 !important;
             }
             .option {
                 padding: 8px 12px;
