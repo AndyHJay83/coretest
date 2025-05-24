@@ -138,9 +138,13 @@ async function performWorkflow() {
         featureArea.innerHTML = '';
         resultsContainer.innerHTML = '';
         
-        // Get the features from the workflow
+        // Get the features from the workflow steps
         const features = workflow.steps.map(step => step.feature);
         console.log('Workflow features:', features);
+        
+        if (!features || features.length === 0) {
+            throw new Error('No features found in workflow');
+        }
         
         // Create and display each feature section
         features.forEach(feature => {
@@ -186,6 +190,9 @@ async function performWorkflow() {
                 case 'shape':
                     addShapeContent(featureSection);
                     break;
+                default:
+                    console.warn('Unknown feature type:', feature);
+                    break;
             }
             
             featureArea.appendChild(featureSection);
@@ -206,7 +213,7 @@ async function performWorkflow() {
 
     } catch (error) {
         console.error('Error executing workflow:', error);
-        alert('There was an error executing the workflow. Please try again.');
+        alert('There was an error executing the workflow: ' + error.message);
     }
 }
 
