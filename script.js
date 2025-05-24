@@ -3344,14 +3344,19 @@ function initializeHomepageDropdowns() {
             customOption.textContent = option.textContent;
             customOption.setAttribute('data-value', option.value);
             
-            // Handle option selection
-            customOption.addEventListener('click', () => {
+            // Handle option selection with both click and touch
+            const handleOptionSelect = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 nativeSelect.value = option.value;
                 selectedText.textContent = option.textContent;
                 optionsList.classList.remove('show');
                 customSelect.classList.remove('active');
                 nativeSelect.dispatchEvent(new Event('change', { bubbles: true }));
-            });
+            };
+            
+            customOption.addEventListener('click', handleOptionSelect);
+            customOption.addEventListener('touchstart', handleOptionSelect, { passive: false });
             
             optionsList.appendChild(customOption);
         });
@@ -3359,8 +3364,8 @@ function initializeHomepageDropdowns() {
         // Set initial selected text
         selectedText.textContent = nativeSelect.options[nativeSelect.selectedIndex].text;
         
-        // Toggle dropdown
-        customSelect.addEventListener('click', (e) => {
+        // Toggle dropdown with both click and touch
+        const handleToggle = (e) => {
             e.preventDefault();
             e.stopPropagation();
             
@@ -3374,6 +3379,24 @@ function initializeHomepageDropdowns() {
             
             optionsList.classList.toggle('show');
             customSelect.classList.toggle('active');
+            
+            // Update aria-expanded attribute
+            customSelect.setAttribute('aria-expanded', optionsList.classList.contains('show'));
+        };
+        
+        customSelect.addEventListener('click', handleToggle);
+        customSelect.addEventListener('touchstart', handleToggle, { passive: false });
+        
+        // Add keyboard navigation
+        customSelect.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleToggle(e);
+            } else if (e.key === 'Escape') {
+                optionsList.classList.remove('show');
+                customSelect.classList.remove('active');
+                customSelect.setAttribute('aria-expanded', 'false');
+            }
         });
     }
     
@@ -3381,25 +3404,29 @@ function initializeHomepageDropdowns() {
     setupDropdown(workflowDropdown);
     setupDropdown(wordlistDropdown);
     
-    // Close dropdowns when clicking outside
-    document.addEventListener('click', (e) => {
+    // Close dropdowns when clicking/touching outside
+    const handleOutsideClick = (e) => {
         if (!e.target.closest('.dropdown')) {
             document.querySelectorAll('.dropdown .options-list').forEach(list => {
                 list.classList.remove('show');
-                list.closest('.custom-select').classList.remove('active');
+                const customSelect = list.closest('.custom-select');
+                customSelect.classList.remove('active');
+                customSelect.setAttribute('aria-expanded', 'false');
             });
         }
-    });
+    };
     
-    // Handle touch events for PWA
-    document.addEventListener('touchstart', (e) => {
-        if (!e.target.closest('.dropdown')) {
-            document.querySelectorAll('.dropdown .options-list').forEach(list => {
-                list.classList.remove('show');
-                list.closest('.custom-select').classList.remove('active');
-            });
-        }
-    }, { passive: true });
+    document.addEventListener('click', handleOutsideClick);
+    document.addEventListener('touchstart', handleOutsideClick, { passive: false });
+    
+    // Prevent body scrolling when dropdown is open
+    document.querySelectorAll('.options-list').forEach(list => {
+        list.addEventListener('touchmove', (e) => {
+            if (list.classList.contains('show')) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+    });
 }
 
 // Initialize homepage dropdowns when the DOM is loaded
