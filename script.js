@@ -1182,6 +1182,8 @@ function setupFeatureListeners(feature, callback) {
                         const consonants = getConsonantsInOrder(input);
                         if (consonants.length >= 2) {
                             const filteredWords = filterWordsByPosition1(currentFilteredWords, consonants);
+                            // Store the input word for vowel feature
+                            currentPosition1Word = input;
                             callback(filteredWords);
                             document.getElementById('position1Feature').dispatchEvent(new Event('completed'));
                         } else {
@@ -1223,12 +1225,18 @@ function setupFeatureListeners(feature, callback) {
             originalFilteredWords = [...currentFilteredWords];
             currentVowelIndex = 0;
             
-            // Get unique vowels from current word list
+            // Get unique vowels from Position 1 word in order
             const vowels = new Set(['a', 'e', 'i', 'o', 'u']);
-            uniqueVowels = Array.from(new Set(
-                currentFilteredWords.join('').toLowerCase().split('')
-                    .filter(char => vowels.has(char))
-            ));
+            uniqueVowels = [];
+            if (currentPosition1Word) {
+                const seenVowels = new Set();
+                for (const char of currentPosition1Word.toLowerCase()) {
+                    if (vowels.has(char) && !seenVowels.has(char)) {
+                        uniqueVowels.push(char);
+                        seenVowels.add(char);
+                    }
+                }
+            }
             
             // Set up the vowel display
             const vowelFeature = document.getElementById('vowelFeature');
