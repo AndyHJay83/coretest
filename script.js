@@ -759,6 +759,8 @@ async function loadWordList() {
 // Function to execute workflow
 async function executeWorkflow(steps) {
     try {
+        console.log('Executing workflow steps:', steps); // Debug log
+        
         // Load the wordlist first
         await loadWordList();
         currentFilteredWords = [...wordList]; // Start with the full wordlist
@@ -777,40 +779,68 @@ async function executeWorkflow(steps) {
             workflowExecution.style.height = '100vh';
         }
 
+        // Clear any existing features
+        const featureArea = document.getElementById('featureArea');
+        if (featureArea) {
+            featureArea.innerHTML = '';
+        }
+
         // Execute each step in the workflow
         for (const step of steps) {
+            console.log('Executing step:', step); // Debug log
             const feature = step.feature;
+            
+            // Create and show the feature element
+            let featureElement;
             switch (feature) {
                 case 'position1':
-                    await createPosition1Feature();
+                    featureElement = createPosition1Feature();
                     break;
                 case 'vowel':
-                    await createVowelFeature();
+                    featureElement = createVowelFeature();
                     break;
                 case 'o':
-                    await createOFeature();
+                    featureElement = createOFeature();
                     break;
                 case 'lexicon':
-                    await createLexiconFeature();
+                    featureElement = createLexiconFeature();
                     break;
                 case 'eee':
-                    await createEeeFeature();
+                    featureElement = createEeeFeature();
                     break;
                 case 'originalLex':
-                    await createOriginalLexFeature();
+                    featureElement = createOriginalLexFeature();
                     break;
                 case 'consonant':
-                    await createConsonantQuestion();
+                    featureElement = createConsonantQuestion();
                     break;
                 case 'colour3':
-                    await createColour3Feature();
+                    featureElement = createColour3Feature();
                     break;
                 case 'shape':
-                    await createShapeFeature();
+                    featureElement = createShapeFeature();
                     break;
                 case 'curved':
-                    await createCurvedFeature();
+                    featureElement = createCurvedFeature();
                     break;
+            }
+
+            if (featureElement) {
+                // Add the feature to the feature area
+                featureArea.appendChild(featureElement);
+                
+                // Set up the feature's event listeners
+                setupFeatureListeners(feature, (filteredWords) => {
+                    currentFilteredWords = filteredWords;
+                    displayResults(filteredWords);
+                });
+
+                // Wait for the feature to complete
+                await new Promise(resolve => {
+                    featureElement.addEventListener('completed', () => {
+                        resolve();
+                    }, { once: true });
+                });
             }
         }
         
