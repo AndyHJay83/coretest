@@ -2202,7 +2202,6 @@ function addFeatureToSelected(featureType) {
     
     const selectedFeature = document.createElement('div');
     selectedFeature.className = 'selected-feature-item';
-    selectedFeature.draggable = true;
     selectedFeature.dataset.feature = featureType;
     
     selectedFeature.innerHTML = `
