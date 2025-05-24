@@ -37,146 +37,69 @@ const performButton = document.getElementById('performButton');
 // Function to initialize workflow dropdown
 function initializeWorkflowDropdown() {
     const workflowSelect = document.getElementById('workflowSelect');
-    if (!workflowSelect) return;
-
-    // Clear existing options except the first one
-    while (workflowSelect.options.length > 1) {
-        workflowSelect.remove(1);
+    const performButton = document.getElementById('performButton');
+    const createWorkflowButton = document.getElementById('createWorkflowButton');
+    
+    // Load saved workflows
+    const savedWorkflows = JSON.parse(localStorage.getItem('workflows') || '[]');
+    
+    // Clear existing options except the first two
+    while (workflowSelect.options.length > 2) {
+        workflowSelect.remove(2);
     }
-
-    // Add saved workflows to dropdown
-    workflows.forEach(workflow => {
+    
+    // Add saved workflows
+    savedWorkflows.forEach(workflow => {
         const option = document.createElement('option');
-        option.value = workflow.name;
+        option.value = workflow.id;
         option.textContent = workflow.name;
         workflowSelect.appendChild(option);
     });
+    
+    // Handle workflow selection
+    workflowSelect.addEventListener('change', function() {
+        const selectedValue = this.value;
+        if (selectedValue === 'create') {
+            showWorkflowCreation();
+        } else if (selectedValue !== '') {
+            performButton.disabled = false;
+        } else {
+            performButton.disabled = true;
+        }
+    });
+    
+    // Handle create workflow button
+    createWorkflowButton.addEventListener('click', showWorkflowCreation);
+    
+    // Handle perform button
+    performButton.addEventListener('click', function() {
+        const selectedWorkflow = workflowSelect.value;
+        if (selectedWorkflow && selectedWorkflow !== 'create') {
+            performWorkflow(selectedWorkflow);
+        }
+    });
+}
 
-    // Initialize the custom dropdown for workflow select
-    const workflowDropdown = workflowSelect.closest('.dropdown');
-    if (workflowDropdown) {
-        const customSelect = workflowDropdown.querySelector('.custom-select');
-        const selectedText = customSelect.querySelector('.selected-text');
-        const optionsList = customSelect.querySelector('.options-list');
+function showWorkflowCreation() {
+    document.getElementById('homepageContent').style.display = 'none';
+    document.getElementById('workflowCreationContent').style.display = 'block';
+    document.getElementById('workflowName').focus();
+}
+
+function performWorkflow(workflowId) {
+    const workflows = JSON.parse(localStorage.getItem('workflows') || '[]');
+    const workflow = workflows.find(w => w.id === workflowId);
+    
+    if (workflow) {
+        // Store the selected workflow ID
+        localStorage.setItem('selectedWorkflowId', workflowId);
         
-        // Clear existing options
-        optionsList.innerHTML = '';
+        // Show the workflow execution page
+        document.getElementById('homepageContent').style.display = 'none';
+        document.getElementById('workflowExecutionContent').style.display = 'block';
         
-        // Add options to custom dropdown
-        Array.from(workflowSelect.options).forEach(option => {
-            const customOption = document.createElement('div');
-            customOption.className = 'option';
-            customOption.textContent = option.textContent;
-            customOption.setAttribute('data-value', option.value);
-            
-            // Add click handler for desktop
-            customOption.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                workflowSelect.value = option.value;
-                selectedText.textContent = option.textContent;
-                optionsList.classList.remove('show');
-                
-                // Trigger change event on the select element
-                const event = new Event('change', { bubbles: true });
-                workflowSelect.dispatchEvent(event);
-                
-                if (option.value === 'create-new') {
-                    showWorkflowCreation();
-                }
-            });
-            
-            // Add touch handler for mobile
-            customOption.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                workflowSelect.value = option.value;
-                selectedText.textContent = option.textContent;
-                optionsList.classList.remove('show');
-                
-                // Trigger change event on the select element
-                const event = new Event('change', { bubbles: true });
-                workflowSelect.dispatchEvent(event);
-                
-                if (option.value === 'create-new') {
-                    showWorkflowCreation();
-                }
-            }, { passive: false });
-            
-            optionsList.appendChild(customOption);
-        });
-        
-        // Set initial selected text
-        selectedText.textContent = workflowSelect.options[workflowSelect.selectedIndex].text;
-        
-        // Remove any existing event listeners
-        const newCustomSelect = customSelect.cloneNode(true);
-        customSelect.parentNode.replaceChild(newCustomSelect, customSelect);
-        
-        // Get the new elements after cloning
-        const newSelectedText = newCustomSelect.querySelector('.selected-text');
-        const newOptionsList = newCustomSelect.querySelector('.options-list');
-        
-        // Add click handler for the custom select
-        newCustomSelect.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            newOptionsList.classList.toggle('show');
-        });
-        
-        // Add touch handler for mobile
-        newCustomSelect.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            newOptionsList.classList.toggle('show');
-        }, { passive: false });
-        
-        // Close dropdown when clicking outside
-        const closeDropdown = (e) => {
-            if (!newCustomSelect.contains(e.target)) {
-                newOptionsList.classList.remove('show');
-            }
-        };
-        
-        document.addEventListener('click', closeDropdown);
-        document.addEventListener('touchstart', closeDropdown, { passive: false });
-        
-        // Prevent body scrolling when dropdown is open
-        newOptionsList.addEventListener('touchmove', (e) => {
-            if (newOptionsList.classList.contains('show')) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-        
-        // Add keyboard navigation
-        newCustomSelect.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                newOptionsList.classList.toggle('show');
-            } else if (e.key === 'Escape') {
-                newOptionsList.classList.remove('show');
-            }
-        });
-        
-        // Add keyboard navigation for options
-        const options = newOptionsList.querySelectorAll('.option');
-        options.forEach((option, index) => {
-            option.setAttribute('tabindex', '0');
-            option.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    option.click();
-                } else if (e.key === 'ArrowDown') {
-                    e.preventDefault();
-                    const nextOption = options[index + 1];
-                    if (nextOption) nextOption.focus();
-                } else if (e.key === 'ArrowUp') {
-                    e.preventDefault();
-                    const prevOption = options[index - 1];
-                    if (prevOption) prevOption.focus();
-                }
-            });
-        });
+        // Initialize the workflow execution
+        initializeWorkflowExecution(workflow);
     }
 }
 
@@ -188,20 +111,6 @@ document.addEventListener('DOMContentLoaded', () => {
 // Add this to ensure dropdown is reinitialized after any workflow changes
 function reinitializeWorkflowDropdown() {
     initializeWorkflowDropdown();
-}
-
-// Show workflow creation page
-function showWorkflowCreation() {
-    const homepage = document.getElementById('homepage');
-    const workflowExecution = document.getElementById('workflowExecution');
-    const workflowCreation = document.getElementById('workflowCreation');
-    
-    if (homepage) homepage.style.display = 'none';
-    if (workflowExecution) workflowExecution.style.display = 'none';
-    if (workflowCreation) workflowCreation.style.display = 'block';
-    
-    // Initialize info buttons
-    initializeInfoButtons();
 }
 
 // Hide workflow creation page
@@ -866,44 +775,6 @@ document.getElementById('cancelWorkflowButton').addEventListener('click', () => 
         checkbox.checked = false;
     });
 });
-
-// Handle workflow selection change
-workflowSelect.addEventListener('change', function() {
-    const selectedValue = this.value;
-    if (selectedValue === 'create-new') {
-        showWorkflowCreation();
-    } else {
-        // Enable the perform button when a workflow is selected
-        const performButton = document.getElementById('performButton');
-        if (performButton) {
-            performButton.disabled = false;
-        }
-    }
-});
-
-// Add touch event handling for workflow selection
-workflowSelect.addEventListener('touchstart', function(e) {
-    e.preventDefault();
-    // Trigger the native select dropdown
-    this.click();
-}, { passive: false });
-
-// Add touch event handling for workflow options
-workflowSelect.addEventListener('touchend', function(e) {
-    e.preventDefault();
-    const selectedOption = this.options[this.selectedIndex];
-    if (selectedOption) {
-        if (selectedOption.value === 'create-new') {
-            showWorkflowCreation();
-        } else {
-            // Enable the perform button when a workflow is selected
-            const performButton = document.getElementById('performButton');
-            if (performButton) {
-                performButton.disabled = false;
-            }
-        }
-    }
-}, { passive: false });
 
 // Function to load word list
 async function loadWordList() {

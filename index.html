@@ -30,31 +30,21 @@
             <div class="selection-container">
                 <div class="selection-group">
                     <h2>Select Workflow</h2>
-                    <div class="card-grid" id="workflowGrid">
-                        <div class="selection-card" data-value="create-new">
-                            <div class="card-content">
-                                <i class="fas fa-plus-circle"></i>
-                                <span>Create New Workflow</span>
-                            </div>
-                        </div>
-                        <!-- Workflow cards will be dynamically added here -->
-                    </div>
-                </div>
-                
-                <div class="selection-group">
-                    <h2>Wordlist</h2>
-                    <div class="card-grid" id="wordlistGrid">
-                        <div class="selection-card" data-value="enuk">
-                            <div class="card-content">
-                                <i class="fas fa-book"></i>
-                                <span>ENUK Wordlist</span>
-                            </div>
+                    <div class="dropdown">
+                        <select id="workflowSelect" class="native-select">
+                            <option value="">Select a workflow...</option>
+                            <option value="create-new">Create New Workflow</option>
+                        </select>
+                        <div class="custom-select">
+                            <div class="selected-text">Select a workflow...</div>
+                            <div class="options-list"></div>
                         </div>
                     </div>
                 </div>
             </div>
             
             <div class="button-container">
+                <button id="createWorkflowButton" class="create-button">Create Workflow</button>
                 <button id="performButton" class="perform-button" disabled>Perform Workflow</button>
             </div>
         </div>
