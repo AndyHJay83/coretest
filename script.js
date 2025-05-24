@@ -1112,6 +1112,10 @@ function createOriginalLexFeature() {
     div.className = 'feature-section';
     div.innerHTML = `
         <h2 class="feature-title">ORIGINAL LEX</h2>
+        <div class="position-info">
+            <div class="position-display">Position: <span class="position-number">1</span></div>
+            <div class="possible-letters">Possible letters: <span class="letters-list"></span></div>
+        </div>
         <div class="lexicon-input">
             <input type="text" id="originalLexInput" placeholder="Enter a word">
             <button id="originalLexButton">SUBMIT</button>
@@ -1525,6 +1529,61 @@ function setupFeatureListeners(feature, callback) {
                 eeeNoBtn.addEventListener('touchstart', (e) => {
                     e.preventDefault();
                     eeeNoBtn.click();
+                }, { passive: false });
+            }
+            break;
+        }
+        
+        case 'originalLex': {
+            const originalLexButton = document.getElementById('originalLexButton');
+            const originalLexSkipButton = document.getElementById('originalLexSkipButton');
+            const originalLexInput = document.getElementById('originalLexInput');
+            
+            // Find position with most variance and update display
+            const { position, letters } = findPositionWithMostVariance(currentFilteredWords);
+            originalLexPosition = position;
+            
+            // Update position display
+            const positionNumber = document.querySelector('#originalLexFeature .position-number');
+            if (positionNumber) {
+                positionNumber.textContent = position + 1; // Convert to 1-based position
+            }
+            
+            // Update possible letters display
+            const lettersList = document.querySelector('#originalLexFeature .letters-list');
+            if (lettersList) {
+                lettersList.textContent = letters.join(', ');
+            }
+            
+            if (originalLexButton) {
+                originalLexButton.onclick = () => {
+                    const input = originalLexInput?.value.trim();
+                    if (input) {
+                        const filteredWords = filterWordsByOriginalLex(currentFilteredWords, originalLexPosition, input);
+                        callback(filteredWords);
+                        document.getElementById('originalLexFeature').dispatchEvent(new Event('completed'));
+                    } else {
+                        alert('Please enter a word');
+                    }
+                };
+                
+                // Add touch event for mobile
+                originalLexButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    originalLexButton.click();
+                }, { passive: false });
+            }
+            
+            if (originalLexSkipButton) {
+                originalLexSkipButton.onclick = () => {
+                    callback(currentFilteredWords);
+                    document.getElementById('originalLexFeature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                originalLexSkipButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    originalLexSkipButton.click();
                 }, { passive: false });
             }
             break;
@@ -2605,3 +2664,29 @@ document.addEventListener('DOMContentLoaded', function() {
 function reinitializeFeatureSelection() {
     initializeFeatureSelection();
 }
+
+// Add CSS for the new elements
+const originalLexStyle = document.createElement('style');
+originalLexStyle.textContent = `
+    .position-info {
+        margin: 10px 0;
+        padding: 10px;
+        background-color: #f5f5f5;
+        border-radius: 5px;
+    }
+    
+    .position-display {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    
+    .possible-letters {
+        font-size: 0.9em;
+        color: #666;
+    }
+    
+    .letters-list {
+        font-family: monospace;
+    }
+`;
+document.head.appendChild(originalLexStyle);
