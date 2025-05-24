@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const toggleButton = document.createElement('button');
         toggleButton.id = 'toggleSavedWorkflows';
         toggleButton.className = 'toggle-saved-workflows';
-        toggleButton.textContent = 'Show Saved Workflows';
+        toggleButton.textContent = 'Saved Workflows';
         
         // Add both click and touch events
         toggleButton.addEventListener('click', (e) => {
