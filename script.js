@@ -75,6 +75,10 @@ function initializeWorkflowDropdown() {
                 selectedText.textContent = option.textContent;
                 optionsList.classList.remove('show');
                 
+                // Trigger change event on the select element
+                const event = new Event('change', { bubbles: true });
+                workflowSelect.dispatchEvent(event);
+                
                 if (option.value === 'create-new') {
                     showWorkflowCreation();
                 }
@@ -86,6 +90,10 @@ function initializeWorkflowDropdown() {
                 workflowSelect.value = option.value;
                 selectedText.textContent = option.textContent;
                 optionsList.classList.remove('show');
+                
+                // Trigger change event on the select element
+                const event = new Event('change', { bubbles: true });
+                workflowSelect.dispatchEvent(event);
                 
                 if (option.value === 'create-new') {
                     showWorkflowCreation();
@@ -827,8 +835,15 @@ document.getElementById('cancelWorkflowButton').addEventListener('click', () => 
 
 // Handle workflow selection change
 workflowSelect.addEventListener('change', function() {
-    if (this.value === 'create-new') {
+    const selectedValue = this.value;
+    if (selectedValue === 'create-new') {
         showWorkflowCreation();
+    } else {
+        // Enable the perform button when a workflow is selected
+        const performButton = document.getElementById('performButton');
+        if (performButton) {
+            performButton.disabled = false;
+        }
     }
 });
 
@@ -843,8 +858,16 @@ workflowSelect.addEventListener('touchstart', function(e) {
 workflowSelect.addEventListener('touchend', function(e) {
     e.preventDefault();
     const selectedOption = this.options[this.selectedIndex];
-    if (selectedOption && selectedOption.value === 'create-new') {
-        showWorkflowCreation();
+    if (selectedOption) {
+        if (selectedOption.value === 'create-new') {
+            showWorkflowCreation();
+        } else {
+            // Enable the perform button when a workflow is selected
+            const performButton = document.getElementById('performButton');
+            if (performButton) {
+                performButton.disabled = false;
+            }
+        }
     }
 }, { passive: false });
 
