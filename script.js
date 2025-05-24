@@ -167,15 +167,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Add toggle button for saved workflows after the save workflow button
     const saveWorkflowButton = document.getElementById('saveWorkflowButton');
     if (saveWorkflowButton) {
+        // Remove existing button if it exists
+        const existingButton = document.getElementById('toggleSavedWorkflows');
+        if (existingButton) {
+            existingButton.remove();
+        }
+        
         const toggleButton = document.createElement('button');
         toggleButton.id = 'toggleSavedWorkflows';
         toggleButton.className = 'toggle-saved-workflows';
         toggleButton.textContent = 'Show Saved Workflows';
         
         // Add both click and touch events
-        toggleButton.addEventListener('click', toggleSavedWorkflows);
+        toggleButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('Toggle button clicked'); // Debug log
+            toggleSavedWorkflows();
+        });
+        
         toggleButton.addEventListener('touchstart', (e) => {
             e.preventDefault();
+            console.log('Toggle button touched'); // Debug log
             toggleSavedWorkflows();
         }, { passive: false });
         
@@ -2324,9 +2336,12 @@ function displaySavedWorkflows() {
 
 // Function to toggle saved workflows visibility
 function toggleSavedWorkflows() {
+    console.log('Toggle saved workflows called'); // Debug log
+    
     // Create modal if it doesn't exist
     let modal = document.getElementById('savedWorkflowsModal');
     if (!modal) {
+        console.log('Creating new modal'); // Debug log
         modal = document.createElement('div');
         modal.id = 'savedWorkflowsModal';
         modal.className = 'modal';
@@ -2359,6 +2374,7 @@ function toggleSavedWorkflows() {
 
     // Display the modal
     modal.style.display = 'block';
+    console.log('Modal displayed'); // Debug log
 
     // Update the workflows list
     const workflowsList = document.getElementById('savedWorkflowsList');
@@ -2473,6 +2489,7 @@ modalStyle.textContent = `
         font-size: 24px;
         cursor: pointer;
         color: #666;
+        padding: 0 8px;
     }
 
     .close-button:hover {
