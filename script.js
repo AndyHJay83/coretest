@@ -1242,6 +1242,14 @@ async function executeWorkflow(steps) {
             }
         });
         
+        // Clear any existing content in the workflow execution area
+        workflowExecution.innerHTML = '';
+        
+        // Create feature area container in the top third
+        const featureArea = document.createElement('div');
+        featureArea.className = 'feature-area';
+        workflowExecution.appendChild(featureArea);
+        
         // Display initial wordlist in the results area (bottom two-thirds)
         const resultsContainer = document.getElementById('results');
         if (resultsContainer) {
@@ -1263,7 +1271,9 @@ async function executeWorkflow(steps) {
                 continue;
             }
             
-            // Show the feature
+            // Move the feature to the feature area
+            featureArea.innerHTML = '';
+            featureArea.appendChild(featureElement);
             featureElement.style.display = 'block';
             console.log(`Showing feature: ${featureId}`);
             
