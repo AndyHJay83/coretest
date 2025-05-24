@@ -171,7 +171,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         toggleButton.id = 'toggleSavedWorkflows';
         toggleButton.className = 'toggle-saved-workflows';
         toggleButton.textContent = 'Show Saved Workflows';
-        toggleButton.onclick = toggleSavedWorkflows;
+        
+        // Add both click and touch events
+        toggleButton.addEventListener('click', toggleSavedWorkflows);
+        toggleButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            toggleSavedWorkflows();
+        }, { passive: false });
         
         // Insert the button after the save workflow button
         saveWorkflowButton.parentNode.insertBefore(toggleButton, saveWorkflowButton.nextSibling);
@@ -3138,6 +3144,8 @@ toggleButtonStyle.textContent = `
         box-sizing: border-box;
         line-height: 1;
         white-space: nowrap;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
     }
     
     .toggle-saved-workflows:hover {
