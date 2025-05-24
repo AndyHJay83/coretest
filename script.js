@@ -772,23 +772,14 @@ function saveWorkflow() {
         // Save to localStorage
         localStorage.setItem('workflows', JSON.stringify(workflows));
         
-        // Update workflow select
-        const workflowSelect = document.getElementById('workflowSelect');
-        if (workflowSelect) {
-            const option = document.createElement('option');
-            option.value = newWorkflow.name;
-            option.textContent = newWorkflow.name;
-            workflowSelect.appendChild(option);
-        }
-        
         // Clear form
         if (workflowNameInput) {
             workflowNameInput.value = '';
         }
         document.getElementById('selectedFeaturesList').innerHTML = '';
         
-        // Reinitialize dropdowns
-        initializeDropdowns();
+        // Reinitialize the workflow dropdown
+        initializeWorkflowDropdown();
         
         // Show success message and return to homepage
         alert('Workflow saved successfully!');
