@@ -242,12 +242,19 @@ function initializeWorkflowDropdown() {
             optionsList.style.display = isVisible ? 'none' : 'block';
             
             if (!isVisible) {
-                // Ensure proper positioning when showing
+                // Get the position of the custom select relative to the viewport
                 const customSelectRect = customSelect.getBoundingClientRect();
+                const dropdownRect = workflowDropdown.getBoundingClientRect();
+                
+                // Position the options list relative to the custom select
                 optionsList.style.position = 'absolute';
                 optionsList.style.top = `${customSelectRect.height}px`;
                 optionsList.style.left = '0';
                 optionsList.style.width = `${customSelectRect.width}px`;
+                optionsList.style.transform = 'none';
+                optionsList.style.opacity = '1';
+                optionsList.style.visibility = 'visible';
+                optionsList.style.zIndex = '10002';
             }
             console.log('Options list display:', optionsList.style.display);
             console.log('Options list classList:', optionsList.classList.toString());
@@ -264,12 +271,19 @@ function initializeWorkflowDropdown() {
             optionsList.style.display = isVisible ? 'none' : 'block';
             
             if (!isVisible) {
-                // Ensure proper positioning when showing
+                // Get the position of the custom select relative to the viewport
                 const customSelectRect = customSelect.getBoundingClientRect();
+                const dropdownRect = workflowDropdown.getBoundingClientRect();
+                
+                // Position the options list relative to the custom select
                 optionsList.style.position = 'absolute';
                 optionsList.style.top = `${customSelectRect.height}px`;
                 optionsList.style.left = '0';
                 optionsList.style.width = `${customSelectRect.width}px`;
+                optionsList.style.transform = 'none';
+                optionsList.style.opacity = '1';
+                optionsList.style.visibility = 'visible';
+                optionsList.style.zIndex = '10002';
             }
             console.log('Options list display:', optionsList.style.display);
             console.log('Options list classList:', optionsList.classList.toString());
