@@ -259,6 +259,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, { passive: false });
     }
     
+    // Initialize info buttons
+    initializeInfoButtons();
+    
     // Display saved workflows
     displaySavedWorkflows();
     
@@ -2393,23 +2396,26 @@ function filterWordsByPosition1(words, consonants) {
 
 // Function to display saved workflows in the workflow builder
 function displaySavedWorkflows() {
-    let savedWorkflowsContainer = document.getElementById('savedWorkflows');
+    console.log('Displaying saved workflows');
     
-    // Create the container if it doesn't exist
+    // Get or create the workflow creation container
+    let workflowCreation = document.getElementById('workflowCreation');
+    if (!workflowCreation) {
+        console.log('Creating workflow creation container');
+        workflowCreation = document.createElement('div');
+        workflowCreation.id = 'workflowCreation';
+        workflowCreation.style.display = 'none';
+        document.body.appendChild(workflowCreation);
+    }
+    
+    // Get or create the saved workflows container
+    let savedWorkflowsContainer = document.getElementById('savedWorkflows');
     if (!savedWorkflowsContainer) {
         console.log('Creating saved workflows container');
         savedWorkflowsContainer = document.createElement('div');
         savedWorkflowsContainer.id = 'savedWorkflows';
         savedWorkflowsContainer.className = 'saved-workflows-container';
-        
-        // Find the workflow creation container and append the saved workflows container
-        const workflowCreation = document.getElementById('workflowCreation');
-        if (workflowCreation) {
-            workflowCreation.appendChild(savedWorkflowsContainer);
-        } else {
-            console.error('Workflow creation container not found');
-            return;
-        }
+        workflowCreation.appendChild(savedWorkflowsContainer);
     }
     
     // Clear existing content
