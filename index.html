@@ -51,35 +51,42 @@
         <!-- Workflow Creation Page (Hidden by default) -->
         <div id="workflowCreation" class="workflow-creation" style="display: none;">
             <div class="workflow-header">
-                <h2>Create New Workflow</h2>
-                <div class="workflow-actions">
-                    <input type="text" id="workflowName" placeholder="Enter workflow name" class="workflow-name-input">
-                    <button id="saveWorkflowButton" class="save-button">Save Workflow</button>
-                    <button id="cancelWorkflowButton" class="back-button">Cancel</button>
-                </div>
+                <h2>Create Workflow</h2>
+                <button id="cancelWorkflowButton" class="cancel-button">Cancel</button>
             </div>
             
-            <div class="workflow-container">
-                <div class="available-features">
-                    <h3>Available Features</h3>
-                    <div class="feature-buttons" id="availableFeatures">
-                        <button class="feature-button" data-feature="eee" draggable="true">EEE?</button>
-                        <button class="feature-button" data-feature="position1" draggable="true">Position 1</button>
-                        <button class="feature-button" data-feature="o" draggable="true">O?</button>
-                        <button class="feature-button" data-feature="curved" draggable="true">CURVED</button>
-                        <button class="feature-button" data-feature="colour3" draggable="true">COLOUR3</button>
-                        <button class="feature-button" data-feature="lexicon" draggable="true">LEXICON</button>
-                        <button class="feature-button" data-feature="consonant" draggable="true">Consonants</button>
-                        <button class="feature-button" data-feature="vowel" draggable="true">VOWEL</button>
-                        <button class="feature-button" data-feature="shape" draggable="true">SHAPE</button>
+            <div class="workflow-content">
+                <div class="workflow-input">
+                    <input type="text" id="workflowName" placeholder="Enter workflow name">
+                </div>
+                
+                <div class="workflow-builder">
+                    <div class="available-features">
+                        <h3>Available Features</h3>
+                        <div id="availableFeatures" class="feature-buttons">
+                            <button class="feature-button" draggable="true" data-feature="position1">POSITION 1</button>
+                            <button class="feature-button" draggable="true" data-feature="vowel">VOWEL</button>
+                            <button class="feature-button" draggable="true" data-feature="o">O?</button>
+                            <button class="feature-button" draggable="true" data-feature="lexicon">LEXICON</button>
+                            <button class="feature-button" draggable="true" data-feature="eee">EEE?</button>
+                            <button class="feature-button" draggable="true" data-feature="originalLex">ORIGINAL LEX</button>
+                            <button class="feature-button" draggable="true" data-feature="consonant">CONSONANTS TOGETHER?</button>
+                            <button class="feature-button" draggable="true" data-feature="colour3">COLOUR3</button>
+                            <button class="feature-button" draggable="true" data-feature="shape">SHAPE</button>
+                            <button class="feature-button" draggable="true" data-feature="curved">CURVED</button>
+                        </div>
+                    </div>
+                    
+                    <div class="selected-features">
+                        <h3>Selected Features</h3>
+                        <div id="selectedFeaturesList" class="selected-features-list"></div>
                     </div>
                 </div>
                 
-                <div class="selected-features">
-                    <h3>Selected Features</h3>
-                    <div id="selectedFeaturesList" class="selected-features-list" ondragover="event.preventDefault();" ondrop="event.preventDefault();">
-                        <!-- Selected features will be displayed here -->
-                    </div>
+                <div id="savedWorkflows" class="saved-workflows"></div>
+                
+                <div class="workflow-actions">
+                    <button id="saveWorkflowButton" class="save-button">Save Workflow</button>
                 </div>
             </div>
         </div>

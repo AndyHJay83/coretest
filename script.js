@@ -56,6 +56,9 @@ function showWorkflowCreation() {
     document.getElementById('homepage').style.display = 'none';
     document.getElementById('workflowCreation').style.display = 'block';
     document.getElementById('workflowExecution').style.display = 'none';
+    
+    // Display saved workflows
+    displaySavedWorkflows();
 }
 
 // Hide workflow creation page
@@ -2339,4 +2342,127 @@ function filterWordsByPosition1(words, consonants) {
             return false;
         }
     });
+}
+
+// Function to display saved workflows in the workflow builder
+function displaySavedWorkflows() {
+    const savedWorkflowsContainer = document.getElementById('savedWorkflows');
+    if (!savedWorkflowsContainer) {
+        console.error('Saved workflows container not found');
+        return;
+    }
+    
+    // Clear existing content
+    savedWorkflowsContainer.innerHTML = '';
+    
+    // Add title
+    const title = document.createElement('h3');
+    title.textContent = 'Saved Workflows';
+    savedWorkflowsContainer.appendChild(title);
+    
+    // Create list container
+    const workflowList = document.createElement('div');
+    workflowList.className = 'saved-workflow-list';
+    
+    // Add each workflow
+    workflows.forEach(workflow => {
+        const workflowItem = document.createElement('div');
+        workflowItem.className = 'saved-workflow-item';
+        
+        // Workflow name
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = workflow.name;
+        nameSpan.className = 'workflow-name';
+        nameSpan.onclick = () => editWorkflow(workflow);
+        workflowItem.appendChild(nameSpan);
+        
+        // Delete button
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = '×';
+        deleteButton.className = 'delete-workflow';
+        deleteButton.onclick = (e) => {
+            e.stopPropagation();
+            deleteWorkflow(workflow);
+        };
+        workflowItem.appendChild(deleteButton);
+        
+        workflowList.appendChild(workflowItem);
+    });
+    
+    savedWorkflowsContainer.appendChild(workflowList);
+}
+
+// Function to edit a workflow
+function editWorkflow(workflow) {
+    // Set workflow name
+    const workflowNameInput = document.getElementById('workflowName');
+    if (workflowNameInput) {
+        workflowNameInput.value = workflow.name;
+    }
+    
+    // Clear existing selected features
+    const selectedFeaturesList = document.getElementById('selectedFeaturesList');
+    if (selectedFeaturesList) {
+        selectedFeaturesList.innerHTML = '';
+    }
+    
+    // Add workflow steps to selected features
+    workflow.steps.forEach(step => {
+        const featureItem = document.createElement('div');
+        featureItem.className = 'selected-feature-item';
+        featureItem.setAttribute('data-feature', step.feature);
+        featureItem.draggable = true;
+        
+        const featureName = document.createElement('span');
+        featureName.textContent = step.feature.toUpperCase();
+        featureItem.appendChild(featureName);
+        
+        const removeButton = document.createElement('button');
+        removeButton.className = 'remove-feature';
+        removeButton.textContent = '×';
+        removeButton.onclick = () => featureItem.remove();
+        featureItem.appendChild(removeButton);
+        
+        // Add drag and drop for reordering
+        featureItem.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', step.feature);
+            e.dataTransfer.effectAllowed = 'move';
+            featureItem.classList.add('dragging');
+        });
+        
+        featureItem.addEventListener('dragend', () => {
+            featureItem.classList.remove('dragging');
+        });
+        
+        selectedFeaturesList.appendChild(featureItem);
+    });
+    
+    // Show workflow creation page
+    showWorkflowCreation();
+}
+
+// Function to delete a workflow
+function deleteWorkflow(workflow) {
+    if (confirm(`Are you sure you want to delete the workflow "${workflow.name}"?`)) {
+        // Remove from workflows array
+        const index = workflows.findIndex(w => w.id === workflow.id);
+        if (index !== -1) {
+            workflows.splice(index, 1);
+            
+            // Update localStorage
+            localStorage.setItem('workflows', JSON.stringify(workflows));
+            
+            // Update workflow select dropdown
+            const workflowSelect = document.getElementById('workflowSelect');
+            if (workflowSelect) {
+                const option = workflowSelect.querySelector(`option[value="${workflow.name}"]`);
+                if (option) {
+                    option.remove();
+                }
+            }
+            
+            // Update saved workflows display
+            displaySavedWorkflows();
+        }
+    }
 }
