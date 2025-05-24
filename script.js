@@ -91,40 +91,61 @@ function initializeWorkflowDropdown() {
         // Add CSS for options list
         const style = document.createElement('style');
         style.textContent = `
+            .dropdown {
+                position: relative;
+                width: 100%;
+                max-width: 300px;
+                margin: 0 auto;
+            }
             .custom-select {
                 position: relative;
                 width: 100%;
                 cursor: pointer;
+                background: white;
             }
             .selected-text {
                 padding: 8px 12px;
                 background: white;
                 border: 1px solid #ccc;
                 border-radius: 4px;
+                position: relative;
+            }
+            .selected-text:after {
+                content: '▼';
+                position: absolute;
+                right: 10px;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 12px;
+                color: #666;
             }
             .options-list {
                 display: none;
                 position: absolute;
-                top: 100%;
+                top: calc(100% + 4px);
                 left: 0;
                 right: 0;
                 background: white;
                 border: 1px solid #ccc;
                 border-radius: 4px;
-                margin-top: 4px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
                 max-height: 200px;
                 overflow-y: auto;
                 z-index: 1000;
             }
             .options-list.show {
-                display: block;
+                display: block !important;
             }
             .option {
                 padding: 8px 12px;
                 cursor: pointer;
+                transition: background-color 0.2s;
             }
             .option:hover {
                 background: #f0f0f0;
+            }
+            .option.selected {
+                background: #e0e0e0;
             }
         `;
         document.head.appendChild(style);
@@ -207,6 +228,7 @@ function initializeWorkflowDropdown() {
             optionsList.classList.toggle('show');
             optionsList.style.display = isVisible ? 'none' : 'block';
             console.log('Options list display:', optionsList.style.display);
+            console.log('Options list classList:', optionsList.classList.toString());
         };
         
         const toggleTouchHandler = (e) => {
@@ -217,6 +239,7 @@ function initializeWorkflowDropdown() {
             optionsList.classList.toggle('show');
             optionsList.style.display = isVisible ? 'none' : 'block';
             console.log('Options list display:', optionsList.style.display);
+            console.log('Options list classList:', optionsList.classList.toString());
         };
         
         // Store toggle handlers on the custom select element
