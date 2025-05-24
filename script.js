@@ -124,7 +124,7 @@ function initializeWorkflowDropdown() {
             }
             .options-list {
                 position: absolute;
-                top: calc(100% + 4px);
+                top: 100%;
                 left: 0;
                 right: 0;
                 background: white;
@@ -139,6 +139,8 @@ function initializeWorkflowDropdown() {
                 transform: none;
                 opacity: 1;
                 visibility: visible;
+                margin-top: 4px;
+                width: 100%;
             }
             .options-list.show {
                 display: block !important;
