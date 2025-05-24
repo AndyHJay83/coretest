@@ -210,7 +210,7 @@ function addFeatureToList(feature) {
 function setupButtonListeners() {
     // Create Workflow button
     const createWorkflowButton = document.getElementById('createWorkflowButton');
-    if (createButton) {
+    if (createWorkflowButton) {
         createWorkflowButton.addEventListener('click', showWorkflowCreation);
         createWorkflowButton.addEventListener('touchstart', (e) => {
             e.preventDefault();
@@ -241,30 +241,10 @@ function setupButtonListeners() {
     // Perform button
     const performButton = document.getElementById('performButton');
     if (performButton) {
-        performButton.addEventListener('click', async () => {
-            const selectedWorkflow = workflowSelect.value;
-            if (!selectedWorkflow) {
-                alert('Please select a workflow first');
-                return;
-            }
-            try {
-                const workflow = workflows.find(w => w.name === selectedWorkflow);
-                if (!workflow) {
-                    throw new Error('Selected workflow not found');
-                }
-                document.getElementById('homepage').style.display = 'none';
-                document.getElementById('workflowCreation').style.display = 'none';
-                const workflowExecution = document.getElementById('workflowExecution');
-                workflowExecution.style.display = 'block';
-                await executeWorkflow(workflow.steps);
-            } catch (error) {
-                console.error('Error executing workflow:', error);
-                alert('Error executing workflow: ' + error.message);
-            }
-        });
+        performButton.addEventListener('click', performWorkflow);
         performButton.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            performButton.click();
+            performWorkflow();
         }, { passive: false });
     }
     
