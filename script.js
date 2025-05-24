@@ -101,16 +101,19 @@ function initializeWorkflowDropdown() {
             .dropdown-group {
                 position: relative;
                 width: 100%;
-                max-width: 300px;
-                margin: 0 auto 20px;
+                /* max-width: 300px; */
+                /* margin: 0 auto 20px; */
+                box-sizing: border-box;
             }
             .dropdown {
                 position: relative;
                 width: 100%;
-                max-width: 300px;
-                margin: 0 auto;
+                /* max-width: 300px; */
+                /* margin: 0 auto; */
+                margin-bottom: 15px;
                 z-index: 9999;
                 display: block;
+                box-sizing: border-box;
             }
             .custom-select {
                 position: relative;
@@ -119,6 +122,7 @@ function initializeWorkflowDropdown() {
                 background: white;
                 z-index: 10000;
                 display: block;
+                box-sizing: border-box;
             }
             .selected-text {
                 padding: 8px 12px;
