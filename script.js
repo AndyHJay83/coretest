@@ -73,6 +73,72 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initialize workflow dropdown
     initializeWorkflowDropdown();
     
+    // Set up drag and drop for feature buttons
+    const featureButtons = document.querySelectorAll('.feature-button');
+    
+    featureButtons.forEach(button => {
+        button.setAttribute('draggable', 'true');
+        
+        button.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', button.dataset.feature);
+            button.classList.add('dragging');
+        });
+        
+        button.addEventListener('dragend', () => {
+            button.classList.remove('dragging');
+        });
+    });
+    
+    if (selectedFeaturesList) {
+        selectedFeaturesList.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            selectedFeaturesList.classList.add('drag-over');
+        });
+        
+        selectedFeaturesList.addEventListener('dragleave', () => {
+            selectedFeaturesList.classList.remove('drag-over');
+        });
+        
+        selectedFeaturesList.addEventListener('drop', (e) => {
+            e.preventDefault();
+            selectedFeaturesList.classList.remove('drag-over');
+            
+            const feature = e.dataTransfer.getData('text/plain');
+            if (feature) {
+                // Check if feature is already selected
+                const existingFeature = selectedFeaturesList.querySelector(`[data-feature="${feature}"]`);
+                if (!existingFeature) {
+                    const featureItem = document.createElement('div');
+                    featureItem.className = 'selected-feature-item';
+                    featureItem.setAttribute('data-feature', feature);
+                    featureItem.draggable = true;
+                    
+                    const featureName = document.createElement('span');
+                    featureName.textContent = feature.toUpperCase();
+                    featureItem.appendChild(featureName);
+                    
+                    const removeButton = document.createElement('button');
+                    removeButton.className = 'remove-feature';
+                    removeButton.textContent = '×';
+                    removeButton.onclick = () => featureItem.remove();
+                    featureItem.appendChild(removeButton);
+                    
+                    // Add drag and drop for reordering
+                    featureItem.addEventListener('dragstart', (e) => {
+                        e.dataTransfer.setData('text/plain', feature);
+                        featureItem.classList.add('dragging');
+                    });
+                    
+                    featureItem.addEventListener('dragend', () => {
+                        featureItem.classList.remove('dragging');
+                    });
+                    
+                    selectedFeaturesList.appendChild(featureItem);
+                }
+            }
+        });
+    }
+    
     // Set up event listeners
     if (createWorkflowButton) {
         createWorkflowButton.addEventListener('click', showWorkflowCreation);
