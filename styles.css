@@ -1477,8 +1477,8 @@ input:checked + .slider:before {
 /* Feature buttons */
 .feature-button {
     display: inline-block;
-    padding: 8px 16px;
-    margin: 4px;
+    padding: 6px 12px;
+    margin: 2px;
     background-color: #f0f0f0;
     border: 1px solid #ddd;
     border-radius: 4px;
@@ -1497,8 +1497,8 @@ input:checked + .slider:before {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 16px;
-    margin: 4px;
+    padding: 6px 12px;
+    margin: 2px;
     background-color: #e8f5e9;
     border: 1px solid #c8e6c9;
     border-radius: 4px;
@@ -1530,8 +1530,8 @@ input:checked + .slider:before {
 #availableFeatures {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    padding: 16px;
+    gap: 10px;
+    padding: 10px;
     background-color: #fafafa;
     border-radius: 8px;
     margin-bottom: 16px;
@@ -1540,8 +1540,8 @@ input:checked + .slider:before {
 #selectedFeaturesList {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    padding: 16px;
+    gap: 10px;
+    padding: 10px;
     background-color: #f5f5f5;
     border-radius: 8px;
     min-height: 60px;
@@ -1572,9 +1572,9 @@ input:checked + .slider:before {
     }
     
     .feature-button, .selected-feature-item {
-        padding: 15px;
-        margin: 10px 0;
-        font-size: 16px;
+        padding: 8px 12px;
+        margin: 2px;
+        font-size: 14px;
     }
     
     .remove-feature {
