@@ -18,6 +18,7 @@ let eeeCompleted = false;
 let lexiconCompleted = false;
 let originalLexCompleted = false;
 let originalLexPosition = -1;
+let currentPosition1Word = '';
 
 // Workflow Management
 let workflows = JSON.parse(localStorage.getItem('workflows')) || [];
@@ -1202,7 +1203,7 @@ function setupFeatureListeners(feature, callback) {
                         if (consonants.length >= 2) {
                             const filteredWords = filterWordsByPosition1(currentFilteredWords, consonants);
                             // Store the input word for vowel feature
-                            currentPosition1Word = input;
+                            currentPosition1Word = input.toUpperCase(); // Ensure it's uppercase
                             callback(filteredWords);
                             document.getElementById('position1Feature').dispatchEvent(new Event('completed'));
                         } else {
@@ -1487,6 +1488,10 @@ function setupFeatureListeners(feature, callback) {
             
             if (eeeButton) {
                 eeeButton.onclick = () => {
+                    if (!currentPosition1Word) {
+                        alert('Please complete the Position 1 feature first');
+                        return;
+                    }
                     const filteredWords = filterWordsByEee(currentFilteredWords, 'E');
                     callback(filteredWords);
                     document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
@@ -1501,6 +1506,10 @@ function setupFeatureListeners(feature, callback) {
             
             if (eeeYesBtn) {
                 eeeYesBtn.onclick = () => {
+                    if (!currentPosition1Word) {
+                        alert('Please complete the Position 1 feature first');
+                        return;
+                    }
                     const filteredWords = filterWordsByEee(currentFilteredWords, 'YES');
                     callback(filteredWords);
                     document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
@@ -1515,6 +1524,10 @@ function setupFeatureListeners(feature, callback) {
             
             if (eeeNoBtn) {
                 eeeNoBtn.onclick = () => {
+                    if (!currentPosition1Word) {
+                        alert('Please complete the Position 1 feature first');
+                        return;
+                    }
                     const filteredWords = filterWordsByEee(currentFilteredWords, 'NO');
                     callback(filteredWords);
                     document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
@@ -1710,6 +1723,7 @@ function resetApp() {
     selectedCurvedLetter = null;
     hasO = null;
     currentFilteredWordsForVowels = [];
+    currentPosition1Word = ''; // Reset the Position 1 word
     
     // Clear all results and show full wordlist
     displayResults(originalFilteredWords);
