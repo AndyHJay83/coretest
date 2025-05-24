@@ -2621,7 +2621,7 @@ function initializeDropdowns() {
             });
             
             // Add touch handler for mobile
-            customOption.addEventListener('touchstart', (e) => {
+            customOption.addEventListener('touchend', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 selectOption(option.value, option.textContent, customOption);
@@ -2641,7 +2641,7 @@ function initializeDropdowns() {
         });
         
         // Add touch handler for mobile
-        customSelect.addEventListener('touchstart', (e) => {
+        customSelect.addEventListener('touchend', (e) => {
             e.preventDefault();
             e.stopPropagation();
             toggleDropdown(optionsList, customSelect);
@@ -2781,6 +2781,13 @@ function preventScroll(e) {
 // Initialize dropdowns when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     initializeDropdowns();
+    
+    // Add touch event listeners to prevent default behavior
+    document.querySelectorAll('.custom-select, .option').forEach(element => {
+        element.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+        }, { passive: false });
+    });
 });
 
 // Reinitialize dropdowns when workflow dropdown changes
