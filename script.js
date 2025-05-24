@@ -2594,65 +2594,73 @@ function initializeDropdowns() {
     const dropdowns = document.querySelectorAll('.dropdown');
     
     dropdowns.forEach(dropdown => {
-        const select = dropdown.querySelector('select');
+        const nativeSelect = dropdown.querySelector('.native-select');
         const customSelect = dropdown.querySelector('.custom-select');
         const selectedText = customSelect.querySelector('.selected-text');
         const optionsList = customSelect.querySelector('.options-list');
-        
-        // Add max-height and overflow-y to make options list scrollable
-        optionsList.style.maxHeight = '200px';
-        optionsList.style.overflowY = 'auto';
         
         // Clear existing options
         optionsList.innerHTML = '';
         
         // Add options to custom dropdown
-        Array.from(select.options).forEach(option => {
+        Array.from(nativeSelect.options).forEach(option => {
             const customOption = document.createElement('div');
             customOption.className = 'option';
             customOption.textContent = option.textContent;
             customOption.setAttribute('data-value', option.value);
-            customOption.setAttribute('tabindex', '0');
             
-            // Add click handler for desktop
+            // Add click handler
             customOption.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                select.value = option.value;
+                nativeSelect.value = option.value;
                 selectedText.textContent = option.textContent;
                 optionsList.classList.remove('show');
-                select.dispatchEvent(new Event('change'));
+                customSelect.classList.remove('active');
+                
+                // Update selected state
+                optionsList.querySelectorAll('.option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                customOption.classList.add('selected');
+                
+                // Trigger change event
+                const event = new Event('change', { bubbles: true });
+                nativeSelect.dispatchEvent(event);
             });
             
             // Add touch handler for mobile
             customOption.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                select.value = option.value;
+                nativeSelect.value = option.value;
                 selectedText.textContent = option.textContent;
                 optionsList.classList.remove('show');
-                select.dispatchEvent(new Event('change'));
+                customSelect.classList.remove('active');
+                
+                // Update selected state
+                optionsList.querySelectorAll('.option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                customOption.classList.add('selected');
+                
+                // Trigger change event
+                const event = new Event('change', { bubbles: true });
+                nativeSelect.dispatchEvent(event);
             }, { passive: false });
-            
-            // Add keyboard navigation
-            customOption.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    customOption.click();
-                }
-            });
             
             optionsList.appendChild(customOption);
         });
         
         // Set initial selected text
-        selectedText.textContent = select.options[select.selectedIndex].text;
+        selectedText.textContent = nativeSelect.options[nativeSelect.selectedIndex].text;
         
         // Add click handler for the custom select
         customSelect.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
             optionsList.classList.toggle('show');
+            customSelect.classList.toggle('active');
         });
         
         // Add touch handler for mobile
@@ -2660,22 +2668,14 @@ function initializeDropdowns() {
             e.preventDefault();
             e.stopPropagation();
             optionsList.classList.toggle('show');
+            customSelect.classList.toggle('active');
         }, { passive: false });
-        
-        // Add keyboard navigation for the select
-        customSelect.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                optionsList.classList.toggle('show');
-            } else if (e.key === 'Escape') {
-                optionsList.classList.remove('show');
-            }
-        });
         
         // Close dropdown when clicking outside
         const closeDropdown = (e) => {
             if (!customSelect.contains(e.target)) {
                 optionsList.classList.remove('show');
+                customSelect.classList.remove('active');
             }
         };
         
@@ -2688,8 +2688,45 @@ function initializeDropdowns() {
                 e.preventDefault();
             }
         }, { passive: false });
+        
+        // Add keyboard navigation
+        customSelect.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                optionsList.classList.toggle('show');
+                customSelect.classList.toggle('active');
+            } else if (e.key === 'Escape') {
+                optionsList.classList.remove('show');
+                customSelect.classList.remove('active');
+            }
+        });
+        
+        // Add keyboard navigation for options
+        const options = optionsList.querySelectorAll('.option');
+        options.forEach((option, index) => {
+            option.setAttribute('tabindex', '0');
+            option.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    option.click();
+                } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    const nextOption = options[index + 1];
+                    if (nextOption) nextOption.focus();
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    const prevOption = options[index - 1];
+                    if (prevOption) prevOption.focus();
+                }
+            });
+        });
     });
 }
+
+// Initialize dropdowns when the DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    initializeDropdowns();
+});
 
 // Initialize drag and drop functionality
 function initializeDragAndDrop() {
