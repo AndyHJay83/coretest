@@ -919,7 +919,9 @@ async function executeWorkflow(steps) {
             homeButton.className = 'home-button';
             homeButton.innerHTML = '⌂';
             homeButton.title = 'Return to Home';
-            homeButton.onclick = () => {
+            
+            // Function to handle home button action
+            const handleHomeAction = () => {
                 // Hide workflow execution
                 if (workflowExecution) {
                     workflowExecution.style.display = 'none';
@@ -936,6 +938,14 @@ async function executeWorkflow(steps) {
                 // Remove home button
                 homeButton.remove();
             };
+            
+            // Add both click and touch events
+            homeButton.addEventListener('click', handleHomeAction);
+            homeButton.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                handleHomeAction();
+            }, { passive: false });
+            
             // Insert home button next to the header
             const header = document.querySelector('.header');
             if (header) {
@@ -951,11 +961,21 @@ async function executeWorkflow(steps) {
             resetButton.className = 'reset-workflow-button';
             resetButton.innerHTML = '↺';
             resetButton.title = 'Reset Workflow';
-            resetButton.onclick = () => {
+            
+            // Function to handle reset action
+            const handleResetAction = () => {
                 if (currentWorkflow) {
                     executeWorkflow(currentWorkflow.steps);
                 }
             };
+            
+            // Add both click and touch events
+            resetButton.addEventListener('click', handleResetAction);
+            resetButton.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                handleResetAction();
+            }, { passive: false });
+            
             document.body.appendChild(resetButton);
         }
         
@@ -2808,3 +2828,63 @@ homeButtonStyle.textContent = `
     }
 `;
 document.head.appendChild(homeButtonStyle);
+
+// Update CSS for buttons to improve touch targets
+const buttonStyles = document.createElement('style');
+buttonStyles.textContent = `
+    .reset-workflow-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background-color: rgba(0, 0, 0, 0.75);
+        color: white;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        transition: background-color 0.2s;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+    }
+    
+    .reset-workflow-button:hover {
+        background-color: rgba(0, 0, 0, 0.9);
+    }
+    
+    .reset-workflow-button:active {
+        transform: scale(0.95);
+    }
+    
+    .home-button {
+        background: none;
+        border: none;
+        color: #333;
+        font-size: 24px;
+        cursor: pointer;
+        padding: 10px;
+        margin-right: 10px;
+        transition: color 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 48px;
+        min-height: 48px;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+    }
+    
+    .home-button:hover {
+        color: #666;
+    }
+    
+    .home-button:active {
+        transform: scale(0.95);
+    }
+`;
+document.head.appendChild(buttonStyles);
