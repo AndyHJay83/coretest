@@ -100,17 +100,21 @@ function performWorkflow(workflowId) {
     const workflows = JSON.parse(localStorage.getItem('workflows') || '[]');
     const workflow = workflows.find(w => w.id === workflowId);
     
-    if (workflow) {
-        // Store the selected workflow ID
-        localStorage.setItem('selectedWorkflowId', workflowId);
-        
-        // Show the workflow execution page
-        document.getElementById('homepageContent').style.display = 'none';
-        document.getElementById('workflowExecutionContent').style.display = 'block';
-        
-        // Initialize the workflow execution
-        initializeWorkflowExecution(workflow);
+    if (!workflow) {
+        console.error('Selected workflow not found');
+        alert('Error: Selected workflow not found');
+        return;
     }
+    
+    // Store the selected workflow ID
+    localStorage.setItem('selectedWorkflowId', workflowId);
+    
+    // Show the workflow execution page
+    document.getElementById('homepage').style.display = 'none';
+    document.getElementById('workflowExecution').style.display = 'block';
+    
+    // Initialize the workflow execution
+    initializeWorkflowExecution(workflow);
 }
 
 // Add this to ensure dropdown is initialized when the page loads
@@ -3059,99 +3063,4 @@ document.addEventListener('DOMContentLoaded', function() {
 function showWorkflowCreation() {
     // ... existing code ...
     initializeInfoButtons();
-}
-
-// Homepage dropdown initialization
-function initializeHomepageDropdowns() {
-    const workflowGrid = document.getElementById('workflowGrid');
-    const wordlistGrid = document.getElementById('wordlistGrid');
-    const performButton = document.getElementById('performButton');
-    
-    let selectedWorkflow = null;
-    
-    // Initialize workflow cards
-    function initializeWorkflowCards() {
-        // Clear existing cards except the "Create New" card
-        const createNewCard = workflowGrid.querySelector('[data-value="create-new"]');
-        workflowGrid.innerHTML = '';
-        workflowGrid.appendChild(createNewCard);
-        
-        // Add saved workflows
-        workflows.forEach(workflow => {
-            const card = document.createElement('div');
-            card.className = 'selection-card';
-            card.setAttribute('data-value', workflow.name);
-            
-            card.innerHTML = `
-                <div class="card-content">
-                    <i class="fas fa-tasks"></i>
-                    <span>${workflow.name}</span>
-                </div>
-            `;
-            
-            card.addEventListener('click', () => selectWorkflow(workflow.name));
-            card.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                selectWorkflow(workflow.name);
-            }, { passive: false });
-            
-            workflowGrid.appendChild(card);
-        });
-    }
-    
-    // Handle workflow selection
-    function selectWorkflow(value) {
-        // Remove selected class from all workflow cards
-        workflowGrid.querySelectorAll('.selection-card').forEach(card => {
-            card.classList.remove('selected');
-        });
-        
-        // Add selected class to clicked card
-        const selectedCard = workflowGrid.querySelector(`[data-value="${value}"]`);
-        if (selectedCard) {
-            selectedCard.classList.add('selected');
-        }
-        
-        selectedWorkflow = value;
-        updatePerformButton();
-        
-        if (value === 'create-new') {
-            showWorkflowCreation();
-        }
-    }
-    
-    // Update perform button state
-    function updatePerformButton() {
-        performButton.disabled = !selectedWorkflow || selectedWorkflow === 'create-new';
-    }
-    
-    // Initialize workflow cards
-    initializeWorkflowCards();
-    
-    // Handle perform button click
-    performButton.addEventListener('click', () => {
-        if (selectedWorkflow && selectedWorkflow !== 'create-new') {
-            const workflow = workflows.find(w => w.name === selectedWorkflow);
-            if (workflow) {
-                executeWorkflow(workflow.steps);
-            }
-        }
-    });
-    
-    // Handle create new workflow card click
-    const createNewCard = workflowGrid.querySelector('[data-value="create-new"]');
-    if (createNewCard) {
-        createNewCard.addEventListener('click', () => {
-            showWorkflowCreation();
-        });
-        createNewCard.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            showWorkflowCreation();
-        }, { passive: false });
-    }
-}
-
-// Update the reinitialize function
-function reinitializeWorkflowDropdown() {
-    initializeHomepageDropdowns();
 }
