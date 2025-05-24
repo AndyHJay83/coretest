@@ -97,8 +97,13 @@ function showWorkflowCreation() {
 }
 
 function performWorkflow(workflowId) {
+    console.log('Performing workflow with ID:', workflowId); // Debug log
+    
     const workflows = JSON.parse(localStorage.getItem('workflows') || '[]');
+    console.log('Available workflows:', workflows); // Debug log
+    
     const workflow = workflows.find(w => w.id === workflowId);
+    console.log('Found workflow:', workflow); // Debug log
     
     if (!workflow) {
         console.error('Selected workflow not found');
@@ -750,6 +755,8 @@ function saveWorkflow() {
             name: workflowName,
             steps: selectedFeatures.map(feature => ({ feature }))
         };
+        
+        console.log('Saving new workflow:', newWorkflow); // Debug log
         
         // Add to workflows array
         workflows.push(newWorkflow);
