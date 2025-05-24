@@ -139,7 +139,7 @@ async function performWorkflow() {
         resultsContainer.innerHTML = '';
         
         // Get the features from the workflow
-        const features = workflow.selectedFeatures || [];
+        const features = workflow.steps.map(step => step.feature);
         console.log('Workflow features:', features);
         
         // Create and display each feature section
@@ -191,8 +191,9 @@ async function performWorkflow() {
             featureArea.appendChild(featureSection);
         });
 
-        // Display initial word count
+        // Display initial word count and results
         updateWordCount(currentFilteredWords.length);
+        displayResults(currentFilteredWords);
         
         // Set up event listeners for the first feature
         if (features.length > 0) {
