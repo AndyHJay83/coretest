@@ -35,6 +35,7 @@ const performButton = document.getElementById('performButton');
 
 // Function to initialize workflow dropdown
 function initializeWorkflowDropdown() {
+    const workflowSelect = document.getElementById('workflowSelect');
     if (!workflowSelect) return;
 
     // Clear existing options except the first one
@@ -49,6 +50,29 @@ function initializeWorkflowDropdown() {
         option.textContent = workflow.name;
         workflowSelect.appendChild(option);
     });
+
+    // Initialize the custom dropdown for workflow select
+    const workflowDropdown = workflowSelect.closest('.dropdown');
+    if (workflowDropdown) {
+        const customSelect = workflowDropdown.querySelector('.custom-select');
+        const selectedText = customSelect.querySelector('.selected-text');
+        const optionsList = customSelect.querySelector('.options-list');
+        
+        // Clear existing options
+        optionsList.innerHTML = '';
+        
+        // Add options to custom dropdown
+        Array.from(workflowSelect.options).forEach(option => {
+            const customOption = document.createElement('div');
+            customOption.className = 'option';
+            customOption.setAttribute('data-value', option.value);
+            customOption.textContent = option.textContent;
+            optionsList.appendChild(customOption);
+        });
+        
+        // Set initial selected text
+        selectedText.textContent = workflowSelect.options[workflowSelect.selectedIndex].text;
+    }
 }
 
 // Show workflow creation page
@@ -2040,7 +2064,7 @@ function deleteWorkflow(workflow) {
     }
 }
 
-// Enhanced dropdown functionality for PWA mode
+// Function to initialize dropdowns
 function initializeDropdowns() {
     const dropdowns = document.querySelectorAll('.dropdown');
     
@@ -2122,16 +2146,6 @@ function initializeDropdowns() {
             });
         }
     });
-}
-
-// Initialize dropdowns when the DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    initializeDropdowns();
-});
-
-// Re-initialize dropdowns when new content is added
-function reinitializeDropdowns() {
-    initializeDropdowns();
 }
 
 // Initialize drag and drop functionality
