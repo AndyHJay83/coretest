@@ -1214,6 +1214,7 @@ input:checked + .slider:before {
     gap: 20px;
 }
 
+/* Header with Create/Cancel buttons */
 .workflow-header {
     display: flex;
     justify-content: space-between;
@@ -1223,23 +1224,44 @@ input:checked + .slider:before {
     top: 0;
     background: #fff;
     z-index: 100;
+    width: 100%;
+}
+
+/* Workflow name input section */
+.workflow-name-section {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 20px;
 }
 
 .workflow-name-input {
-    width: 100%;
+    flex: 1;
     padding: 12px;
     font-size: 16px;
     border: 2px solid #ddd;
     border-radius: 8px;
-    margin-bottom: 20px;
 }
 
+.save-workflow-button {
+    padding: 12px 24px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+/* Features section */
 .workflow-content {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
     margin-bottom: 20px;
     min-height: 300px;
+    width: 100%;
 }
 
 .available-features, .selected-features {
@@ -1260,7 +1282,9 @@ input:checked + .slider:before {
     background: rgba(0, 123, 255, 0.1);
 }
 
+/* Saved workflows section */
 .saved-workflows {
+    width: 100%;
     margin-top: 20px;
     padding: 15px;
     background: #f5f5f5;
@@ -1269,16 +1293,84 @@ input:checked + .slider:before {
     overflow-y: auto;
 }
 
+/* Feature buttons */
+.feature-button {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+    transition: all 0.2s ease;
+}
+
+.feature-button:hover {
+    background: #f0f0f0;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.feature-button.dragging {
+    opacity: 0.5;
+    background: #e0e0e0;
+}
+
+/* Selected feature items */
+.selected-feature-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    margin: 8px 0;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+}
+
+.selected-feature-item.dragging {
+    opacity: 0.5;
+    background: #e0e0e0;
+}
+
+.remove-feature {
+    background: none;
+    border: none;
+    color: #ff4444;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0 8px;
+}
+
+.remove-feature:hover {
+    color: #cc0000;
+}
+
 /* Mobile-specific styles */
 @media (max-width: 768px) {
     .workflow-creation {
         padding: 15px;
-        padding-top: 60px; /* Keep increased padding for mobile */
+        padding-top: 60px;
     }
     
     .workflow-content {
         grid-template-columns: 1fr 1fr; /* Keep side by side even on mobile */
         gap: 10px;
+    }
+    
+    .workflow-name-section {
+        flex-direction: column;
+    }
+    
+    .save-workflow-button {
+        width: 100%;
     }
     
     .available-features, .selected-features {
@@ -1324,66 +1416,6 @@ input:checked + .slider:before {
 
 .cancel-button:hover {
     background: #d32f2f;
-}
-
-/* Feature button styles */
-.feature-button {
-    display: block;
-    width: 100%;
-    padding: 12px;
-    margin: 8px 0;
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    cursor: pointer;
-    user-select: none;
-    -webkit-user-select: none;
-    touch-action: none;
-    transition: all 0.2s ease;
-}
-
-.feature-button:hover {
-    background: #f0f0f0;
-    transform: translateY(-2px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.feature-button.dragging {
-    opacity: 0.5;
-    background: #e0e0e0;
-}
-
-/* Selected feature item styles */
-.selected-feature-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px;
-    margin: 8px 0;
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    user-select: none;
-    -webkit-user-select: none;
-    touch-action: none;
-}
-
-.selected-feature-item.dragging {
-    opacity: 0.5;
-    background: #e0e0e0;
-}
-
-.remove-feature {
-    background: none;
-    border: none;
-    color: #ff4444;
-    font-size: 1.2rem;
-    cursor: pointer;
-    padding: 0 8px;
-}
-
-.remove-feature:hover {
-    color: #cc0000;
 }
 
 /* Custom Dropdown Styles */

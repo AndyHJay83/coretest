@@ -48,45 +48,51 @@
             <button id="createWorkflowButton" class="create-button">Create New Workflow</button>
         </div>
 
-        <!-- Workflow Creation Page (Hidden by default) -->
-        <div id="workflowCreation" class="workflow-creation" style="display: none;">
-            <div class="workflow-header">
-                <h2>Create Workflow</h2>
-                <button id="cancelWorkflowButton" class="cancel-button">Cancel</button>
-            </div>
-            
-            <div class="workflow-content">
-                <div class="workflow-input">
-                    <input type="text" id="workflowName" placeholder="Enter workflow name">
+        <!-- Workflow Creation Page -->
+        <div id="workflowCreation" style="display: none;">
+            <div class="workflow-creation">
+                <!-- Header with Create/Cancel buttons -->
+                <div class="workflow-header">
+                    <h2>Create Workflow</h2>
+                    <button id="cancelWorkflowButton" class="cancel-button">Cancel</button>
                 </div>
-                
-                <div class="workflow-builder">
+
+                <!-- Workflow name input section -->
+                <div class="workflow-name-section">
+                    <input type="text" id="workflowName" class="workflow-name-input" placeholder="Enter workflow name">
+                    <button id="saveWorkflowButton" class="save-workflow-button">Save Workflow</button>
+                </div>
+
+                <!-- Features section -->
+                <div class="workflow-content">
+                    <!-- Available Features -->
                     <div class="available-features">
                         <h3>Available Features</h3>
-                        <div id="availableFeatures" class="feature-buttons">
-                            <button class="feature-button" draggable="true" data-feature="position1">POSITION 1</button>
-                            <button class="feature-button" draggable="true" data-feature="vowel">VOWEL</button>
-                            <button class="feature-button" draggable="true" data-feature="o">O?</button>
-                            <button class="feature-button" draggable="true" data-feature="lexicon">LEXICON</button>
-                            <button class="feature-button" draggable="true" data-feature="eee">EEE?</button>
-                            <button class="feature-button" draggable="true" data-feature="originalLex">ORIGINAL LEX</button>
-                            <button class="feature-button" draggable="true" data-feature="consonant">CONSONANTS TOGETHER?</button>
-                            <button class="feature-button" draggable="true" data-feature="colour3">COLOUR3</button>
-                            <button class="feature-button" draggable="true" data-feature="shape">SHAPE</button>
-                            <button class="feature-button" draggable="true" data-feature="curved">CURVED</button>
+                        <div id="availableFeatures">
+                            <button class="feature-button" data-feature="position1" draggable="true">Position 1</button>
+                            <button class="feature-button" data-feature="vowel" draggable="true">Vowel</button>
+                            <button class="feature-button" data-feature="o" draggable="true">O?</button>
+                            <button class="feature-button" data-feature="lexicon" draggable="true">Lexicon</button>
+                            <button class="feature-button" data-feature="eee" draggable="true">EEE?</button>
+                            <button class="feature-button" data-feature="originalLex" draggable="true">Original Lex</button>
+                            <button class="feature-button" data-feature="consonant" draggable="true">Consonants Together?</button>
+                            <button class="feature-button" data-feature="colour3" draggable="true">Colour3</button>
+                            <button class="feature-button" data-feature="shape" draggable="true">Shape</button>
+                            <button class="feature-button" data-feature="curved" draggable="true">Curved</button>
                         </div>
                     </div>
-                    
+
+                    <!-- Selected Features -->
                     <div class="selected-features">
                         <h3>Selected Features</h3>
-                        <div id="selectedFeaturesList" class="selected-features-list"></div>
+                        <div id="selectedFeaturesList"></div>
                     </div>
                 </div>
-                
-                <div id="savedWorkflows" class="saved-workflows"></div>
-                
-                <div class="workflow-actions">
-                    <button id="saveWorkflowButton" class="save-button">Save Workflow</button>
+
+                <!-- Saved Workflows -->
+                <div class="saved-workflows">
+                    <h3>Saved Workflows</h3>
+                    <div id="savedWorkflows"></div>
                 </div>
             </div>
         </div>
