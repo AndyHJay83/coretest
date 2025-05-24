@@ -2204,14 +2204,33 @@ function addFeatureToSelected(featureType) {
     selectedFeature.className = 'selected-feature-item';
     selectedFeature.dataset.feature = featureType;
     
-    selectedFeature.innerHTML = `
-        <span>${featureButton.textContent}</span>
-        <button class="remove-feature" onclick="removeFeature('${featureType}')">×</button>
-    `;
+    const featureName = document.createElement('span');
+    featureName.textContent = featureButton.textContent;
+    selectedFeature.appendChild(featureName);
     
-    // Add drag events to the new selected feature
-    selectedFeature.addEventListener('dragstart', handleDragStart);
-    selectedFeature.addEventListener('dragend', handleDragEnd);
+    const removeButton = document.createElement('button');
+    removeButton.className = 'remove-feature';
+    removeButton.textContent = '×';
+    removeButton.onclick = (e) => {
+        e.stopPropagation(); // Prevent the click from bubbling up
+        selectedFeature.remove();
+    };
+    selectedFeature.appendChild(removeButton);
+    
+    // Add click event to move feature back to available
+    selectedFeature.addEventListener('click', (e) => {
+        if (e.target !== removeButton) {
+            selectedFeature.remove();
+        }
+    });
+    
+    // Add touch event for mobile
+    selectedFeature.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (e.target !== removeButton) {
+            selectedFeature.remove();
+        }
+    }, { passive: false });
     
     selectedFeatures.appendChild(selectedFeature);
 }
@@ -2278,23 +2297,31 @@ function addFeatureToSelected(featureType) {
     selectedFeature.className = 'selected-feature-item';
     selectedFeature.dataset.feature = featureType;
     
-    selectedFeature.innerHTML = `
-        <span>${featureButton.textContent}</span>
-        <button class="remove-feature" onclick="removeFeature('${featureType}')">×</button>
-    `;
+    const featureName = document.createElement('span');
+    featureName.textContent = featureButton.textContent;
+    selectedFeature.appendChild(featureName);
+    
+    const removeButton = document.createElement('button');
+    removeButton.className = 'remove-feature';
+    removeButton.textContent = '×';
+    removeButton.onclick = (e) => {
+        e.stopPropagation(); // Prevent the click from bubbling up
+        selectedFeature.remove();
+    };
+    selectedFeature.appendChild(removeButton);
     
     // Add click event to move feature back to available
     selectedFeature.addEventListener('click', (e) => {
-        if (e.target !== selectedFeature.querySelector('.remove-feature')) {
-            removeFeature(featureType);
+        if (e.target !== removeButton) {
+            selectedFeature.remove();
         }
     });
     
     // Add touch event for mobile
     selectedFeature.addEventListener('touchstart', (e) => {
         e.preventDefault();
-        if (e.target !== selectedFeature.querySelector('.remove-feature')) {
-            removeFeature(featureType);
+        if (e.target !== removeButton) {
+            selectedFeature.remove();
         }
     }, { passive: false });
     
