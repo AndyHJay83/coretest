@@ -1355,9 +1355,9 @@ input:checked + .slider:before {
 /* Homepage Styles */
 .homepage-content {
     padding: 20px;
-    max-width: 600px;
-    margin: 0 auto;
     position: relative;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .selection-container {
@@ -1367,6 +1367,7 @@ input:checked + .slider:before {
     margin-bottom: 30px;
     position: relative;
     width: 100%;
+    box-sizing: border-box;
 }
 
 .dropdown-group {
