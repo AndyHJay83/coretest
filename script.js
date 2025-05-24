@@ -129,6 +129,35 @@ function initializeWorkflowDropdown() {
         // Set initial selected text
         selectedText.textContent = workflowSelect.options[workflowSelect.selectedIndex].text;
         
+        // Remove any existing click/touch handlers from document
+        const oldClickHandler = document._workflowDropdownClickHandler;
+        const oldTouchHandler = document._workflowDropdownTouchHandler;
+        if (oldClickHandler) {
+            document.removeEventListener('click', oldClickHandler);
+        }
+        if (oldTouchHandler) {
+            document.removeEventListener('touchstart', oldTouchHandler);
+        }
+        
+        // Create new handlers
+        const clickHandler = (e) => {
+            if (!customSelect.contains(e.target)) {
+                optionsList.classList.remove('show');
+                optionsList.style.display = 'none';
+            }
+        };
+        
+        const touchHandler = (e) => {
+            if (!customSelect.contains(e.target)) {
+                optionsList.classList.remove('show');
+                optionsList.style.display = 'none';
+            }
+        };
+        
+        // Store handlers for future cleanup
+        document._workflowDropdownClickHandler = clickHandler;
+        document._workflowDropdownTouchHandler = touchHandler;
+        
         // Add click handler for the custom select
         customSelect.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -146,21 +175,9 @@ function initializeWorkflowDropdown() {
             optionsList.style.display = optionsList.classList.contains('show') ? 'block' : 'none';
         }, { passive: false });
         
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!customSelect.contains(e.target)) {
-                optionsList.classList.remove('show');
-                optionsList.style.display = 'none';
-            }
-        });
-        
-        // Close dropdown when touching outside (mobile)
-        document.addEventListener('touchstart', (e) => {
-            if (!customSelect.contains(e.target)) {
-                optionsList.classList.remove('show');
-                optionsList.style.display = 'none';
-            }
-        }, { passive: false });
+        // Add document-level handlers
+        document.addEventListener('click', clickHandler);
+        document.addEventListener('touchstart', touchHandler, { passive: false });
     } else {
         console.error('Workflow dropdown container not found');
     }
