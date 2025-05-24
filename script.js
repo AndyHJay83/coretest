@@ -1243,8 +1243,15 @@ async function executeWorkflow(steps) {
         
         // Add all feature elements to the document body (they'll be moved to feature area when needed)
         Object.values(featureElements).forEach(element => {
-            if (element && !document.body.contains(element)) {
+            if (element) {
+                // Remove from any existing parent
+                if (element.parentNode) {
+                    element.parentNode.removeChild(element);
+                }
+                // Add to document body
                 document.body.appendChild(element);
+                // Hide initially
+                element.style.display = 'none';
             }
         });
         
