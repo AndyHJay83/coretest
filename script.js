@@ -98,33 +98,52 @@ function initializeWorkflowDropdown() {
         // Set initial selected text
         selectedText.textContent = workflowSelect.options[workflowSelect.selectedIndex].text;
         
+        // Remove any existing event listeners
+        const newCustomSelect = customSelect.cloneNode(true);
+        customSelect.parentNode.replaceChild(newCustomSelect, customSelect);
+        
+        // Get the new elements after cloning
+        const newSelectedText = newCustomSelect.querySelector('.selected-text');
+        const newOptionsList = newCustomSelect.querySelector('.options-list');
+        
         // Add click handler for the custom select
-        customSelect.addEventListener('click', (e) => {
+        newCustomSelect.addEventListener('click', (e) => {
+            e.preventDefault();
             e.stopPropagation();
-            optionsList.classList.toggle('show');
+            newOptionsList.classList.toggle('show');
         });
         
         // Add touch handler for mobile
-        customSelect.addEventListener('touchstart', (e) => {
+        newCustomSelect.addEventListener('touchstart', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            optionsList.classList.toggle('show');
+            newOptionsList.classList.toggle('show');
         }, { passive: false });
         
         // Close dropdown when clicking outside
         document.addEventListener('click', (e) => {
-            if (!customSelect.contains(e.target)) {
-                optionsList.classList.remove('show');
+            if (!newCustomSelect.contains(e.target)) {
+                newOptionsList.classList.remove('show');
             }
         });
         
         // Close dropdown when touching outside (mobile)
         document.addEventListener('touchstart', (e) => {
-            if (!customSelect.contains(e.target)) {
-                optionsList.classList.remove('show');
+            if (!newCustomSelect.contains(e.target)) {
+                newOptionsList.classList.remove('show');
             }
         }, { passive: false });
     }
+}
+
+// Add this to ensure dropdown is initialized when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+    initializeWorkflowDropdown();
+});
+
+// Add this to ensure dropdown is reinitialized after any workflow changes
+function reinitializeWorkflowDropdown() {
+    initializeWorkflowDropdown();
 }
 
 // Show workflow creation page
@@ -779,7 +798,7 @@ function saveWorkflow() {
         document.getElementById('selectedFeaturesList').innerHTML = '';
         
         // Reinitialize the workflow dropdown
-        initializeWorkflowDropdown();
+        reinitializeWorkflowDropdown();
         
         // Show success message and return to homepage
         alert('Workflow saved successfully!');
