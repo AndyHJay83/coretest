@@ -3020,7 +3020,7 @@ document.head.appendChild(buttonStyles);
 // Add CSS for button consistency
 const buttonConsistencyStyle = document.createElement('style');
 buttonConsistencyStyle.textContent = `
-    #createWorkflowButton, #performButton {
+    #createWorkflowButton {
         width: 200px;
         height: 40px;
         font-size: 16px;
@@ -3042,8 +3042,34 @@ buttonConsistencyStyle.textContent = `
         white-space: nowrap;
     }
     
-    #createWorkflowButton:hover, #performButton:hover {
+    #createWorkflowButton:hover {
         background-color: #45a049;
+    }
+    
+    #performButton {
+        width: 200px;
+        height: 40px;
+        font-size: 16px;
+        font-weight: bold;
+        padding: 8px 16px;
+        margin: 10px;
+        border-radius: 4px;
+        background-color: #4169E1; /* Royal Blue */
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        box-sizing: border-box;
+        line-height: 1;
+        white-space: nowrap;
+    }
+    
+    #performButton:hover {
+        background-color: #1E40AF; /* Darker Royal Blue for hover */
     }
     
     #createWorkflowButton:active, #performButton:active {
