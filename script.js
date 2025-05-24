@@ -1285,32 +1285,49 @@ async function executeWorkflow(steps) {
 // Function to setup feature listeners
 function setupFeatureListeners(feature, callback) {
     switch (feature) {
-        case 'eee':
-            const eeeButton = document.getElementById('eeeButton');
-            const eeeYesBtn = document.getElementById('eeeYesBtn');
-            const eeeNoBtn = document.getElementById('eeeNoBtn');
+        case 'position1':
+            const position1Button = document.getElementById('position1Button');
+            const position1DoneButton = document.getElementById('position1DoneButton');
             
-            if (eeeButton) {
-                eeeButton.onclick = () => {
-                    const filteredWords = filterWordsByEee(currentFilteredWords, 'E');
-                    callback(filteredWords);
-                    document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
+            if (position1Button) {
+                position1Button.onclick = () => {
+                    const input = document.getElementById('position1Input')?.value.trim();
+                    if (input) {
+                        const consonants = getConsonantsInOrder(input);
+                        if (consonants.length >= 2) {
+                            const filteredWords = filterWordsByPosition1(currentFilteredWords, consonants);
+                            callback(filteredWords);
+                            document.getElementById('position1Feature').dispatchEvent(new Event('completed'));
+                        }
+                    }
                 };
             }
             
-            if (eeeYesBtn) {
-                eeeYesBtn.onclick = () => {
-                    const filteredWords = filterWordsByEee(currentFilteredWords, 'YES');
-                    callback(filteredWords);
-                    document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
+            if (position1DoneButton) {
+                position1DoneButton.onclick = () => {
+                    callback(currentFilteredWords);
+                    document.getElementById('position1Feature').dispatchEvent(new Event('completed'));
+                };
+            }
+            break;
+            
+        case 'vowel':
+            const vowelYesBtn = document.querySelector('#vowelFeature .yes-btn');
+            const vowelNoBtn = document.querySelector('#vowelFeature .no-btn');
+            
+            if (vowelYesBtn) {
+                vowelYesBtn.onclick = () => {
+                    handleVowelSelection(true);
+                    callback(currentFilteredWordsForVowels);
+                    document.getElementById('vowelFeature').dispatchEvent(new Event('completed'));
                 };
             }
             
-            if (eeeNoBtn) {
-                eeeNoBtn.onclick = () => {
-                    const filteredWords = filterWordsByEee(currentFilteredWords, 'NO');
-                    callback(filteredWords);
-                    document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
+            if (vowelNoBtn) {
+                vowelNoBtn.onclick = () => {
+                    handleVowelSelection(false);
+                    callback(currentFilteredWordsForVowels);
+                    document.getElementById('vowelFeature').dispatchEvent(new Event('completed'));
                 };
             }
             break;
@@ -1431,64 +1448,34 @@ function setupFeatureListeners(feature, callback) {
             }
             break;
             
-        case 'position1':
-            const position1Button = document.getElementById('position1Button');
-            const position1DoneButton = document.getElementById('position1DoneButton');
+        case 'eee':
+            const eeeButton = document.getElementById('eeeButton');
+            const eeeYesBtn = document.getElementById('eeeYesBtn');
+            const eeeNoBtn = document.getElementById('eeeNoBtn');
             
-            if (position1Button) {
-                position1Button.onclick = () => {
-                    const input = document.getElementById('position1Input')?.value.trim();
-                    if (input) {
-                        const consonants = getConsonantsInOrder(input);
-                        if (consonants.length >= 2) {
-                            const filteredWords = filterWordsByPosition1(currentFilteredWords, consonants);
-                            callback(filteredWords);
-                            document.getElementById('position1Feature').dispatchEvent(new Event('completed'));
-                        }
-                    }
-                };
-            }
-            
-            if (position1DoneButton) {
-                position1DoneButton.onclick = () => {
-                    callback(currentFilteredWords);
-                    document.getElementById('position1Feature').dispatchEvent(new Event('completed'));
-                };
-            }
-            break;
-            
-        case 'vowel':
-            const vowelYesBtn = document.querySelector('#vowelFeature .yes-btn');
-            const vowelNoBtn = document.querySelector('#vowelFeature .no-btn');
-            
-            if (vowelYesBtn) {
-                vowelYesBtn.onclick = () => {
-                    handleVowelSelection(true);
-                    callback(currentFilteredWordsForVowels);
-                    document.getElementById('vowelFeature').dispatchEvent(new Event('completed'));
-                };
-            }
-            
-            if (vowelNoBtn) {
-                vowelNoBtn.onclick = () => {
-                    handleVowelSelection(false);
-                    callback(currentFilteredWordsForVowels);
-                    document.getElementById('vowelFeature').dispatchEvent(new Event('completed'));
-                };
-            }
-            break;
-            
-        case 'shape':
-            const categoryButtons = document.querySelectorAll('.category-button');
-            
-            categoryButtons.forEach(button => {
-                button.onclick = () => {
-                    const category = button.textContent.split(' ')[0].toLowerCase();
-                    const filteredWords = filterWordsByShape(currentFilteredWords, currentPosition, category);
+            if (eeeButton) {
+                eeeButton.onclick = () => {
+                    const filteredWords = filterWordsByEee(currentFilteredWords, 'E');
                     callback(filteredWords);
-                    document.getElementById('shapeFeature').dispatchEvent(new Event('completed'));
+                    document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
                 };
-            });
+            }
+            
+            if (eeeYesBtn) {
+                eeeYesBtn.onclick = () => {
+                    const filteredWords = filterWordsByEee(currentFilteredWords, 'YES');
+                    callback(filteredWords);
+                    document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
+                };
+            }
+            
+            if (eeeNoBtn) {
+                eeeNoBtn.onclick = () => {
+                    const filteredWords = filterWordsByEee(currentFilteredWords, 'NO');
+                    callback(filteredWords);
+                    document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
+                };
+            }
             break;
     }
 }
