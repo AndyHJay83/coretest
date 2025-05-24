@@ -93,6 +93,136 @@ function showWorkflowCreation() {
     document.getElementById('workflowName').focus();
 }
 
+function setupFeatureListeners(featureId, callback) {
+    console.log('Setting up listeners for feature:', featureId);
+    const featureSection = document.getElementById(`${featureId}Feature`);
+    
+    if (!featureSection) {
+        console.error('Feature section not found:', featureId);
+        return;
+    }
+
+    // Set up listeners based on feature type
+    switch(featureId) {
+        case 'originallex':
+            const originalLexInput = featureSection.querySelector('input');
+            if (originalLexInput) {
+                originalLexInput.addEventListener('input', () => {
+                    const position = featureSection.querySelector('select').value;
+                    const letter = originalLexInput.value;
+                    const filteredWords = filterWordsByOriginalLex(currentFilteredWords, position, letter);
+                    callback(filteredWords);
+                });
+            }
+            break;
+            
+        case 'eee?':
+            const eeeButtons = featureSection.querySelectorAll('.vowel-btn');
+            eeeButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const mode = btn.dataset.mode;
+                    const filteredWords = filterWordsByEee(currentFilteredWords, mode);
+                    callback(filteredWords);
+                });
+            });
+            break;
+            
+        case 'o?':
+            const oButtons = featureSection.querySelectorAll('.vowel-btn');
+            oButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const includeO = btn.dataset.mode === 'yes';
+                    const filteredWords = filterWordsByO(currentFilteredWords, includeO);
+                    callback(filteredWords);
+                });
+            });
+            break;
+            
+        case 'curved':
+            const curvedButtons = featureSection.querySelectorAll('.curved-btn');
+            curvedButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const positions = btn.dataset.positions.split(',');
+                    const filteredWords = filterWordsByCurvedPositions(currentFilteredWords, positions);
+                    callback(filteredWords);
+                });
+            });
+            break;
+            
+        case 'colour3':
+            const colour3Buttons = featureSection.querySelectorAll('.category-button');
+            colour3Buttons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const filteredWords = filterWordsByColour3(currentFilteredWords);
+                    callback(filteredWords);
+                });
+            });
+            break;
+            
+        case 'lexicon':
+            const lexiconInput = featureSection.querySelector('input');
+            if (lexiconInput) {
+                lexiconInput.addEventListener('input', () => {
+                    const positions = lexiconInput.value.split(',').map(p => p.trim());
+                    const filteredWords = filterWordsByLexicon(currentFilteredWords, positions);
+                    callback(filteredWords);
+                });
+            }
+            break;
+            
+        case 'consonant':
+            const consonantButtons = featureSection.querySelectorAll('.vowel-btn');
+            consonantButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const hasConsonants = btn.dataset.mode === 'yes';
+                    const filteredWords = currentFilteredWords.filter(word => 
+                        hasConsonants ? hasWordAdjacentConsonants(word) : !hasWordAdjacentConsonants(word)
+                    );
+                    callback(filteredWords);
+                });
+            });
+            break;
+            
+        case 'position1':
+            const position1Input = featureSection.querySelector('input');
+            if (position1Input) {
+                position1Input.addEventListener('input', () => {
+                    const consonants = position1Input.value.split(',').map(c => c.trim());
+                    const filteredWords = filterWordsByPosition1(currentFilteredWords, consonants);
+                    callback(filteredWords);
+                });
+            }
+            break;
+            
+        case 'vowel':
+            const vowelButtons = featureSection.querySelectorAll('.vowel-btn');
+            vowelButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const includeVowel = btn.dataset.mode === 'yes';
+                    const filteredWords = handleVowelSelection(includeVowel);
+                    callback(filteredWords);
+                });
+            });
+            break;
+            
+        case 'shape':
+            const shapeButtons = featureSection.querySelectorAll('.category-button');
+            shapeButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const position = featureSection.querySelector('select').value;
+                    const category = btn.dataset.category;
+                    const filteredWords = filterWordsByShape(currentFilteredWords, position, category);
+                    callback(filteredWords);
+                });
+            });
+            break;
+            
+        default:
+            console.warn('Unknown feature type for listeners:', featureId);
+            break;
+    }
+}
+
 async function performWorkflow() {
     console.log('Performing workflow...');
     
