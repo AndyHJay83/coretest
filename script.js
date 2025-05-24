@@ -3032,6 +3032,8 @@ function showFeatureInfo(featureId) {
     if (modal) {
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
+        // Prevent background scrolling
+        document.body.addEventListener('touchmove', preventScroll, { passive: false });
     }
 }
 
@@ -3040,36 +3042,57 @@ function hideFeatureInfo(featureId) {
     if (modal) {
         modal.style.display = 'none';
         document.body.style.overflow = '';
+        // Re-enable background scrolling
+        document.body.removeEventListener('touchmove', preventScroll);
     }
+}
+
+function preventScroll(e) {
+    e.preventDefault();
 }
 
 // Add event listeners for info buttons
 document.addEventListener('DOMContentLoaded', function() {
     // Info button click handlers
     document.querySelectorAll('.info-button').forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.stopPropagation(); // Prevent drag start
-            const featureId = this.getAttribute('data-feature');
-            showFeatureInfo(featureId);
-        });
+        // Add both click and touch events
+        button.addEventListener('click', handleInfoClick);
+        button.addEventListener('touchend', handleInfoClick);
     });
 
     // Close button click handlers
     document.querySelectorAll('.close-info-button').forEach(button => {
-        button.addEventListener('click', function() {
-            const modal = this.closest('.feature-info-modal');
-            const featureId = modal.id.replace('Info', '');
-            hideFeatureInfo(featureId);
-        });
+        // Add both click and touch events
+        button.addEventListener('click', handleCloseClick);
+        button.addEventListener('touchend', handleCloseClick);
     });
 
     // Close modal when clicking outside
     document.querySelectorAll('.feature-info-modal').forEach(modal => {
-        modal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                const featureId = this.id.replace('Info', '');
-                hideFeatureInfo(featureId);
-            }
-        });
+        // Add both click and touch events
+        modal.addEventListener('click', handleOutsideClick);
+        modal.addEventListener('touchend', handleOutsideClick);
     });
 });
+
+function handleInfoClick(e) {
+    e.preventDefault();
+    e.stopPropagation(); // Prevent drag start
+    const featureId = this.getAttribute('data-feature');
+    showFeatureInfo(featureId);
+}
+
+function handleCloseClick(e) {
+    e.preventDefault();
+    const modal = this.closest('.feature-info-modal');
+    const featureId = modal.id.replace('Info', '');
+    hideFeatureInfo(featureId);
+}
+
+function handleOutsideClick(e) {
+    e.preventDefault();
+    if (e.target === this) {
+        const featureId = this.id.replace('Info', '');
+        hideFeatureInfo(featureId);
+    }
+}
