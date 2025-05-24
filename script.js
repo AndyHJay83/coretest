@@ -2051,18 +2051,26 @@ function initializeDropdowns() {
         const optionsList = customSelect.querySelector('.options-list');
         const options = customSelect.querySelectorAll('.option');
         
-        // Update selected text when select changes
-        select.addEventListener('change', () => {
+        // Set initial selected text
+        if (select && selectedText) {
             selectedText.textContent = select.options[select.selectedIndex].text;
-            optionsList.classList.remove('show');
-        });
+        }
         
-        // Toggle options list on click
-        customSelect.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            optionsList.classList.toggle('show');
-        });
+        // Toggle options list on click/touch
+        if (customSelect) {
+            customSelect.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                optionsList.classList.toggle('show');
+            });
+            
+            // Handle touch events
+            customSelect.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                optionsList.classList.toggle('show');
+            }, { passive: false });
+        }
         
         // Handle option selection
         options.forEach(option => {
@@ -2070,45 +2078,55 @@ function initializeDropdowns() {
                 e.preventDefault();
                 e.stopPropagation();
                 const value = option.getAttribute('data-value');
-                select.value = value;
-                selectedText.textContent = option.textContent;
-                optionsList.classList.remove('show');
-                select.dispatchEvent(new Event('change'));
+                if (select) {
+                    select.value = value;
+                    selectedText.textContent = option.textContent;
+                    optionsList.classList.remove('show');
+                    select.dispatchEvent(new Event('change'));
+                }
             });
-        });
-        
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!customSelect.contains(e.target)) {
-                optionsList.classList.remove('show');
-            }
-        });
-        
-        // Handle touch events for mobile
-        customSelect.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            optionsList.classList.toggle('show');
-        }, { passive: false });
-        
-        options.forEach(option => {
+            
+            // Handle touch events for options
             option.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 const value = option.getAttribute('data-value');
-                select.value = value;
-                selectedText.textContent = option.textContent;
-                optionsList.classList.remove('show');
-                select.dispatchEvent(new Event('change'));
+                if (select) {
+                    select.value = value;
+                    selectedText.textContent = option.textContent;
+                    optionsList.classList.remove('show');
+                    select.dispatchEvent(new Event('change'));
+                }
             }, { passive: false });
         });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (customSelect && !customSelect.contains(e.target)) {
+                optionsList.classList.remove('show');
+            }
+        });
+        
+        // Close dropdown when touching outside
+        document.addEventListener('touchstart', (e) => {
+            if (customSelect && !customSelect.contains(e.target)) {
+                optionsList.classList.remove('show');
+            }
+        }, { passive: false });
+        
+        // Update selected text when select changes
+        if (select) {
+            select.addEventListener('change', () => {
+                selectedText.textContent = select.options[select.selectedIndex].text;
+                optionsList.classList.remove('show');
+            });
+        }
     });
 }
 
 // Initialize dropdowns when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     initializeDropdowns();
-    // ... existing initialization code ...
 });
 
 // Re-initialize dropdowns when new content is added
