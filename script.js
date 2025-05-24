@@ -1710,8 +1710,12 @@ function setupFeatureListeners(feature, callback) {
 // Function to display results
 function displayResults(words) {
     const resultsContainer = document.getElementById('results');
-    if (!resultsContainer) return;
+    if (!resultsContainer) {
+        console.error('Results container not found');
+        return;
+    }
     
+    // Clear the results container
     resultsContainer.innerHTML = '';
     
     if (words.length === 0) {
@@ -1719,16 +1723,25 @@ function displayResults(words) {
         return;
     }
     
+    // Create word list container
     const wordList = document.createElement('ul');
     wordList.className = 'word-list';
     
+    // Add words to the list
     words.forEach(word => {
         const li = document.createElement('li');
         li.textContent = word;
         wordList.appendChild(li);
     });
     
+    // Add the word list to the results container
     resultsContainer.appendChild(wordList);
+    
+    // Ensure the feature area is empty and visible
+    const featureArea = document.getElementById('featureArea');
+    if (featureArea) {
+        featureArea.style.display = 'block';
+    }
 }
 
 // Function to handle vowel selection
