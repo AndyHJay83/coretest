@@ -148,6 +148,10 @@ function hideWorkflowCreation() {
     document.getElementById('homepage').style.display = 'block';
     document.getElementById('workflowCreation').style.display = 'none';
     document.getElementById('workflowExecution').style.display = 'none';
+    
+    // Ensure dropdowns are initialized when returning to homepage
+    initializeWorkflowDropdown();
+    initializeDropdowns();
 }
 
 // Initialize everything when the DOM is loaded
@@ -771,27 +775,46 @@ function saveWorkflow() {
         // Save to localStorage
         localStorage.setItem('workflows', JSON.stringify(workflows));
         
-        // Update workflow select
-        const workflowSelect = document.getElementById('workflowSelect');
-        if (workflowSelect) {
-            const option = document.createElement('option');
-            option.value = newWorkflow.name;
-            option.textContent = newWorkflow.name;
-            workflowSelect.appendChild(option);
-        }
-        
         // Clear form
         if (workflowNameInput) {
             workflowNameInput.value = '';
         }
         document.getElementById('selectedFeaturesList').innerHTML = '';
         
-        // Reinitialize dropdowns
+        // Show success message
+        alert('Workflow saved successfully!');
+        
+        // Hide workflow creation and show homepage
+        hideWorkflowCreation();
+        
+        // Reinitialize workflow dropdown and all dropdowns
+        initializeWorkflowDropdown();
         initializeDropdowns();
         
-        // Show success message and return to homepage
-        alert('Workflow saved successfully!');
-        hideWorkflowCreation();
+        // Force a re-render of the workflow select dropdown
+        const workflowSelect = document.getElementById('workflowSelect');
+        if (workflowSelect) {
+            // Remove and re-add the custom dropdown
+            const dropdown = workflowSelect.closest('.dropdown');
+            if (dropdown) {
+                const customSelect = dropdown.querySelector('.custom-select');
+                if (customSelect) {
+                    customSelect.remove();
+                }
+                
+                // Create new custom select
+                const newCustomSelect = document.createElement('div');
+                newCustomSelect.className = 'custom-select';
+                newCustomSelect.innerHTML = `
+                    <div class="selected-text">Select a workflow</div>
+                    <div class="options-list"></div>
+                `;
+                dropdown.insertBefore(newCustomSelect, workflowSelect);
+                
+                // Reinitialize the dropdown
+                initializeDropdowns();
+            }
+        }
         
     } catch (error) {
         console.error('Error saving workflow:', error);
