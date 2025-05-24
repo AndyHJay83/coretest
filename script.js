@@ -61,17 +61,21 @@ function initializeWorkflowDropdown() {
     const workflowDropdown = workflowSelect.closest('.dropdown');
     if (workflowDropdown) {
         console.log('Found workflow dropdown container');
-        const customSelect = workflowDropdown.querySelector('.custom-select');
-        if (!customSelect) {
-            console.log('Creating new custom select element');
-            const newCustomSelect = document.createElement('div');
-            newCustomSelect.className = 'custom-select';
-            newCustomSelect.innerHTML = `
-                <div class="selected-text">Select a workflow</div>
-                <div class="options-list"></div>
-            `;
-            workflowDropdown.insertBefore(newCustomSelect, workflowSelect);
+        
+        // Remove existing custom select if it exists
+        const existingCustomSelect = workflowDropdown.querySelector('.custom-select');
+        if (existingCustomSelect) {
+            existingCustomSelect.remove();
         }
+        
+        // Create new custom select
+        const customSelect = document.createElement('div');
+        customSelect.className = 'custom-select';
+        customSelect.innerHTML = `
+            <div class="selected-text">Select a workflow</div>
+            <div class="options-list"></div>
+        `;
+        workflowDropdown.insertBefore(customSelect, workflowSelect);
 
         const selectedText = customSelect.querySelector('.selected-text');
         const optionsList = customSelect.querySelector('.options-list');
