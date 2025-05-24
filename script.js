@@ -739,11 +739,19 @@ function saveWorkflow() {
     
     if (!workflowName) {
         alert('Please enter a workflow name');
+        workflowNameInput.focus();
         return;
     }
     
     if (selectedFeatures.length === 0) {
         alert('Please select at least one feature');
+        return;
+    }
+    
+    // Check if workflow name already exists
+    if (workflows.some(w => w.name === workflowName)) {
+        alert('A workflow with this name already exists. Please choose a different name.');
+        workflowNameInput.focus();
         return;
     }
     
@@ -769,8 +777,7 @@ function saveWorkflow() {
     }
     
     // Return to homepage
-    document.getElementById('workflowCreation').style.display = 'none';
-    document.getElementById('homepage').style.display = 'block';
+    hideWorkflowCreation();
     
     // Clear form
     if (workflowNameInput) {
@@ -780,6 +787,9 @@ function saveWorkflow() {
     
     // Reinitialize dropdowns
     initializeDropdowns();
+    
+    // Show success message
+    alert('Workflow saved successfully!');
 }
 
 // Handle cancel workflow creation
