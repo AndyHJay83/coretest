@@ -1170,7 +1170,7 @@ function createCurvedFeature() {
 // Function to setup feature listeners
 function setupFeatureListeners(feature, callback) {
     switch (feature) {
-        case 'position1':
+        case 'position1': {
             const position1Button = document.getElementById('position1Button');
             const position1DoneButton = document.getElementById('position1DoneButton');
             const position1Input = document.getElementById('position1Input');
@@ -1191,6 +1191,12 @@ function setupFeatureListeners(feature, callback) {
                         alert('Please enter a word');
                     }
                 };
+                
+                // Add touch event for mobile
+                position1Button.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    position1Button.click();
+                }, { passive: false });
             }
             
             if (position1DoneButton) {
@@ -1198,25 +1204,17 @@ function setupFeatureListeners(feature, callback) {
                     callback(currentFilteredWords);
                     document.getElementById('position1Feature').dispatchEvent(new Event('completed'));
                 };
-            }
-
-            // Add touch events for mobile
-            if (position1Button) {
-                position1Button.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    position1Button.click();
-                }, { passive: false });
-            }
-
-            if (position1DoneButton) {
+                
+                // Add touch event for mobile
                 position1DoneButton.addEventListener('touchstart', (e) => {
                     e.preventDefault();
                     position1DoneButton.click();
                 }, { passive: false });
             }
             break;
+        }
             
-        case 'vowel':
+        case 'vowel': {
             const vowelYesBtn = document.querySelector('#vowelFeature .yes-btn');
             const vowelNoBtn = document.querySelector('#vowelFeature .no-btn');
             
@@ -1236,7 +1234,6 @@ function setupFeatureListeners(feature, callback) {
             const vowelFeature = document.getElementById('vowelFeature');
             const vowelLetter = vowelFeature.querySelector('.vowel-letter');
             if (uniqueVowels.length > 0) {
-                console.log('Setting first vowel letter to:', uniqueVowels[0].toUpperCase());
                 vowelLetter.textContent = uniqueVowels[0].toUpperCase();
                 vowelLetter.style.display = 'inline-block';
             }
@@ -1247,6 +1244,12 @@ function setupFeatureListeners(feature, callback) {
                     callback(currentFilteredWordsForVowels);
                     document.getElementById('vowelFeature').dispatchEvent(new Event('completed'));
                 };
+                
+                // Add touch event for mobile
+                vowelYesBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    vowelYesBtn.click();
+                }, { passive: false });
             }
             
             if (vowelNoBtn) {
@@ -1255,10 +1258,17 @@ function setupFeatureListeners(feature, callback) {
                     callback(currentFilteredWordsForVowels);
                     document.getElementById('vowelFeature').dispatchEvent(new Event('completed'));
                 };
+                
+                // Add touch event for mobile
+                vowelNoBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    vowelNoBtn.click();
+                }, { passive: false });
             }
             break;
+        }
             
-        case 'o':
+        case 'o': {
             const oYesBtn = document.getElementById('oYesBtn');
             const oNoBtn = document.getElementById('oNoBtn');
             const oSkipBtn = document.getElementById('oSkipBtn');
@@ -1269,6 +1279,12 @@ function setupFeatureListeners(feature, callback) {
                     callback(filteredWords);
                     document.getElementById('oFeature').dispatchEvent(new Event('completed'));
                 };
+                
+                // Add touch event for mobile
+                oYesBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    oYesBtn.click();
+                }, { passive: false });
             }
             
             if (oNoBtn) {
@@ -1277,6 +1293,12 @@ function setupFeatureListeners(feature, callback) {
                     callback(filteredWords);
                     document.getElementById('oFeature').dispatchEvent(new Event('completed'));
                 };
+                
+                // Add touch event for mobile
+                oNoBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    oNoBtn.click();
+                }, { passive: false });
             }
             
             if (oSkipBtn) {
@@ -1284,10 +1306,17 @@ function setupFeatureListeners(feature, callback) {
                     callback(currentFilteredWords);
                     document.getElementById('oFeature').dispatchEvent(new Event('completed'));
                 };
+                
+                // Add touch event for mobile
+                oSkipBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    oSkipBtn.click();
+                }, { passive: false });
             }
             break;
+        }
             
-        case 'curved':
+        case 'curved': {
             const curvedButtons = document.querySelectorAll('.curved-btn');
             const curvedSkipBtn = document.getElementById('curvedSkipBtn');
             
@@ -1298,6 +1327,12 @@ function setupFeatureListeners(feature, callback) {
                     callback(filteredWords);
                     document.getElementById('curvedFeature').dispatchEvent(new Event('completed'));
                 };
+                
+                // Add touch event for mobile
+                button.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    button.click();
+                }, { passive: false });
             });
             
             if (curvedSkipBtn) {
@@ -1305,10 +1340,17 @@ function setupFeatureListeners(feature, callback) {
                     callback(currentFilteredWords);
                     document.getElementById('curvedFeature').dispatchEvent(new Event('completed'));
                 };
+                
+                // Add touch event for mobile
+                curvedSkipBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    curvedSkipBtn.click();
+                }, { passive: false });
             }
             break;
+        }
             
-        case 'colour3':
+        case 'colour3': {
             const colour3YesBtn = document.getElementById('colour3YesBtn');
             const colour3SkipButton = document.getElementById('colour3SkipButton');
             
@@ -1318,6 +1360,12 @@ function setupFeatureListeners(feature, callback) {
                     callback(filteredWords);
                     document.getElementById('colour3Feature').dispatchEvent(new Event('completed'));
                 };
+                
+                // Add touch event for mobile
+                colour3YesBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    colour3YesBtn.click();
+                }, { passive: false });
             }
             
             if (colour3SkipButton) {
@@ -1325,10 +1373,17 @@ function setupFeatureListeners(feature, callback) {
                     callback(currentFilteredWords);
                     document.getElementById('colour3Feature').dispatchEvent(new Event('completed'));
                 };
+                
+                // Add touch event for mobile
+                colour3SkipButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    colour3SkipButton.click();
+                }, { passive: false });
             }
             break;
+        }
             
-        case 'lexicon':
+        case 'lexicon': {
             const lexiconButton = document.getElementById('lexiconButton');
             const lexiconSkipButton = document.getElementById('lexiconSkipButton');
             
@@ -1339,8 +1394,16 @@ function setupFeatureListeners(feature, callback) {
                         const filteredWords = filterWordsByLexicon(currentFilteredWords, input);
                         callback(filteredWords);
                         document.getElementById('lexiconFeature').dispatchEvent(new Event('completed'));
+                    } else {
+                        alert('Please enter positions (e.g., 123)');
                     }
                 };
+                
+                // Add touch event for mobile
+                lexiconButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    lexiconButton.click();
+                }, { passive: false });
             }
             
             if (lexiconSkipButton) {
@@ -1348,10 +1411,17 @@ function setupFeatureListeners(feature, callback) {
                     callback(currentFilteredWords);
                     document.getElementById('lexiconFeature').dispatchEvent(new Event('completed'));
                 };
+                
+                // Add touch event for mobile
+                lexiconSkipButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    lexiconSkipButton.click();
+                }, { passive: false });
             }
             break;
+        }
             
-        case 'consonant':
+        case 'consonant': {
             const consonantYesBtn = document.getElementById('consonantYesBtn');
             const consonantNoBtn = document.getElementById('consonantNoBtn');
             
@@ -1362,6 +1432,12 @@ function setupFeatureListeners(feature, callback) {
                     callback(filteredWords);
                     document.getElementById('consonantQuestion').dispatchEvent(new Event('completed'));
                 };
+                
+                // Add touch event for mobile
+                consonantYesBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    consonantYesBtn.click();
+                }, { passive: false });
             }
             
             if (consonantNoBtn) {
@@ -1371,10 +1447,17 @@ function setupFeatureListeners(feature, callback) {
                     callback(filteredWords);
                     document.getElementById('consonantQuestion').dispatchEvent(new Event('completed'));
                 };
+                
+                // Add touch event for mobile
+                consonantNoBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    consonantNoBtn.click();
+                }, { passive: false });
             }
             break;
+        }
             
-        case 'eee':
+        case 'eee': {
             const eeeButton = document.getElementById('eeeButton');
             const eeeYesBtn = document.getElementById('eeeYesBtn');
             const eeeNoBtn = document.getElementById('eeeNoBtn');
@@ -1385,6 +1468,12 @@ function setupFeatureListeners(feature, callback) {
                     callback(filteredWords);
                     document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
                 };
+                
+                // Add touch event for mobile
+                eeeButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    eeeButton.click();
+                }, { passive: false });
             }
             
             if (eeeYesBtn) {
@@ -1393,6 +1482,12 @@ function setupFeatureListeners(feature, callback) {
                     callback(filteredWords);
                     document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
                 };
+                
+                // Add touch event for mobile
+                eeeYesBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    eeeYesBtn.click();
+                }, { passive: false });
             }
             
             if (eeeNoBtn) {
@@ -1401,8 +1496,15 @@ function setupFeatureListeners(feature, callback) {
                     callback(filteredWords);
                     document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
                 };
+                
+                // Add touch event for mobile
+                eeeNoBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    eeeNoBtn.click();
+                }, { passive: false });
             }
             break;
+        }
     }
 }
 
