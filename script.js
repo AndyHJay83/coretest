@@ -235,42 +235,14 @@ function initializeWorkflowDropdown() {
         // Set initial selected text
         selectedText.textContent = workflowSelect.options[workflowSelect.selectedIndex].text;
         
-        // Remove any existing click/touch handlers from document
-        const oldClickHandler = document._workflowDropdownClickHandler;
-        const oldTouchHandler = document._workflowDropdownTouchHandler;
-        if (oldClickHandler) {
-            document.removeEventListener('click', oldClickHandler);
-        }
-        if (oldTouchHandler) {
-            document.removeEventListener('touchstart', oldTouchHandler);
-        }
-        
-        // Create new handlers
-        const clickHandler = (e) => {
-            if (!customSelect.contains(e.target)) {
-                optionsList.classList.remove('show');
-                optionsList.style.display = 'none';
-            }
-        };
-        
-        const touchHandler = (e) => {
-            if (!customSelect.contains(e.target)) {
-                optionsList.classList.remove('show');
-                optionsList.style.display = 'none';
-            }
-        };
-        
-        // Store handlers for future cleanup
-        document._workflowDropdownClickHandler = clickHandler;
-        document._workflowDropdownTouchHandler = touchHandler;
-        
-        // Create toggle handlers
-        const toggleClickHandler = (e) => {
+        // Add click handler for the custom select
+        customSelect.addEventListener('click', (e) => {
             e.stopPropagation();
             console.log('Custom select clicked');
             const isVisible = optionsList.classList.contains('show');
             optionsList.classList.toggle('show');
             optionsList.style.display = isVisible ? 'none' : 'block';
+            
             if (!isVisible) {
                 // Ensure proper positioning when showing
                 const customSelectRect = customSelect.getBoundingClientRect();
@@ -282,15 +254,17 @@ function initializeWorkflowDropdown() {
             console.log('Options list display:', optionsList.style.display);
             console.log('Options list classList:', optionsList.classList.toString());
             console.log('Options list position:', optionsList.getBoundingClientRect());
-        };
+        });
         
-        const toggleTouchHandler = (e) => {
+        // Add touch handler for mobile
+        customSelect.addEventListener('touchstart', (e) => {
             e.preventDefault();
             e.stopPropagation();
             console.log('Custom select touched');
             const isVisible = optionsList.classList.contains('show');
             optionsList.classList.toggle('show');
             optionsList.style.display = isVisible ? 'none' : 'block';
+            
             if (!isVisible) {
                 // Ensure proper positioning when showing
                 const customSelectRect = customSelect.getBoundingClientRect();
@@ -302,21 +276,23 @@ function initializeWorkflowDropdown() {
             console.log('Options list display:', optionsList.style.display);
             console.log('Options list classList:', optionsList.classList.toString());
             console.log('Options list position:', optionsList.getBoundingClientRect());
-        };
+        }, { passive: false });
         
-        // Store toggle handlers on the custom select element
-        customSelect._toggleClickHandler = toggleClickHandler;
-        customSelect._toggleTouchHandler = toggleTouchHandler;
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!customSelect.contains(e.target)) {
+                optionsList.classList.remove('show');
+                optionsList.style.display = 'none';
+            }
+        });
         
-        // Add click handler for the custom select
-        customSelect.addEventListener('click', toggleClickHandler);
-        
-        // Add touch handler for mobile
-        customSelect.addEventListener('touchstart', toggleTouchHandler, { passive: false });
-        
-        // Add document-level handlers
-        document.addEventListener('click', clickHandler);
-        document.addEventListener('touchstart', touchHandler, { passive: false });
+        // Close dropdown when touching outside (mobile)
+        document.addEventListener('touchstart', (e) => {
+            if (!customSelect.contains(e.target)) {
+                optionsList.classList.remove('show');
+                optionsList.style.display = 'none';
+            }
+        }, { passive: false });
         
         // Store reference to custom select for cleanup
         workflowDropdown._customSelect = customSelect;
