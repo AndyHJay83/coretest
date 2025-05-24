@@ -861,6 +861,18 @@ async function executeWorkflow(steps) {
         await loadWordList();
         currentFilteredWords = [...wordList]; // Start with the full wordlist
         
+        // Reset all feature states
+        lexiconCompleted = false;
+        originalLexCompleted = false;
+        eeeCompleted = false;
+        hasAdjacentConsonants = null;
+        hasO = null;
+        selectedCurvedLetter = null;
+        currentVowelIndex = 0;
+        uniqueVowels = [];
+        currentFilteredWordsForVowels = [];
+        currentPosition1Word = '';
+        
         // Hide homepage and show workflow execution
         const homepage = document.getElementById('homepage');
         const workflowExecution = document.getElementById('workflowExecution');
@@ -954,7 +966,7 @@ async function executeWorkflow(steps) {
             lexiconFeature: createLexiconFeature(),
             eeeFeature: createEeeFeature(),
             originalLexFeature: createOriginalLexFeature(),
-            consonantFeature: createConsonantQuestion(), // Changed from consonantQuestion to consonantFeature
+            consonantFeature: createConsonantQuestion(),
             colour3Feature: createColour3Feature(),
             shapeFeature: createShapeFeature(),
             curvedFeature: createCurvedFeature()
@@ -971,6 +983,8 @@ async function executeWorkflow(steps) {
                 document.body.appendChild(element);
                 // Hide initially
                 element.style.display = 'none';
+                // Reset completed state
+                element.classList.remove('completed');
             }
         });
         
