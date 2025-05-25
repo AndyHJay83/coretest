@@ -13,10 +13,6 @@
     <meta name="HandheldFriendly" content="true">
     <meta name="msapplication-tap-highlight" content="no">
     <title>Word Filter</title>
-    <link rel="icon" type="image/x-icon" href="icons/icon.svg">
-    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512x512.png">
-    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -39,6 +35,10 @@
                             <option value="">Select a workflow...</option>
                             <option value="create-new">New Workflow</option>
                         </select>
+                        <div class="custom-select">
+                            <div class="selected-text">Select a workflow...</div>
+                            <div class="options-list"></div>
+                        </div>
                     </div>
                 </div>
                 
@@ -48,6 +48,10 @@
                         <select id="wordlistSelect">
                             <option value="enuk" selected>ENUK Wordlist</option>
                         </select>
+                        <div class="custom-select">
+                            <div class="selected-text">ENUK Wordlist</div>
+                            <div class="options-list"></div>
+                        </div>
                     </div>
                 </div>
             </div>
