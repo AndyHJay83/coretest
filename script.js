@@ -2595,107 +2595,17 @@ function deleteWorkflow(workflow) {
 
 // Function to initialize dropdowns
 function initializeDropdowns() {
-    const dropdowns = document.querySelectorAll('.dropdown');
+    const dropdowns = document.querySelectorAll('.dropdown select');
     
-    dropdowns.forEach(dropdown => {
-        const select = dropdown.querySelector('select');
-        const customSelect = dropdown.querySelector('.custom-select');
-        const selectedText = customSelect.querySelector('.selected-text');
-        const optionsList = customSelect.querySelector('.options-list');
-        
-        // Add max-height and overflow-y to make options list scrollable
-        optionsList.style.maxHeight = '200px';
-        optionsList.style.overflowY = 'auto';
-        
-        // Clear existing options
-        optionsList.innerHTML = '';
-        
-        // Add options to custom dropdown
-        Array.from(select.options).forEach(option => {
-            const customOption = document.createElement('div');
-            customOption.className = 'option';
-            customOption.textContent = option.textContent;
-            customOption.setAttribute('data-value', option.value);
-            
-            // Add click handler for desktop
-            customOption.addEventListener('click', () => {
-                select.value = option.value;
-                selectedText.textContent = option.textContent;
-                optionsList.classList.remove('show');
-                select.dispatchEvent(new Event('change'));
-                
-                // Close dropdown after selection
-                optionsList.style.display = 'none';
+    dropdowns.forEach(select => {
+        // Add change event listener for workflow select
+        if (select.id === 'workflowSelect') {
+            select.addEventListener('change', () => {
+                if (select.value === 'create-new') {
+                    showWorkflowCreation();
+                }
             });
-            
-            // Add touch handler for mobile
-            customOption.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                select.value = option.value;
-                selectedText.textContent = option.textContent;
-                optionsList.classList.remove('show');
-                select.dispatchEvent(new Event('change'));
-                
-                // Close dropdown after selection
-                optionsList.style.display = 'none';
-            }, { passive: false });
-            
-            optionsList.appendChild(customOption);
-        });
-        
-        // Set initial selected text
-        selectedText.textContent = select.options[select.selectedIndex].text;
-        
-        // Add click handler for the custom select
-        customSelect.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const isVisible = optionsList.classList.contains('show');
-            optionsList.classList.toggle('show');
-            optionsList.style.display = isVisible ? 'none' : 'block';
-            
-            if (!isVisible) {
-                // Ensure proper positioning when showing
-                const customSelectRect = customSelect.getBoundingClientRect();
-                optionsList.style.position = 'absolute';
-                optionsList.style.top = `${customSelectRect.height}px`;
-                optionsList.style.left = '0';
-                optionsList.style.width = `${customSelectRect.width}px`;
-            }
-        });
-        
-        // Add touch handler for mobile
-        customSelect.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            const isVisible = optionsList.classList.contains('show');
-            optionsList.classList.toggle('show');
-            optionsList.style.display = isVisible ? 'none' : 'block';
-            
-            if (!isVisible) {
-                // Ensure proper positioning when showing
-                const customSelectRect = customSelect.getBoundingClientRect();
-                optionsList.style.position = 'absolute';
-                optionsList.style.top = `${customSelectRect.height}px`;
-                optionsList.style.left = '0';
-                optionsList.style.width = `${customSelectRect.width}px`;
-            }
-        }, { passive: false });
-        
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!customSelect.contains(e.target)) {
-                optionsList.classList.remove('show');
-                optionsList.style.display = 'none';
-            }
-        });
-        
-        // Close dropdown when touching outside (mobile)
-        document.addEventListener('touchstart', (e) => {
-            if (!customSelect.contains(e.target)) {
-                optionsList.classList.remove('show');
-                optionsList.style.display = 'none';
-            }
-        }, { passive: false });
+        }
     });
 }
 
