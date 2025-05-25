@@ -1386,75 +1386,41 @@ input:checked + .slider:before {
     position: relative;
     width: 100%;
     margin-bottom: 15px;
-    z-index: 9999;
-    display: block;
-    box-sizing: border-box;
-    overflow: visible;
 }
 
-.custom-select {
-    position: relative;
+.dropdown select {
     width: 100%;
-    cursor: pointer;
-    background: white;
-    z-index: 10000;
-    display: block;
-    box-sizing: border-box;
-    overflow: visible;
-}
-
-.selected-text {
     padding: 8px 12px;
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    position: relative;
-    z-index: 10001;
-    width: 100%;
-    box-sizing: border-box;
-    display: block;
-}
-
-.options-list {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    max-height: 200px;
-    overflow-y: auto;
-    display: none;
-    pointer-events: auto;
-    z-index: 10002;
-    transform: none;
-    opacity: 1;
-    visibility: visible;
-    margin-top: 4px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.options-list.show {
-    display: block !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    transform: none !important;
-    position: absolute !important;
-    z-index: 10002 !important;
-}
-
-.option {
-    padding: 12px;
-    cursor: pointer;
-    transition: background-color 0.2s;
     font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 16px;
+    padding-right: 32px;
 }
 
-.option:hover {
-    background-color: #f5f5f5;
+.dropdown select:focus {
+    outline: none;
+    border-color: #666;
+}
+
+.dropdown select:hover {
+    border-color: #999;
+}
+
+/* Remove custom dropdown styles */
+.custom-select,
+.selected-text,
+.options-list,
+.option {
+    display: none;
 }
 
 /* Mobile styles */
