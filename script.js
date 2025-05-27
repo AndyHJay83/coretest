@@ -1172,6 +1172,21 @@ function createEeeFeature() {
     return div;
 }
 
+function createEeeFirstFeature() {
+    const div = document.createElement('div');
+    div.id = 'eeeFirstFeature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">EEEFIRST</h2>
+        <div class="button-container">
+            <button id="eeeFirstButton">E</button>
+            <button id="eeeFirstYesBtn" class="yes-btn">YES</button>
+            <button id="eeeFirstNoBtn" class="no-btn">NO</button>
+        </div>
+    `;
+    return div;
+}
+
 function createOriginalLexFeature() {
     const div = document.createElement('div');
     div.id = 'originalLexFeature';
@@ -1628,6 +1643,55 @@ function setupFeatureListeners(feature, callback) {
             }
             break;
         }
+
+        case 'eeeFirst': {
+            const eeeFirstButton = document.getElementById('eeeFirstButton');
+            const eeeFirstYesBtn = document.getElementById('eeeFirstYesBtn');
+            const eeeFirstNoBtn = document.getElementById('eeeFirstNoBtn');
+            
+            if (eeeFirstButton) {
+                eeeFirstButton.onclick = () => {
+                    const filteredWords = filterWordsByEeeFirst(currentFilteredWords, 'E');
+                    callback(filteredWords);
+                    document.getElementById('eeeFirstFeature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                eeeFirstButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    eeeFirstButton.click();
+                }, { passive: false });
+            }
+            
+            if (eeeFirstYesBtn) {
+                eeeFirstYesBtn.onclick = () => {
+                    const filteredWords = filterWordsByEeeFirst(currentFilteredWords, 'YES');
+                    callback(filteredWords);
+                    document.getElementById('eeeFirstFeature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                eeeFirstYesBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    eeeFirstYesBtn.click();
+                }, { passive: false });
+            }
+            
+            if (eeeFirstNoBtn) {
+                eeeFirstNoBtn.onclick = () => {
+                    const filteredWords = filterWordsByEeeFirst(currentFilteredWords, 'NO');
+                    callback(filteredWords);
+                    document.getElementById('eeeFirstFeature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                eeeFirstNoBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    eeeFirstNoBtn.click();
+                }, { passive: false });
+            }
+            break;
+        }
         
         case 'originalLex': {
             const originalLexButton = document.getElementById('originalLexButton');
@@ -1868,7 +1932,8 @@ function showNextFeature() {
         'curvedFeature',
         'lexiconFeature',
         'originalLexFeature',
-        'eeeFeature'
+        'eeeFeature',
+        'eeeFirstFeature'
     ];
     
     features.forEach(featureId => {
@@ -1910,6 +1975,9 @@ function showNextFeature() {
     else if (!document.getElementById('curvedFeature').classList.contains('completed')) {
         document.getElementById('curvedFeature').style.display = 'block';
     }
+    else if (!document.getElementById('eeeFirstFeature').classList.contains('completed')) {
+        document.getElementById('eeeFirstFeature').style.display = 'block';
+    }
     else {
         expandWordList();
     }
@@ -1950,7 +2018,8 @@ function resetApp() {
         'curvedFeature',
         'lexiconFeature',
         'originalLexFeature',
-        'eeeFeature'
+        'eeeFeature',
+        'eeeFirstFeature'
     ];
     
     features.forEach(featureId => {
@@ -2176,6 +2245,28 @@ function filterWordsByEee(words, mode) {
             case 'NO':
                 const noLetters = new Set(['B', 'C', 'D', 'G', 'P', 'T', 'V', 'Z']);
                 return !noLetters.has(secondChar);
+        }
+    });
+}
+
+// Function to filter words by EEEFIRST feature
+function filterWordsByEeeFirst(words, mode) {
+    return words.filter(word => {
+        if (word.length < 1) return false;
+        
+        const firstChar = word[0].toUpperCase();
+        
+        switch(mode) {
+            case 'E':
+                return firstChar === 'E';
+                
+            case 'YES':
+                const yesLetters = new Set(['B', 'C', 'D', 'G', 'P', 'T', 'V', 'Z']);
+                return yesLetters.has(firstChar);
+                
+            case 'NO':
+                const noLetters = new Set(['B', 'C', 'D', 'G', 'P', 'T', 'V', 'Z']);
+                return !noLetters.has(firstChar);
         }
     });
 }

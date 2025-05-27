@@ -102,6 +102,10 @@
                                 <button class="info-button" data-feature="eee"><i class="fas fa-info-circle"></i></button>
                             </div>
                             <div class="feature-group">
+                                <button class="feature-button" data-feature="eeeFirst" draggable="true">EEEFIRST</button>
+                                <button class="info-button" data-feature="eeeFirst"><i class="fas fa-info-circle"></i></button>
+                            </div>
+                            <div class="feature-group">
                                 <button class="feature-button" data-feature="originalLex" draggable="true">Lexicon</button>
                                 <button class="info-button" data-feature="originalLex"><i class="fas fa-info-circle"></i></button>
                             </div>
@@ -152,6 +156,16 @@
                         <button id="eeeButton" class="yes-btn">E</button>
                         <button id="eeeYesBtn" class="yes-btn">YES</button>
                         <button id="eeeNoBtn" class="no-btn">NO</button>
+                    </div>
+                </div>
+
+                <!-- EEEfirst feature -->
+                <div id="eeeFirstFeature" class="feature-section" style="display: none;">
+                    <div class="feature-title">EEEFIRST</div>
+                    <div class="button-container">
+                        <button id="eeeFirstButton" class="yes-btn">E</button>
+                        <button id="eeeFirstYesBtn" class="yes-btn">YES</button>
+                        <button id="eeeFirstNoBtn" class="no-btn">NO</button>
                     </div>
                 </div>
 
@@ -309,6 +323,13 @@
             <div class="feature-info-content">
                 <h3>EEE?</h3>
                 <p><strong>E?</strong><br>Input an "E", an "E" sound, or no E in the second position of the chosen word.</p>
+                <button class="close-info-button">&times;</button>
+            </div>
+        </div>
+        <div id="eeeFirstInfo" class="feature-info-modal">
+            <div class="feature-info-content">
+                <h3>EEEFIRST</h3>
+                <p><strong>E?</strong><br>Input an "E", an "E" sound, or no E in the first position of the chosen word.</p>
                 <button class="close-info-button">&times;</button>
             </div>
         </div>
