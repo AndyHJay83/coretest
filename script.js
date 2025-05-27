@@ -959,83 +959,127 @@ async function executeWorkflow(steps) {
         // Store current workflow for reset functionality
         currentWorkflow = { steps };
         
-        // Create and append all features
-        const featureArea = document.getElementById('featureArea');
-        const resultsContainer = document.getElementById('results');
-        
-        // Clear existing features
-        featureArea.innerHTML = '';
-        
-        // Create all features
-        const features = {
-            position1: createPosition1Feature(),
-            vowel: createVowelFeature(),
-            o: createOFeature(),
-            lexicon: createLexiconFeature(),
-            eee: createEeeFeature(),
-            eeeFirst: createEeeFirstFeature(),
-            originalLex: createOriginalLexFeature(),
-            consonant: createConsonantQuestion(),
-            colour3: createColour3Feature(),
-            shape: createShapeFeature(),
-            curved: createCurvedFeature()
+        // Create feature elements if they don't exist
+        const featureElements = {
+            position1Feature: createPosition1Feature(),
+            vowelFeature: createVowelFeature(),
+            oFeature: createOFeature(),
+            lexiconFeature: createLexiconFeature(),
+            eeeFeature: createEeeFeature(),
+            originalLexFeature: createOriginalLexFeature(),
+            consonantFeature: createConsonantQuestion(),
+            colour3Feature: createColour3Feature(),
+            shapeFeature: createShapeFeature(),
+            curvedFeature: createCurvedFeature()
         };
         
-        // Append all features to the feature area
-        Object.values(features).forEach(feature => {
-            if (feature) {
-                featureArea.appendChild(feature);
+        // Add all feature elements to the document body (they'll be moved to feature area when needed)
+        Object.values(featureElements).forEach(element => {
+            if (element) {
+                // Remove from any existing parent
+                if (element.parentNode) {
+                    element.parentNode.removeChild(element);
+                }
+                // Add to document body
+                document.body.appendChild(element);
+                // Hide initially
+                element.style.display = 'none';
+                // Reset completed state
+                element.classList.remove('completed');
             }
         });
         
-        // Process each step in the workflow
-        let currentWords = [...wordList];
-        let currentStepIndex = 0;
-
-        function processNextStep() {
-            if (currentStepIndex >= steps.length) {
-                // Workflow complete
-                displayResults(currentWords);
-                return;
-            }
-
-            const step = steps[currentStepIndex];
-            const feature = features[step.type];
+        // Get or create the feature area and results container
+        let featureArea = document.getElementById('featureArea');
+        let resultsContainer = document.getElementById('results');
+        
+        if (!featureArea) {
+            featureArea = document.createElement('div');
+            featureArea.id = 'featureArea';
+            featureArea.className = 'feature-area';
+            workflowExecution.insertBefore(featureArea, workflowExecution.firstChild);
+        }
+        
+        if (!resultsContainer) {
+            resultsContainer = document.createElement('div');
+            resultsContainer.id = 'results';
+            resultsContainer.className = 'results-container';
+            workflowExecution.appendChild(resultsContainer);
+        }
+        
+        // Set up the layout
+        featureArea.style.flex = '0 0 33vh';
+        featureArea.style.minHeight = '200px';
+        featureArea.style.padding = '20px';
+        featureArea.style.backgroundColor = '#f5f5f5';
+        featureArea.style.borderBottom = '1px solid #ddd';
+        
+        resultsContainer.style.flex = '1';
+        resultsContainer.style.overflowY = 'auto';
+        resultsContainer.style.padding = '20px';
+        resultsContainer.style.backgroundColor = '#fff';
+        
+        // Clear any existing content in both areas
+        featureArea.innerHTML = '';
+        resultsContainer.innerHTML = '';
+        
+        console.log('Feature area:', featureArea);
+        console.log('Results container:', resultsContainer);
+        
+        // Display initial wordlist in the results container
+        displayResults(currentFilteredWords);
+        
+        // Execute each step in sequence
+        for (const step of steps) {
+            console.log('Executing step:', step);
             
-            if (!feature) {
-                console.error(`Feature ${step.type} not found`);
-                return;
-            }
-
-            // Show the current feature
-            feature.style.display = 'block';
+            // Get the feature ID from the step object
+            const featureId = step.feature + 'Feature';
+            console.log('Looking for feature element with ID:', featureId);
             
-            // Setup listeners for this feature
-            setupFeatureListeners(step.type, (filteredWords) => {
-                currentWords = filteredWords;
-                updateWordCount(currentWords.length);
-                
-                // Hide current feature
-                feature.style.display = 'none';
-                
-                // Move to next step
-                currentStepIndex++;
-                processNextStep();
+            // Get the feature element
+            const featureElement = featureElements[featureId];
+            if (!featureElement) {
+                console.error(`Feature element not found for step: ${featureId}`);
+                continue;
+            }
+            
+            // Move the feature to the feature area
+            featureArea.innerHTML = '';
+            featureArea.appendChild(featureElement);
+            featureElement.style.display = 'block';
+            console.log(`Showing feature: ${featureId}`);
+            
+            // Set up event listeners for this feature
+            setupFeatureListeners(step.feature, (filteredWords) => {
+                currentFilteredWords = filteredWords;
+                // Update wordlist in the results container
+                displayResults(currentFilteredWords);
             });
-
-            // Add completion listener
-            feature.addEventListener('completed', () => {
-                // Hide current feature
-                feature.style.display = 'none';
+            
+            // Wait for user interaction
+            await new Promise((resolve) => {
+                const handleFeatureComplete = () => {
+                    console.log(`Feature ${featureId} completed`);
+                    featureElement.classList.add('completed');
+                    featureElement.style.display = 'none';
+                    
+                    // If this was the vowel feature, ensure originalLexCompleted is false
+                    if (featureId === 'vowelFeature') {
+                        console.log('Vowel feature completed, resetting originalLexCompleted');
+                        originalLexCompleted = false;
+                    }
+                    
+                    resolve();
+                };
                 
-                // Move to next step
-                currentStepIndex++;
-                processNextStep();
+                // Add event listener for feature completion
+                featureElement.addEventListener('completed', handleFeatureComplete, { once: true });
             });
         }
-
-        // Start processing steps
-        processNextStep();
+        
+        // Show final results in the results container
+        displayResults(currentFilteredWords);
     } catch (error) {
         console.error('Error executing workflow:', error);
         throw error;
@@ -1211,24 +1255,6 @@ function createCurvedFeature() {
         <button id="curvedSkipBtn" class="skip-button">SKIP</button>
     `;
     return div;
-}
-
-function createEeeFirstFeature() {
-    const feature = document.createElement('div');
-    feature.id = 'eeeFirstFeature';
-    feature.className = 'feature-section';
-    feature.style.display = 'none';
-    
-    feature.innerHTML = `
-        <div class="feature-title">EEE FIRST</div>
-        <div class="button-container">
-            <button id="eeeFirstButton" class="yes-btn">E</button>
-            <button id="eeeFirstYesBtn" class="yes-btn">YES</button>
-            <button id="eeeFirstNoBtn" class="no-btn">NO</button>
-        </div>
-    `;
-    
-    return feature;
 }
 
 // Function to setup feature listeners
@@ -1561,7 +1587,7 @@ function setupFeatureListeners(feature, callback) {
             
             if (eeeButton) {
                 eeeButton.onclick = () => {
-                    const filteredWords = filterWordsByEee(currentFilteredWords, 'e');
+                    const filteredWords = filterWordsByEee(currentFilteredWords, 'E');
                     callback(filteredWords);
                     document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
                 };
@@ -1575,7 +1601,7 @@ function setupFeatureListeners(feature, callback) {
             
             if (eeeYesBtn) {
                 eeeYesBtn.onclick = () => {
-                    const filteredWords = filterWordsByEee(currentFilteredWords, 'yes');
+                    const filteredWords = filterWordsByEee(currentFilteredWords, 'YES');
                     callback(filteredWords);
                     document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
                 };
@@ -1589,70 +1615,15 @@ function setupFeatureListeners(feature, callback) {
             
             if (eeeNoBtn) {
                 eeeNoBtn.onclick = () => {
-                    const filteredWords = filterWordsByEee(currentFilteredWords, 'no');
+                    const filteredWords = filterWordsByEee(currentFilteredWords, 'NO');
                     callback(filteredWords);
-                    // Hide EEE feature and show EEEfirst feature
-                    const eeeFeature = document.getElementById('eeeFeature');
-                    const eeeFirstFeature = document.getElementById('eeeFirstFeature');
-                    if (eeeFeature && eeeFirstFeature) {
-                        eeeFeature.style.display = 'none';
-                        eeeFirstFeature.style.display = 'block';
-                    }
+                    document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
                 };
                 
                 // Add touch event for mobile
                 eeeNoBtn.addEventListener('touchstart', (e) => {
                     e.preventDefault();
                     eeeNoBtn.click();
-                }, { passive: false });
-            }
-            break;
-        }
-
-        case 'eeeFirst': {
-            const eeeFirstButton = document.getElementById('eeeFirstButton');
-            const eeeFirstYesBtn = document.getElementById('eeeFirstYesBtn');
-            const eeeFirstNoBtn = document.getElementById('eeeFirstNoBtn');
-            
-            if (eeeFirstButton) {
-                eeeFirstButton.onclick = () => {
-                    const filteredWords = filterWordsByEeeFirst(currentFilteredWords, 'e');
-                    callback(filteredWords);
-                    document.getElementById('eeeFirstFeature').dispatchEvent(new Event('completed'));
-                };
-                
-                // Add touch event for mobile
-                eeeFirstButton.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    eeeFirstButton.click();
-                }, { passive: false });
-            }
-            
-            if (eeeFirstYesBtn) {
-                eeeFirstYesBtn.onclick = () => {
-                    const filteredWords = filterWordsByEeeFirst(currentFilteredWords, 'yes');
-                    callback(filteredWords);
-                    document.getElementById('eeeFirstFeature').dispatchEvent(new Event('completed'));
-                };
-                
-                // Add touch event for mobile
-                eeeFirstYesBtn.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    eeeFirstYesBtn.click();
-                }, { passive: false });
-            }
-            
-            if (eeeFirstNoBtn) {
-                eeeFirstNoBtn.onclick = () => {
-                    const filteredWords = filterWordsByEeeFirst(currentFilteredWords, 'no');
-                    callback(filteredWords);
-                    document.getElementById('eeeFirstFeature').dispatchEvent(new Event('completed'));
-                };
-                
-                // Add touch event for mobile
-                eeeFirstNoBtn.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    eeeFirstNoBtn.click();
                 }, { passive: false });
             }
             break;
@@ -3284,26 +3255,4 @@ document.addEventListener('DOMContentLoaded', function() {
 function showWorkflowCreation() {
     // ... existing code ...
     initializeInfoButtons();
-}
-
-// Add the new filter function for EEEfirst
-function filterWordsByEeeFirst(words, mode) {
-    const eeeSoundLetters = new Set(['A', 'E', 'I', 'O', 'U', 'Y']);
-    
-    return words.filter(word => {
-        if (word.length < 1) return false;
-        
-        const firstLetter = word[0].toUpperCase();
-        
-        switch (mode) {
-            case 'e':
-                return firstLetter === 'E';
-            case 'yes':
-                return eeeSoundLetters.has(firstLetter);
-            case 'no':
-                return !eeeSoundLetters.has(firstLetter);
-            default:
-                return true;
-        }
-    });
 }
