@@ -1301,6 +1301,7 @@ function setupFeatureListeners(feature, callback) {
         case 'vowel': {
             const vowelYesBtn = document.querySelector('#vowelFeature .yes-btn');
             const vowelNoBtn = document.querySelector('#vowelFeature .no-btn');
+            const positionBtns = document.querySelectorAll('#vowelFeature .position-btn');
             
             // Initialize vowel processing with current words
             currentFilteredWordsForVowels = [...currentFilteredWords];
@@ -1319,17 +1320,46 @@ function setupFeatureListeners(feature, callback) {
             }
             
             // Set up the vowel display
-        const vowelFeature = document.getElementById('vowelFeature');
-        const vowelLetter = vowelFeature.querySelector('.vowel-letter');
+            const vowelFeature = document.getElementById('vowelFeature');
+            const vowelLetter = vowelFeature.querySelector('.vowel-letter');
             if (uniqueVowels.length > 0) {
-        vowelLetter.textContent = uniqueVowels[0].toUpperCase();
-        vowelLetter.style.display = 'inline-block';
+                vowelLetter.textContent = uniqueVowels[0].toUpperCase();
+                vowelLetter.style.display = 'inline-block';
             }
-            
+
+            // Function to filter words by vowel position
+            function filterWordsByVowelPosition(words, vowel, position) {
+                return words.filter(word => {
+                    // Convert position to 0-based index
+                    const pos = position - 1;
+                    // Check if word is long enough and has the vowel in the specified position
+                    return word.length > pos && word[pos].toLowerCase() === vowel.toLowerCase();
+                });
+            }
+
+            // Add click handlers for position buttons
+            positionBtns.forEach(btn => {
+                btn.onclick = () => {
+                    const position = parseInt(btn.dataset.position);
+                    const currentVowel = uniqueVowels[currentVowelIndex];
+                    if (currentVowel) {
+                        const filteredWords = filterWordsByVowelPosition(currentFilteredWords, currentVowel, position);
+                        callback(filteredWords);
+                        document.getElementById('vowelFeature').dispatchEvent(new Event('completed'));
+                    }
+                };
+                
+                // Add touch event for mobile
+                btn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    btn.click();
+                }, { passive: false });
+            });
+
+            // Existing YES/NO button handlers remain unchanged
             if (vowelYesBtn) {
                 vowelYesBtn.onclick = () => {
                     handleVowelSelection(true);
-                    callback(currentFilteredWordsForVowels);
                 };
                 
                 // Add touch event for mobile
@@ -1342,7 +1372,6 @@ function setupFeatureListeners(feature, callback) {
             if (vowelNoBtn) {
                 vowelNoBtn.onclick = () => {
                     handleVowelSelection(false);
-                    callback(currentFilteredWordsForVowels);
                 };
                 
                 // Add touch event for mobile

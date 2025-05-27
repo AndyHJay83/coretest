@@ -1912,4 +1912,52 @@ input:checked + .slider:before {
         max-height: 60vh;
         padding: 8px;
     }
+}
+
+/* Position buttons in vowel feature */
+.position-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.position-btn {
+    padding: 10px 15px;
+    font-size: 1.2em;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: bold;
+    background-color: #007bff;
+    color: white;
+    min-width: 40px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.position-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.position-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Mobile-specific improvements for position buttons */
+@media (max-width: 600px) {
+    .position-buttons {
+        gap: 8px;
+    }
+    
+    .position-btn {
+        padding: 8px 12px;
+        font-size: 1.1em;
+        min-width: 35px;
+    }
 } 
