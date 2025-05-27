@@ -988,65 +988,54 @@ async function executeWorkflow(steps) {
             }
         });
         
-        // ... rest of the existing code ...
-        
-        console.log('Feature area:', featureArea);
-        console.log('Results container:', resultsContainer);
-        
-        // Display initial wordlist in the results container
-        displayResults(currentFilteredWords);
-        
-        // Execute each step in sequence
-        for (const step of steps) {
-            console.log('Executing step:', step);
-            
-            // Get the feature ID from the step object
-            const featureId = step.feature + 'Feature';
-            console.log('Looking for feature element with ID:', featureId);
-            
-            // Get the feature element
-            const featureElement = featureElements[featureId];
-            if (!featureElement) {
-                console.error(`Feature element not found for step: ${featureId}`);
-                continue;
+        // Process each step in the workflow
+        let currentWords = [...wordList];
+        let currentStepIndex = 0;
+
+        function processNextStep() {
+            if (currentStepIndex >= steps.length) {
+                // Workflow complete
+                displayResults(currentWords);
+                return;
             }
+
+            const step = steps[currentStepIndex];
+            const feature = features[step.type];
             
-            // Move the feature to the feature area
-            featureArea.innerHTML = '';
-            featureArea.appendChild(featureElement);
-            featureElement.style.display = 'block';
-            console.log(`Showing feature: ${featureId}`);
+            if (!feature) {
+                console.error(`Feature ${step.type} not found`);
+                return;
+            }
+
+            // Show the current feature
+            feature.style.display = 'block';
             
-            // Set up event listeners for this feature
-            setupFeatureListeners(step.feature, (filteredWords) => {
-                currentFilteredWords = filteredWords;
-                // Update wordlist in the results container
-                displayResults(currentFilteredWords);
-            });
-            
-            // Wait for user interaction
-            await new Promise((resolve) => {
-                const handleFeatureComplete = () => {
-                    console.log(`Feature ${featureId} completed`);
-                    featureElement.classList.add('completed');
-                    featureElement.style.display = 'none';
-                    
-                    // If this was the vowel feature, ensure originalLexCompleted is false
-                    if (featureId === 'vowelFeature') {
-                        console.log('Vowel feature completed, resetting originalLexCompleted');
-                        originalLexCompleted = false;
-                    }
-                    
-                    resolve();
-                };
+            // Setup listeners for this feature
+            setupFeatureListeners(step.type, (filteredWords) => {
+                currentWords = filteredWords;
+                updateWordCount(currentWords.length);
                 
-                // Add event listener for feature completion
-                featureElement.addEventListener('completed', handleFeatureComplete, { once: true });
+                // Hide current feature
+                feature.style.display = 'none';
+                
+                // Move to next step
+                currentStepIndex++;
+                processNextStep();
+            });
+
+            // Add completion listener
+            feature.addEventListener('completed', () => {
+                // Hide current feature
+                feature.style.display = 'none';
+                
+                // Move to next step
+                currentStepIndex++;
+                processNextStep();
             });
         }
-        
-        // Show final results in the results container
-        displayResults(currentFilteredWords);
+
+        // Start processing steps
+        processNextStep();
     } catch (error) {
         console.error('Error executing workflow:', error);
         throw error;
