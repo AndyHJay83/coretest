@@ -959,69 +959,36 @@ async function executeWorkflow(steps) {
         // Store current workflow for reset functionality
         currentWorkflow = { steps };
         
-        // Create feature elements if they don't exist
-        const featureElements = {
-            position1Feature: createPosition1Feature(),
-            vowelFeature: createVowelFeature(),
-            oFeature: createOFeature(),
-            lexiconFeature: createLexiconFeature(),
-            eeeFeature: createEeeFeature(),
-            originalLexFeature: createOriginalLexFeature(),
-            consonantFeature: createConsonantQuestion(),
-            colour3Feature: createColour3Feature(),
-            shapeFeature: createShapeFeature(),
-            curvedFeature: createCurvedFeature()
+        // Create and append all features
+        const featureArea = document.getElementById('featureArea');
+        const resultsContainer = document.getElementById('results');
+        
+        // Clear existing features
+        featureArea.innerHTML = '';
+        
+        // Create all features
+        const features = {
+            position1: createPosition1Feature(),
+            vowel: createVowelFeature(),
+            o: createOFeature(),
+            lexicon: createLexiconFeature(),
+            eee: createEeeFeature(),
+            eeeFirst: createEeeFirstFeature(),
+            originalLex: createOriginalLexFeature(),
+            consonant: createConsonantQuestion(),
+            colour3: createColour3Feature(),
+            shape: createShapeFeature(),
+            curved: createCurvedFeature()
         };
         
-        // Add all feature elements to the document body (they'll be moved to feature area when needed)
-        Object.values(featureElements).forEach(element => {
-            if (element) {
-                // Remove from any existing parent
-                if (element.parentNode) {
-                    element.parentNode.removeChild(element);
-                }
-                // Add to document body
-                document.body.appendChild(element);
-                // Hide initially
-                element.style.display = 'none';
-                // Reset completed state
-                element.classList.remove('completed');
+        // Append all features to the feature area
+        Object.values(features).forEach(feature => {
+            if (feature) {
+                featureArea.appendChild(feature);
             }
         });
         
-        // Get or create the feature area and results container
-        let featureArea = document.getElementById('featureArea');
-        let resultsContainer = document.getElementById('results');
-        
-        if (!featureArea) {
-            featureArea = document.createElement('div');
-            featureArea.id = 'featureArea';
-            featureArea.className = 'feature-area';
-            workflowExecution.insertBefore(featureArea, workflowExecution.firstChild);
-        }
-        
-        if (!resultsContainer) {
-            resultsContainer = document.createElement('div');
-            resultsContainer.id = 'results';
-            resultsContainer.className = 'results-container';
-            workflowExecution.appendChild(resultsContainer);
-        }
-        
-        // Set up the layout
-        featureArea.style.flex = '0 0 33vh';
-        featureArea.style.minHeight = '200px';
-        featureArea.style.padding = '20px';
-        featureArea.style.backgroundColor = '#f5f5f5';
-        featureArea.style.borderBottom = '1px solid #ddd';
-        
-        resultsContainer.style.flex = '1';
-        resultsContainer.style.overflowY = 'auto';
-        resultsContainer.style.padding = '20px';
-        resultsContainer.style.backgroundColor = '#fff';
-        
-        // Clear any existing content in both areas
-        featureArea.innerHTML = '';
-        resultsContainer.innerHTML = '';
+        // ... rest of the existing code ...
         
         console.log('Feature area:', featureArea);
         console.log('Results container:', resultsContainer);
@@ -1255,6 +1222,24 @@ function createCurvedFeature() {
         <button id="curvedSkipBtn" class="skip-button">SKIP</button>
     `;
     return div;
+}
+
+function createEeeFirstFeature() {
+    const feature = document.createElement('div');
+    feature.id = 'eeeFirstFeature';
+    feature.className = 'feature-section';
+    feature.style.display = 'none';
+    
+    feature.innerHTML = `
+        <div class="feature-title">EEE FIRST</div>
+        <div class="button-container">
+            <button id="eeeFirstButton" class="yes-btn">E</button>
+            <button id="eeeFirstYesBtn" class="yes-btn">YES</button>
+            <button id="eeeFirstNoBtn" class="no-btn">NO</button>
+        </div>
+    `;
+    
+    return feature;
 }
 
 // Function to setup feature listeners
@@ -1617,9 +1602,13 @@ function setupFeatureListeners(feature, callback) {
                 eeeNoBtn.onclick = () => {
                     const filteredWords = filterWordsByEee(currentFilteredWords, 'no');
                     callback(filteredWords);
-                    // Instead of completing, show the EEEfirst feature
-                    document.getElementById('eeeFeature').style.display = 'none';
-                    document.getElementById('eeeFirstFeature').style.display = 'block';
+                    // Hide EEE feature and show EEEfirst feature
+                    const eeeFeature = document.getElementById('eeeFeature');
+                    const eeeFirstFeature = document.getElementById('eeeFirstFeature');
+                    if (eeeFeature && eeeFirstFeature) {
+                        eeeFeature.style.display = 'none';
+                        eeeFirstFeature.style.display = 'block';
+                    }
                 };
                 
                 // Add touch event for mobile
