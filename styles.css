@@ -1922,6 +1922,7 @@ input:checked + .slider:before {
     margin-top: 20px;
     flex-wrap: wrap;
     width: 100%;
+    padding: 10px;
 }
 
 .position-btn {
@@ -1932,32 +1933,37 @@ input:checked + .slider:before {
     cursor: pointer;
     transition: all 0.3s ease;
     font-weight: bold;
-    background-color: #007bff;
-    color: white;
+    background-color: #1B5E20 !important; /* Using the same green as other buttons */
+    color: white !important;
     min-width: 40px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    text-transform: none !important; /* Override the uppercase transform */
 }
 
 .position-btn:hover {
     opacity: 0.9;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background-color: #2E7D32 !important; /* Slightly lighter green on hover */
 }
 
 .position-btn:active {
     transform: translateY(0);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    background-color: #1B5E20 !important; /* Back to dark green when pressed */
 }
 
 /* Mobile-specific improvements for position buttons */
 @media (max-width: 600px) {
     .position-buttons {
         gap: 8px;
+        padding: 8px;
     }
     
     .position-btn {
         padding: 8px 12px;
         font-size: 1.1em;
         min-width: 35px;
+        min-height: 35px;
     }
 } 
