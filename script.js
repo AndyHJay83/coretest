@@ -1649,6 +1649,7 @@ function setupFeatureListeners(feature, callback) {
             const eeeFirstButton = document.getElementById('eeeFirstButton');
             const eeeFirstYesBtn = document.getElementById('eeeFirstYesBtn');
             const eeeFirstNoBtn = document.getElementById('eeeFirstNoBtn');
+            const eeeFirstSkipButton = document.getElementById('eeeFirstSkipButton');
             
             if (eeeFirstButton) {
                 eeeFirstButton.onclick = () => {
@@ -1689,6 +1690,19 @@ function setupFeatureListeners(feature, callback) {
                 eeeFirstNoBtn.addEventListener('touchstart', (e) => {
                     e.preventDefault();
                     eeeFirstNoBtn.click();
+                }, { passive: false });
+            }
+
+            if (eeeFirstSkipButton) {
+                eeeFirstSkipButton.onclick = () => {
+                    callback(currentFilteredWords); // Keep the current word list unchanged
+                    document.getElementById('eeeFirstFeature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                eeeFirstSkipButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    eeeFirstSkipButton.click();
                 }, { passive: false });
             }
             break;
