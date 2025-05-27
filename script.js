@@ -966,8 +966,9 @@ async function executeWorkflow(steps) {
             oFeature: createOFeature(),
             lexiconFeature: createLexiconFeature(),
             eeeFeature: createEeeFeature(),
+            eeeFirstFeature: createEeeFirstFeature(),
             originalLexFeature: createOriginalLexFeature(),
-            consonantFeature: createConsonantQuestion(),
+            consonantQuestion: createConsonantQuestion(),
             colour3Feature: createColour3Feature(),
             shapeFeature: createShapeFeature(),
             curvedFeature: createCurvedFeature()
