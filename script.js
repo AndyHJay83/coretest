@@ -1108,12 +1108,20 @@ function createVowelFeature() {
     div.className = 'feature-section';
     div.innerHTML = `
         <h2 class="feature-title">VOWEL</h2>
-        <div class="vowel-content">
-            <span class="vowel-letter"></span>
-        </div>
-        <div class="vowel-buttons">
+        <div class="vowel-letter"></div>
+        <div class="button-container">
             <button class="vowel-btn yes-btn">YES</button>
             <button class="vowel-btn no-btn">NO</button>
+        </div>
+        <div class="position-buttons">
+            <button class="position-btn" data-position="1">1</button>
+            <button class="position-btn" data-position="2">2</button>
+            <button class="position-btn" data-position="3">3</button>
+            <button class="position-btn" data-position="4">4</button>
+            <button class="position-btn" data-position="5">5</button>
+            <button class="position-btn" data-position="6">6</button>
+            <button class="position-btn" data-position="7">7</button>
+            <button class="position-btn" data-position="8">8</button>
         </div>
     `;
     return div;
