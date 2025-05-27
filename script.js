@@ -1092,7 +1092,7 @@ function createPosition1Feature() {
     div.id = 'position1Feature';
     div.className = 'feature-section';
     div.innerHTML = `
-        <h2 class="feature-title">POSITION 1</h2>
+        <h2 class="feature-title">SHORT WORD</h2>
         <div class="position-input">
             <input type="text" id="position1Input" placeholder="Enter a word">
             <button id="position1Button">SUBMIT</button>
