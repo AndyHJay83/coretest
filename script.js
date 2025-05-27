@@ -1169,7 +1169,7 @@ function createOriginalLexFeature() {
     div.id = 'originalLexFeature';
     div.className = 'feature-section';
     div.innerHTML = `
-        <h2 class="feature-title">ORIGINAL LEX</h2>
+        <h2 class="feature-title">LEXICON</h2>
         <div class="position-info">
             <div class="position-display">Position: <span class="position-number">1</span></div>
             <div class="possible-letters">Possible letters: <span class="letters-list"></span></div>
