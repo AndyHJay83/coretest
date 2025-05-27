@@ -1587,7 +1587,7 @@ function setupFeatureListeners(feature, callback) {
             
             if (eeeButton) {
                 eeeButton.onclick = () => {
-                    const filteredWords = filterWordsByEee(currentFilteredWords, 'E');
+                    const filteredWords = filterWordsByEee(currentFilteredWords, 'e');
                     callback(filteredWords);
                     document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
                 };
@@ -1601,7 +1601,7 @@ function setupFeatureListeners(feature, callback) {
             
             if (eeeYesBtn) {
                 eeeYesBtn.onclick = () => {
-                    const filteredWords = filterWordsByEee(currentFilteredWords, 'YES');
+                    const filteredWords = filterWordsByEee(currentFilteredWords, 'yes');
                     callback(filteredWords);
                     document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
                 };
@@ -1615,15 +1615,66 @@ function setupFeatureListeners(feature, callback) {
             
             if (eeeNoBtn) {
                 eeeNoBtn.onclick = () => {
-                    const filteredWords = filterWordsByEee(currentFilteredWords, 'NO');
+                    const filteredWords = filterWordsByEee(currentFilteredWords, 'no');
                     callback(filteredWords);
-                    document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
+                    // Instead of completing, show the EEEfirst feature
+                    document.getElementById('eeeFeature').style.display = 'none';
+                    document.getElementById('eeeFirstFeature').style.display = 'block';
                 };
                 
                 // Add touch event for mobile
                 eeeNoBtn.addEventListener('touchstart', (e) => {
                     e.preventDefault();
                     eeeNoBtn.click();
+                }, { passive: false });
+            }
+            break;
+        }
+
+        case 'eeeFirst': {
+            const eeeFirstButton = document.getElementById('eeeFirstButton');
+            const eeeFirstYesBtn = document.getElementById('eeeFirstYesBtn');
+            const eeeFirstNoBtn = document.getElementById('eeeFirstNoBtn');
+            
+            if (eeeFirstButton) {
+                eeeFirstButton.onclick = () => {
+                    const filteredWords = filterWordsByEeeFirst(currentFilteredWords, 'e');
+                    callback(filteredWords);
+                    document.getElementById('eeeFirstFeature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                eeeFirstButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    eeeFirstButton.click();
+                }, { passive: false });
+            }
+            
+            if (eeeFirstYesBtn) {
+                eeeFirstYesBtn.onclick = () => {
+                    const filteredWords = filterWordsByEeeFirst(currentFilteredWords, 'yes');
+                    callback(filteredWords);
+                    document.getElementById('eeeFirstFeature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                eeeFirstYesBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    eeeFirstYesBtn.click();
+                }, { passive: false });
+            }
+            
+            if (eeeFirstNoBtn) {
+                eeeFirstNoBtn.onclick = () => {
+                    const filteredWords = filterWordsByEeeFirst(currentFilteredWords, 'no');
+                    callback(filteredWords);
+                    document.getElementById('eeeFirstFeature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                eeeFirstNoBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    eeeFirstNoBtn.click();
                 }, { passive: false });
             }
             break;
@@ -3255,4 +3306,26 @@ document.addEventListener('DOMContentLoaded', function() {
 function showWorkflowCreation() {
     // ... existing code ...
     initializeInfoButtons();
+}
+
+// Add the new filter function for EEEfirst
+function filterWordsByEeeFirst(words, mode) {
+    const eeeSoundLetters = new Set(['A', 'E', 'I', 'O', 'U', 'Y']);
+    
+    return words.filter(word => {
+        if (word.length < 1) return false;
+        
+        const firstLetter = word[0].toUpperCase();
+        
+        switch (mode) {
+            case 'e':
+                return firstLetter === 'E';
+            case 'yes':
+                return eeeSoundLetters.has(firstLetter);
+            case 'no':
+                return !eeeSoundLetters.has(firstLetter);
+            default:
+                return true;
+        }
+    });
 }
