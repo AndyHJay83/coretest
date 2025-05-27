@@ -1184,6 +1184,7 @@ function createEeeFirstFeature() {
             <button id="eeeFirstYesBtn" class="yes-btn">YES</button>
             <button id="eeeFirstNoBtn" class="no-btn">NO</button>
         </div>
+        <button id="eeeFirstSkipButton" class="skip-button">SKIP</button>
     `;
     return div;
 }
