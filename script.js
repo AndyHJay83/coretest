@@ -165,6 +165,28 @@ function initializeWorkflowDropdown() {
         optionsList.addEventListener('touchmove', (e) => {
             e.stopPropagation();
         }, { passive: false });
+
+        // Add keyboard navigation
+        customSelect.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                optionsList.classList.toggle('show');
+            } else if (e.key === 'Escape') {
+                optionsList.classList.remove('show');
+            }
+        });
+
+        // Add focus styles
+        customSelect.addEventListener('focus', () => {
+            customSelect.classList.add('focused');
+        });
+
+        customSelect.addEventListener('blur', () => {
+            customSelect.classList.remove('focused');
+        });
+
+        // Make the custom select focusable
+        customSelect.setAttribute('tabindex', '0');
     }
 }
 

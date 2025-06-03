@@ -1666,6 +1666,16 @@ input:checked + .slider:before {
     min-height: 44px;
     display: flex;
     align-items: center;
+    transition: border-color 0.2s ease;
+}
+
+.custom-select:hover {
+    border-color: #999;
+}
+
+.custom-select.focused {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
 
 .selected-text {
@@ -1685,6 +1695,11 @@ input:checked + .slider:before {
     font-size: 12px;
     color: #666;
     pointer-events: none;
+    transition: transform 0.2s ease;
+}
+
+.custom-select.show .selected-text::after {
+    transform: translateY(-50%) rotate(180deg);
 }
 
 .options-list {
@@ -1703,6 +1718,7 @@ input:checked + .slider:before {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
+    margin-top: 2px;
 }
 
 .options-list.show {
