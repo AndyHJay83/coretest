@@ -118,14 +118,27 @@ function initializeDropdowns() {
     // Set initial selected text
     workflowSelectedText.textContent = workflowSelect.options[workflowSelect.selectedIndex].textContent;
 
+    // Function to close workflow dropdown
+    const closeWorkflowDropdown = () => {
+        workflowOptionsList.classList.remove('show');
+        workflowOptionsList.style.cssText = '';
+    };
+
     // Set up workflow dropdown click and touch handlers
     const toggleWorkflowDropdown = (e) => {
         if (e) {
             e.preventDefault();
             e.stopPropagation();
         }
-        workflowOptionsList.classList.toggle('show');
+        
+        // Close wordlist dropdown if it's open
+        closeWordlistDropdown();
+        
+        // Toggle workflow dropdown
         if (workflowOptionsList.classList.contains('show')) {
+            closeWorkflowDropdown();
+        } else {
+            workflowOptionsList.classList.add('show');
             workflowOptionsList.style.cssText = `
                 display: block !important;
                 position: absolute;
@@ -137,8 +150,6 @@ function initializeDropdowns() {
                 background: white;
                 box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             `;
-        } else {
-            workflowOptionsList.style.cssText = '';
         }
     };
 
@@ -158,9 +169,8 @@ function initializeDropdowns() {
         workflowSelect.value = value;
         workflowSelectedText.textContent = text;
 
-        // Close dropdown and reset styles
-        workflowOptionsList.classList.remove('show');
-        workflowOptionsList.style.cssText = '';
+        // Close dropdown
+        closeWorkflowDropdown();
 
         // If "New Workflow" is selected, show the workflow creation page
         if (value === 'create-new') {
@@ -206,14 +216,27 @@ function initializeDropdowns() {
     // Set initial wordlist selected text
     wordlistSelectedText.textContent = wordlistSelect.options[wordlistSelect.selectedIndex].textContent;
     
+    // Function to close wordlist dropdown
+    const closeWordlistDropdown = () => {
+        wordlistOptionsList.classList.remove('show');
+        wordlistOptionsList.style.cssText = '';
+    };
+
     // Set up wordlist dropdown click and touch handlers
     const toggleWordlistDropdown = (e) => {
         if (e) {
             e.preventDefault();
             e.stopPropagation();
         }
-        wordlistOptionsList.classList.toggle('show');
+        
+        // Close workflow dropdown if it's open
+        closeWorkflowDropdown();
+        
+        // Toggle wordlist dropdown
         if (wordlistOptionsList.classList.contains('show')) {
+            closeWordlistDropdown();
+        } else {
+            wordlistOptionsList.classList.add('show');
             wordlistOptionsList.style.cssText = `
                 display: block !important;
                 position: absolute;
@@ -225,8 +248,6 @@ function initializeDropdowns() {
                 background: white;
                 box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             `;
-        } else {
-            wordlistOptionsList.style.cssText = '';
         }
     };
 
@@ -246,9 +267,8 @@ function initializeDropdowns() {
         wordlistSelect.value = value;
         wordlistSelectedText.textContent = text;
 
-        // Close dropdown and reset styles
-        wordlistOptionsList.classList.remove('show');
-        wordlistOptionsList.style.cssText = '';
+        // Close dropdown
+        closeWordlistDropdown();
     };
 
     wordlistOptionsList.addEventListener('click', handleWordlistOptionSelect);
@@ -257,12 +277,10 @@ function initializeDropdowns() {
     // Close dropdowns when clicking/touching outside
     const closeDropdowns = (e) => {
         if (!workflowCustomSelect.contains(e.target)) {
-            workflowOptionsList.classList.remove('show');
-            workflowOptionsList.style.cssText = '';
+            closeWorkflowDropdown();
         }
         if (!wordlistCustomSelect.contains(e.target)) {
-            wordlistOptionsList.classList.remove('show');
-            wordlistOptionsList.style.cssText = '';
+            closeWordlistDropdown();
         }
     };
 
