@@ -36,72 +36,58 @@ const performButton = document.getElementById('performButton');
 
 // Function to initialize workflow dropdown
 function initializeWorkflowDropdown() {
-    console.log('Initializing workflow dropdown...');
     const workflowSelect = document.getElementById('workflowSelect');
-    const customSelect = document.querySelector('.dropdown:first-child .custom-select');
-    const optionsList = document.querySelector('.dropdown:first-child .options-list');
-    
-    if (!workflowSelect || !customSelect || !optionsList) {
-        console.error('Required elements not found:', {
-            workflowSelect: !!workflowSelect,
-            customSelect: !!customSelect,
-            optionsList: !!optionsList
-        });
+    const customSelect = workflowSelect.nextElementSibling;
+    const selectedText = customSelect.querySelector('.selected-text');
+    const optionsList = customSelect.querySelector('.options-list');
+
+    if (!workflowSelect || !customSelect || !selectedText || !optionsList) {
+        console.error('Required workflow dropdown elements not found');
         return;
     }
-    
-    // Add workflow-dropdown class to the parent dropdown
-    customSelect.closest('.dropdown').classList.add('workflow-dropdown');
-    
-    // Clear existing options except the first two (Select a workflow... and New Workflow)
+
+    // Clear existing options except the first two
     while (workflowSelect.options.length > 2) {
         workflowSelect.remove(2);
     }
-    
-    // Add saved workflows to the dropdown
+
+    // Clear existing custom options
+    optionsList.innerHTML = '';
+
+    // Add default options to custom dropdown
+    const defaultOptions = [
+        { value: '', text: 'Select a workflow...' },
+        { value: 'create-new', text: 'New Workflow' }
+    ];
+
+    defaultOptions.forEach(option => {
+        const optionElement = document.createElement('div');
+        optionElement.className = 'option';
+        optionElement.textContent = option.text;
+        optionElement.dataset.value = option.value;
+        optionsList.appendChild(optionElement);
+    });
+
+    // Add saved workflows
     const savedWorkflows = JSON.parse(localStorage.getItem('workflows') || '[]');
-    console.log('Found saved workflows:', savedWorkflows);
-    
     savedWorkflows.forEach(workflow => {
+        // Add to native select
         const option = document.createElement('option');
         option.value = workflow.name;
         option.textContent = workflow.name;
         workflowSelect.appendChild(option);
+
+        // Add to custom dropdown
+        const optionElement = document.createElement('div');
+        optionElement.className = 'option';
+        optionElement.textContent = workflow.name;
+        optionElement.dataset.value = workflow.name;
+        optionsList.appendChild(optionElement);
     });
-    
-    // Initialize custom dropdown component
-    console.log('Setting up custom dropdown component...');
-    
-    // Clear existing options
-    optionsList.innerHTML = '';
-    
-    // Add options to custom dropdown
-    Array.from(workflowSelect.options).forEach(option => {
-        const customOption = document.createElement('div');
-        customOption.className = 'option';
-        customOption.textContent = option.textContent;
-        customOption.setAttribute('data-value', option.value);
-        
-        if (option.selected) {
-            customOption.classList.add('selected');
-        }
-        
-        optionsList.appendChild(customOption);
-    });
-    
-    // Set initial selected text
-    const selectedText = customSelect.querySelector('.selected-text');
-    if (selectedText) {
-        selectedText.textContent = workflowSelect.options[0].textContent;
-    }
-    
-    // Add click handler to custom select
-    customSelect.addEventListener('click', function(e) {
-        e.stopPropagation();
-        this.classList.toggle('show');
+
+    // Set up click handlers
+    customSelect.addEventListener('click', () => {
         optionsList.classList.toggle('show');
-        
-        // Force the dropdown to be fully visible
         if (optionsList.classList.contains('show')) {
             optionsList.style.cssText = `
                 display: block !important;
@@ -114,28 +100,30 @@ function initializeWorkflowDropdown() {
             `;
         }
     });
-    
-    // Add click handlers to options
-    optionsList.querySelectorAll('.option').forEach(option => {
-        option.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const value = this.getAttribute('data-value');
-            workflowSelect.value = value;
-            selectedText.textContent = this.textContent;
-            customSelect.classList.remove('show');
-            optionsList.classList.remove('show');
-            
-            // If "New Workflow" is selected, show the workflow creation page
-            if (value === 'create-new') {
-                showWorkflowCreation();
-            }
-        });
+
+    optionsList.addEventListener('click', (e) => {
+        const option = e.target.closest('.option');
+        if (!option) return;
+
+        const value = option.dataset.value;
+        const text = option.textContent;
+
+        // Update both dropdowns
+        workflowSelect.value = value;
+        selectedText.textContent = text;
+
+        // Close dropdown
+        optionsList.classList.remove('show');
+
+        // If "New Workflow" is selected, show the workflow creation page
+        if (value === 'create-new') {
+            showWorkflowCreation();
+        }
     });
-    
+
     // Close dropdown when clicking outside
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', (e) => {
         if (!customSelect.contains(e.target)) {
-            customSelect.classList.remove('show');
             optionsList.classList.remove('show');
         }
     });
