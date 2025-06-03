@@ -38,8 +38,8 @@ const performButton = document.getElementById('performButton');
 function initializeWorkflowDropdown() {
     console.log('Initializing workflow dropdown...');
     const workflowSelect = document.getElementById('workflowSelect');
-    const customSelect = document.querySelector('.custom-select');
-    const optionsList = document.querySelector('.options-list');
+    const customSelect = document.querySelector('.dropdown:first-child .custom-select');
+    const optionsList = document.querySelector('.dropdown:first-child .options-list');
     
     if (!workflowSelect || !customSelect || !optionsList) {
         console.error('Required elements not found:', {
@@ -136,6 +136,68 @@ function initializeWorkflowDropdown() {
     });
 }
 
+// Initialize wordlist dropdown
+function initializeWordlistDropdown() {
+    const wordlistSelect = document.getElementById('wordlistSelect');
+    const customSelect = document.querySelector('.dropdown:last-child .custom-select');
+    const optionsList = document.querySelector('.dropdown:last-child .options-list');
+    
+    if (!wordlistSelect || !customSelect || !optionsList) {
+        console.error('Required elements not found for wordlist dropdown');
+        return;
+    }
+    
+    // Clear existing options
+    optionsList.innerHTML = '';
+    
+    // Add options to custom dropdown
+    Array.from(wordlistSelect.options).forEach(option => {
+        const customOption = document.createElement('div');
+        customOption.className = 'option';
+        customOption.textContent = option.textContent;
+        customOption.setAttribute('data-value', option.value);
+        
+        if (option.selected) {
+            customOption.classList.add('selected');
+        }
+        
+        optionsList.appendChild(customOption);
+    });
+    
+    // Set initial selected text
+    const selectedText = customSelect.querySelector('.selected-text');
+    if (selectedText) {
+        selectedText.textContent = wordlistSelect.options[wordlistSelect.selectedIndex].textContent;
+    }
+    
+    // Add click handler to custom select
+    customSelect.addEventListener('click', function(e) {
+        e.stopPropagation();
+        this.classList.toggle('show');
+        optionsList.classList.toggle('show');
+    });
+    
+    // Add click handlers to options
+    optionsList.querySelectorAll('.option').forEach(option => {
+        option.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const value = this.getAttribute('data-value');
+            wordlistSelect.value = value;
+            selectedText.textContent = this.textContent;
+            customSelect.classList.remove('show');
+            optionsList.classList.remove('show');
+        });
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!customSelect.contains(e.target)) {
+            customSelect.classList.remove('show');
+            optionsList.classList.remove('show');
+        }
+    });
+}
+
 // Show workflow creation page
 function showWorkflowCreation() {
     document.getElementById('homepage').style.display = 'none';
@@ -179,55 +241,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         workflows = JSON.parse(savedWorkflows);
     }
     
-    // Initialize workflow dropdown
+    // Initialize both dropdowns
     initializeWorkflowDropdown();
-    
-    // Initialize all dropdowns
-    initializeDropdowns();
-    
-    // Add toggle button for saved workflows after the save workflow button
-    const saveWorkflowButton = document.getElementById('saveWorkflowButton');
-    if (saveWorkflowButton) {
-        // Remove existing button if it exists
-        const existingButton = document.getElementById('toggleSavedWorkflows');
-        if (existingButton) {
-            existingButton.remove();
-        }
-        
-        const toggleButton = document.createElement('button');
-        toggleButton.id = 'toggleSavedWorkflows';
-        toggleButton.className = 'toggle-saved-workflows';
-        toggleButton.textContent = 'Saved Workflows';
-        
-        // Add both click and touch events
-        toggleButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            toggleSavedWorkflows();
-        });
-        
-        toggleButton.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            toggleSavedWorkflows();
-        }, { passive: false });
-        
-        // Insert the button after the save workflow button
-        saveWorkflowButton.parentNode.insertBefore(toggleButton, saveWorkflowButton.nextSibling);
-        
-        // Remove any existing event listeners from saveWorkflowButton
-        const newSaveButton = saveWorkflowButton.cloneNode(true);
-        saveWorkflowButton.parentNode.replaceChild(newSaveButton, saveWorkflowButton);
-        
-        // Add single event listener for both click and touch
-        newSaveButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            saveWorkflow();
-        });
-        
-        newSaveButton.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            saveWorkflow();
-        }, { passive: false });
-    }
+    initializeWordlistDropdown();
     
     // Display saved workflows
     displaySavedWorkflows();
