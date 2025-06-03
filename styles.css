@@ -1716,8 +1716,7 @@ input:checked + .slider:before {
     border: 2px solid #ddd;
     border-top: none;
     border-radius: 0 0 8px 8px;
-    max-height: 300px;
-    overflow-y: auto;
+    overflow-y: visible;
     z-index: 1000;
     display: none;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -1727,9 +1726,11 @@ input:checked + .slider:before {
     width: 100%;
 }
 
-/* Increase z-index for workflow dropdown options */
+/* Keep scrolling for workflow dropdown */
 .workflow-dropdown .options-list {
     z-index: 2000;
+    max-height: 300px;
+    overflow-y: auto;
 }
 
 .options-list.show {
@@ -1773,9 +1774,8 @@ input:checked + .slider:before {
         min-height: 44px;
     }
     
-    .options-list {
+    .workflow-dropdown .options-list {
         max-height: 400px;
-        width: 100%;
     }
 }
 
