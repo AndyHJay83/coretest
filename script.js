@@ -42,15 +42,16 @@ function initializeWorkflowDropdown() {
     const optionsList = document.querySelector('.options-list');
     
     if (!workflowSelect || !customSelect || !optionsList) {
-        console.error('Missing required elements:', {
+        console.error('Required elements not found:', {
             workflowSelect: !!workflowSelect,
             customSelect: !!customSelect,
             optionsList: !!optionsList
         });
         return;
     }
-
-    console.log('Found all required elements, proceeding with initialization');
+    
+    // Add workflow-dropdown class to the parent dropdown
+    customSelect.closest('.dropdown').classList.add('workflow-dropdown');
     
     // Clear existing options except the first one
     while (workflowSelect.options.length > 1) {

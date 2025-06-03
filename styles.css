@@ -1650,6 +1650,11 @@ input:checked + .slider:before {
     z-index: 1000;
 }
 
+/* Increase z-index for workflow dropdown specifically */
+.dropdown.workflow-dropdown {
+    z-index: 2000;
+}
+
 .dropdown select {
     display: none;
 }
@@ -1720,6 +1725,11 @@ input:checked + .slider:before {
     overscroll-behavior: contain;
     margin-top: 2px;
     width: 100%;
+}
+
+/* Increase z-index for workflow dropdown options */
+.workflow-dropdown .options-list {
+    z-index: 2000;
 }
 
 .options-list.show {
