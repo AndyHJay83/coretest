@@ -1654,58 +1654,6 @@ input:checked + .slider:before {
     z-index: 2000;
 }
 
-.dropdown select {
-    display: none;
-}
-
-.custom-select {
-    position: relative;
-    background: #fff;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    cursor: pointer;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-    min-height: 44px;
-    display: flex;
-    align-items: center;
-    transition: border-color 0.2s ease;
-}
-
-.custom-select:hover {
-    border-color: #999;
-}
-
-.custom-select.focused {
-    border-color: #007bff;
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-}
-
-.selected-text {
-    padding: 12px;
-    display: block;
-    position: relative;
-    flex: 1;
-    font-size: 16px;
-}
-
-.selected-text::after {
-    content: '▼';
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 12px;
-    color: #666;
-    pointer-events: none;
-    transition: transform 0.2s ease;
-}
-
-.custom-select.show .selected-text::after {
-    transform: translateY(-50%) rotate(180deg);
-}
-
 .options-list {
     position: absolute;
     top: 100%;
@@ -1715,12 +1663,13 @@ input:checked + .slider:before {
     border: 2px solid #ddd;
     border-top: none;
     border-radius: 0 0 8px 8px;
-    overflow-y: visible;
-    z-index: 1000;
+    overflow: visible;
+    z-index: 2000;
     display: none;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     margin-top: 2px;
     width: 100%;
+    height: auto;
     max-height: none;
 }
 
@@ -1735,17 +1684,11 @@ input:checked + .slider:before {
     border-top: none;
     border-radius: 0 0 8px 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    width: 100%;
-    max-height: none;
-    overflow-y: visible;
-}
-
-/* Keep scrolling for workflow dropdown */
-.workflow-dropdown .options-list {
     z-index: 2000;
-    max-height: 300px;
-    overflow-y: auto;
+    width: 100%;
+    height: auto;
+    max-height: none;
+    overflow: visible;
 }
 
 .option {
@@ -1759,6 +1702,8 @@ input:checked + .slider:before {
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
     border-bottom: 1px solid #eee;
+    white-space: normal;
+    word-wrap: break-word;
 }
 
 .option:last-child {
@@ -1781,8 +1726,11 @@ input:checked + .slider:before {
     
     .options-list,
     .options-list.show {
+        position: absolute;
+        width: 100%;
+        height: auto;
         max-height: none;
-        overflow-y: visible;
+        overflow: visible;
     }
     
     .option {
@@ -1792,23 +1740,15 @@ input:checked + .slider:before {
     }
 }
 
-/* Scrollbar styling */
-.options-list::-webkit-scrollbar {
-    width: 8px;
-}
-
-.options-list::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
-}
-
-.options-list::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 4px;
-}
-
-.options-list::-webkit-scrollbar-thumb:hover {
-    background: #555;
+/* Ensure dropdown is above other elements */
+.dropdown.workflow-dropdown .options-list,
+.dropdown.workflow-dropdown .options-list.show {
+    z-index: 9999;
+    position: absolute;
+    width: 100%;
+    height: auto;
+    max-height: none;
+    overflow: visible;
 }
 
 /* Feature Info Button Styles */

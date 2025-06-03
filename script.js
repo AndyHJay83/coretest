@@ -101,11 +101,17 @@ function initializeWorkflowDropdown() {
         this.classList.toggle('show');
         optionsList.classList.toggle('show');
         
-        // Ensure the dropdown is visible
+        // Force the dropdown to be fully visible
         if (optionsList.classList.contains('show')) {
-            optionsList.style.display = 'block';
-            optionsList.style.maxHeight = 'none';
-            optionsList.style.overflowY = 'visible';
+            optionsList.style.cssText = `
+                display: block !important;
+                position: absolute;
+                width: 100%;
+                height: auto;
+                max-height: none;
+                overflow: visible;
+                z-index: 9999;
+            `;
         }
     });
     
