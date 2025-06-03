@@ -1711,7 +1711,7 @@ input:checked + .slider:before {
     border: 2px solid #ddd;
     border-top: none;
     border-radius: 0 0 8px 8px;
-    max-height: 200px;
+    max-height: 300px;
     overflow-y: auto;
     z-index: 1000;
     display: none;
@@ -1719,6 +1719,7 @@ input:checked + .slider:before {
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
     margin-top: 2px;
+    width: 100%;
 }
 
 .options-list.show {
@@ -1763,7 +1764,8 @@ input:checked + .slider:before {
     }
     
     .options-list {
-        max-height: 300px;
+        max-height: 400px;
+        width: 100%;
     }
 }
 
