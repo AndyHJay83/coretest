@@ -54,89 +54,56 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Function to initialize dropdowns
 function initializeDropdowns() {
-    // Initialize workflow dropdown
+    // --- WORKFLOW DROPDOWN ---
     const workflowSelect = document.getElementById('workflowSelect');
-    const workflowCustomSelect = workflowSelect.nextElementSibling;
-    workflowCustomSelect.id = 'workflowCustomSelect'; // Ensure it has an id
+    // Remove old custom select if it exists
+    const oldWorkflowCustom = document.getElementById('workflowCustomSelect');
+    if (oldWorkflowCustom && oldWorkflowCustom.parentNode) {
+        oldWorkflowCustom.parentNode.removeChild(oldWorkflowCustom);
+    }
+    // Create new custom select
+    const workflowCustomSelect = document.createElement('div');
+    workflowCustomSelect.className = 'custom-select';
+    workflowCustomSelect.id = 'workflowCustomSelect';
+    workflowCustomSelect.innerHTML = `
+        <div class="selected-text">${workflowSelect.options[workflowSelect.selectedIndex]?.textContent || 'Select a workflow...'}</div>
+        <div class="options-list"></div>
+    `;
+    workflowSelect.insertAdjacentElement('afterend', workflowCustomSelect);
     const workflowSelectedText = workflowCustomSelect.querySelector('.selected-text');
     const workflowOptionsList = workflowCustomSelect.querySelector('.options-list');
-
-    if (!workflowSelect || !workflowCustomSelect || !workflowSelectedText || !workflowOptionsList) {
-        console.error('Required workflow dropdown elements not found');
-        return;
-    }
-
-    // Set base z-index for workflow dropdown - using very high values to ensure it's on top
     workflowCustomSelect.style.zIndex = '9998';
     workflowOptionsList.style.zIndex = '9999';
-
-    // Clear existing workflow options except the first two
-    while (workflowSelect.options.length > 2) {
-        workflowSelect.remove(2);
-    }
-
-    // Clear existing custom workflow options
+    // Populate options
     workflowOptionsList.innerHTML = '';
-
-    // Add default workflow options
     const defaultWorkflowOptions = [
         { value: '', text: 'Select a workflow...' },
         { value: 'create-new', text: 'New Workflow' }
     ];
-
     defaultWorkflowOptions.forEach(option => {
-        // Add to native select
-        const nativeOption = document.createElement('option');
-        nativeOption.value = option.value;
-        nativeOption.textContent = option.text;
-        workflowSelect.appendChild(nativeOption);
-
-        // Add to custom dropdown
         const optionElement = document.createElement('div');
         optionElement.className = 'option';
         optionElement.textContent = option.text;
         optionElement.dataset.value = option.value;
         workflowOptionsList.appendChild(optionElement);
     });
-
-    // Add saved workflows
     const savedWorkflows = JSON.parse(localStorage.getItem('workflows') || '[]');
     savedWorkflows.forEach(workflow => {
-        // Add to native select
-        const option = document.createElement('option');
-        option.value = workflow.name;
-        option.textContent = workflow.name;
-        workflowSelect.appendChild(option);
-
-        // Add to custom dropdown
         const optionElement = document.createElement('div');
         optionElement.className = 'option';
         optionElement.textContent = workflow.name;
         optionElement.dataset.value = workflow.name;
         workflowOptionsList.appendChild(optionElement);
     });
-
-    // Set initial selected text
-    workflowSelectedText.textContent = workflowSelect.options[workflowSelect.selectedIndex].textContent;
-
-    // Function to close workflow dropdown
+    // Event handlers
     const closeWorkflowDropdown = () => {
         workflowOptionsList.classList.remove('show');
         workflowOptionsList.style.cssText = '';
         document.body.classList.remove('workflow-dropdown-open');
     };
-
-    // Set up workflow dropdown click and touch handlers
     const toggleWorkflowDropdown = (e) => {
-        if (e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-        
-        // Close wordlist dropdown if it's open
+        if (e) { e.preventDefault(); e.stopPropagation(); }
         closeWordlistDropdown();
-        
-        // Toggle workflow dropdown
         if (workflowOptionsList.classList.contains('show')) {
             closeWorkflowDropdown();
         } else {
@@ -155,87 +122,60 @@ function initializeDropdowns() {
             document.body.classList.add('workflow-dropdown-open');
         }
     };
-
     workflowCustomSelect.addEventListener('click', toggleWorkflowDropdown);
     workflowCustomSelect.addEventListener('touchstart', toggleWorkflowDropdown, { passive: false });
-
     const handleWorkflowOptionSelect = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
+        e.preventDefault(); e.stopPropagation();
         const option = e.target.closest('.option');
         if (!option) return;
-
         const value = option.dataset.value;
         const text = option.textContent;
-
-        // Update both dropdowns
         workflowSelect.value = value;
         workflowSelectedText.textContent = text;
-
-        // Close dropdown
         closeWorkflowDropdown();
-
-        // If "New Workflow" is selected, show the workflow creation page
-        if (value === 'create-new') {
-            showWorkflowCreation();
-        }
+        if (value === 'create-new') { showWorkflowCreation(); }
     };
-
     workflowOptionsList.addEventListener('click', handleWorkflowOptionSelect);
     workflowOptionsList.addEventListener('touchstart', handleWorkflowOptionSelect, { passive: false });
 
-    // Initialize wordlist dropdown
+    // --- WORDLIST DROPDOWN ---
     const wordlistSelect = document.getElementById('wordlistSelect');
-    const wordlistCustomSelect = wordlistSelect.nextElementSibling;
+    // Remove old custom select if it exists
+    const oldWordlistCustom = document.getElementById('wordlistCustomSelect');
+    if (oldWordlistCustom && oldWordlistCustom.parentNode) {
+        oldWordlistCustom.parentNode.removeChild(oldWordlistCustom);
+    }
+    // Create new custom select
+    const wordlistCustomSelect = document.createElement('div');
+    wordlistCustomSelect.className = 'custom-select';
+    wordlistCustomSelect.id = 'wordlistCustomSelect';
+    wordlistCustomSelect.innerHTML = `
+        <div class="selected-text">${wordlistSelect.options[wordlistSelect.selectedIndex]?.textContent || 'ENUK Wordlist'}</div>
+        <div class="options-list"></div>
+    `;
+    wordlistSelect.insertAdjacentElement('afterend', wordlistCustomSelect);
     const wordlistSelectedText = wordlistCustomSelect.querySelector('.selected-text');
     const wordlistOptionsList = wordlistCustomSelect.querySelector('.options-list');
-    
-    if (!wordlistSelect || !wordlistCustomSelect || !wordlistSelectedText || !wordlistOptionsList) {
-        console.error('Required wordlist dropdown elements not found');
-        return;
-    }
-
-    // Set base z-index for wordlist dropdown - using lower values
     wordlistCustomSelect.style.zIndex = '100';
     wordlistOptionsList.style.zIndex = '101';
- 
-    // Clear existing wordlist options
+    // Populate options
     wordlistOptionsList.innerHTML = '';
-    
-    // Add wordlist options to custom dropdown
     Array.from(wordlistSelect.options).forEach(option => {
         const customOption = document.createElement('div');
         customOption.className = 'option';
         customOption.textContent = option.textContent;
         customOption.dataset.value = option.value;
-        
-        if (option.selected) {
-            customOption.classList.add('selected');
-        }
-        
+        if (option.selected) { customOption.classList.add('selected'); }
         wordlistOptionsList.appendChild(customOption);
     });
-    
-    // Set initial wordlist selected text
-    wordlistSelectedText.textContent = wordlistSelect.options[wordlistSelect.selectedIndex].textContent;
-    
-    // Function to close wordlist dropdown
+    // Event handlers
     const closeWordlistDropdown = () => {
         wordlistOptionsList.classList.remove('show');
         wordlistOptionsList.style.cssText = '';
     };
-
-    // Set up wordlist dropdown click and touch handlers
     const toggleWordlistDropdown = (e) => {
-        if (e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-        
-        // Close workflow dropdown if it's open
+        if (e) { e.preventDefault(); e.stopPropagation(); }
         closeWorkflowDropdown();
-        
-        // Toggle wordlist dropdown
         if (wordlistOptionsList.classList.contains('show')) {
             closeWordlistDropdown();
         } else {
@@ -253,40 +193,26 @@ function initializeDropdowns() {
             `;
         }
     };
-
     wordlistCustomSelect.addEventListener('click', toggleWordlistDropdown);
     wordlistCustomSelect.addEventListener('touchstart', toggleWordlistDropdown, { passive: false });
-    
     const handleWordlistOptionSelect = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
+        e.preventDefault(); e.stopPropagation();
         const option = e.target.closest('.option');
         if (!option) return;
-
         const value = option.dataset.value;
         const text = option.textContent;
-
-        // Update both dropdowns
         wordlistSelect.value = value;
         wordlistSelectedText.textContent = text;
-
-        // Close dropdown
         closeWordlistDropdown();
     };
-
     wordlistOptionsList.addEventListener('click', handleWordlistOptionSelect);
     wordlistOptionsList.addEventListener('touchstart', handleWordlistOptionSelect, { passive: false });
-    
-    // Close dropdowns when clicking/touching outside
-    const closeDropdowns = (e) => {
-        if (!workflowCustomSelect.contains(e.target)) {
-            closeWorkflowDropdown();
-        }
-        if (!wordlistCustomSelect.contains(e.target)) {
-            closeWordlistDropdown();
-        }
-    };
 
+    // --- OUTSIDE CLICK HANDLERS ---
+    const closeDropdowns = (e) => {
+        if (!workflowCustomSelect.contains(e.target)) { closeWorkflowDropdown(); }
+        if (!wordlistCustomSelect.contains(e.target)) { closeWordlistDropdown(); }
+    };
     document.addEventListener('click', closeDropdowns);
     document.addEventListener('touchstart', closeDropdowns, { passive: true });
 
