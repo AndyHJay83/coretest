@@ -71,6 +71,29 @@ function initializeWorkflowDropdown() {
     // Initialize custom dropdown component
     console.log('Setting up custom dropdown component...');
     
+    // Clear existing options
+    optionsList.innerHTML = '';
+    
+    // Add options to custom dropdown
+    Array.from(workflowSelect.options).forEach(option => {
+        const customOption = document.createElement('div');
+        customOption.className = 'option';
+        customOption.textContent = option.textContent;
+        customOption.setAttribute('data-value', option.value);
+        
+        if (option.selected) {
+            customOption.classList.add('selected');
+        }
+        
+        optionsList.appendChild(customOption);
+    });
+    
+    // Set initial selected text
+    const selectedText = customSelect.querySelector('.selected-text');
+    if (selectedText) {
+        selectedText.textContent = workflowSelect.options[workflowSelect.selectedIndex].text;
+    }
+    
     // Click event for desktop
     customSelect.addEventListener('click', (e) => {
         console.log('Custom select clicked');
@@ -145,6 +168,12 @@ function initializeWorkflowDropdown() {
         // Update native select
         workflowSelect.value = value;
         
+        // Update selected state
+        optionsList.querySelectorAll('.option').forEach(opt => {
+            opt.classList.remove('selected');
+        });
+        option.classList.add('selected');
+        
         // Trigger change event
         const event = new Event('change', { bubbles: true });
         workflowSelect.dispatchEvent(event);
@@ -152,6 +181,11 @@ function initializeWorkflowDropdown() {
         // Close dropdown
         optionsList.classList.remove('show');
         customSelect.classList.remove('show');
+        
+        // Handle special case for "create-new"
+        if (value === 'create-new') {
+            showWorkflowCreation();
+        }
     });
     
     // Close dropdown when clicking outside
