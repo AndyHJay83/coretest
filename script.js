@@ -65,6 +65,10 @@ function initializeDropdowns() {
         return;
     }
 
+    // Set base z-index for workflow dropdown
+    workflowCustomSelect.style.zIndex = '1000';
+    workflowOptionsList.style.zIndex = '1001';
+
     // Clear existing workflow options except the first two
     while (workflowSelect.options.length > 2) {
         workflowSelect.remove(2);
@@ -129,7 +133,7 @@ function initializeDropdowns() {
                 height: auto;
                 max-height: none;
                 overflow: visible;
-                z-index: 9999;
+                z-index: 1001;
                 background: white;
                 box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             `;
@@ -193,6 +197,10 @@ function initializeDropdowns() {
         console.error('Required wordlist dropdown elements not found');
         return;
     }
+
+    // Set base z-index for wordlist dropdown
+    wordlistCustomSelect.style.zIndex = '900';
+    wordlistOptionsList.style.zIndex = '901';
  
     // Clear existing wordlist options
     wordlistOptionsList.innerHTML = '';
@@ -229,7 +237,7 @@ function initializeDropdowns() {
                 height: auto;
                 max-height: none;
                 overflow: visible;
-                z-index: 9999;
+                z-index: 901;
                 background: white;
                 box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             `;
