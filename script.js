@@ -3344,3 +3344,18 @@ function hideWorkflowCreation() {
     document.getElementById('workflowCreation').style.display = 'none';
     document.getElementById('workflowExecution').style.display = 'none';
 }
+
+// Hide native select elements to prevent overlap with custom dropdowns
+const hideNativeSelectStyle = document.createElement('style');
+hideNativeSelectStyle.textContent = `
+select#workflowSelect,
+select#wordlistSelect {
+    position: absolute !important;
+    left: -9999px !important;
+    width: 1px !important;
+    height: 1px !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+`;
+document.head.appendChild(hideNativeSelectStyle);
