@@ -100,6 +100,13 @@ function initializeWorkflowDropdown() {
         e.stopPropagation();
         this.classList.toggle('show');
         optionsList.classList.toggle('show');
+        
+        // Ensure the dropdown is visible
+        if (optionsList.classList.contains('show')) {
+            optionsList.style.display = 'block';
+            optionsList.style.maxHeight = 'none';
+            optionsList.style.overflowY = 'visible';
+        }
     });
     
     // Add click handlers to options
