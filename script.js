@@ -346,7 +346,7 @@ function setupButtonListeners() {
     const performButton = document.getElementById('performButton');
     if (performButton) {
         performButton.addEventListener('click', async () => {
-            const selectedWorkflow = workflowSelect.value;
+            const selectedWorkflow = document.getElementById('workflowSelect').value;
             if (!selectedWorkflow) {
                 alert('Please select a workflow first');
                 return;
@@ -2922,6 +2922,9 @@ function initializeDropdowns() {
             wordlistOptionsList.classList.remove('show');
         }
     });
+
+    // Set up button listeners
+    setupButtonListeners();
 }
 
 // Initialize drag and drop functionality
