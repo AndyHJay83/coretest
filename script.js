@@ -175,6 +175,19 @@ function initializeWordlistDropdown() {
         e.stopPropagation();
         this.classList.toggle('show');
         optionsList.classList.toggle('show');
+        
+        // Force the dropdown to be fully visible
+        if (optionsList.classList.contains('show')) {
+            optionsList.style.cssText = `
+                display: block !important;
+                position: absolute;
+                width: 100%;
+                height: auto;
+                max-height: none;
+                overflow: visible;
+                z-index: 9999;
+            `;
+        }
     });
     
     // Add click handlers to options
@@ -322,6 +335,16 @@ function setupButtonListeners() {
         cancelWorkflowButton.addEventListener('touchstart', (e) => {
             e.preventDefault();
             hideWorkflowCreation();
+        }, { passive: false });
+    }
+    
+    // Save Workflow button
+    const saveWorkflowButton = document.getElementById('saveWorkflowButton');
+    if (saveWorkflowButton) {
+        saveWorkflowButton.addEventListener('click', saveWorkflow);
+        saveWorkflowButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            saveWorkflow();
         }, { passive: false });
     }
     
