@@ -57,6 +57,7 @@ function initializeDropdowns() {
     // Initialize workflow dropdown
     const workflowSelect = document.getElementById('workflowSelect');
     const workflowCustomSelect = workflowSelect.nextElementSibling;
+    workflowCustomSelect.id = 'workflowCustomSelect'; // Ensure it has an id
     const workflowSelectedText = workflowCustomSelect.querySelector('.selected-text');
     const workflowOptionsList = workflowCustomSelect.querySelector('.options-list');
 
@@ -122,6 +123,7 @@ function initializeDropdowns() {
     const closeWorkflowDropdown = () => {
         workflowOptionsList.classList.remove('show');
         workflowOptionsList.style.cssText = '';
+        document.body.classList.remove('workflow-dropdown-open');
     };
 
     // Set up workflow dropdown click and touch handlers
@@ -150,6 +152,7 @@ function initializeDropdowns() {
                 background: white;
                 box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             `;
+            document.body.classList.add('workflow-dropdown-open');
         }
     };
 
@@ -3361,3 +3364,14 @@ select#wordlistSelect {
 }
 `;
 document.head.appendChild(hideNativeSelectStyle);
+
+// Inject CSS to lower z-index and opacity of other custom-selects when workflow dropdown is open
+const workflowDropdownCSS = document.createElement('style');
+workflowDropdownCSS.textContent = `
+body.workflow-dropdown-open .custom-select:not(#workflowCustomSelect) {
+    z-index: 1 !important;
+    opacity: 0.2 !important;
+    pointer-events: none !important;
+}
+`;
+document.head.appendChild(workflowDropdownCSS);
