@@ -56,10 +56,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 function initializeDropdowns() {
     // --- WORKFLOW DROPDOWN ---
     const workflowSelect = document.getElementById('workflowSelect');
-    // Remove old custom select if it exists
-    const oldWorkflowCustom = document.getElementById('workflowCustomSelect');
-    if (oldWorkflowCustom && oldWorkflowCustom.parentNode) {
-        oldWorkflowCustom.parentNode.removeChild(oldWorkflowCustom);
+    // Remove any existing custom-select immediately after workflowSelect
+    let nextElem = workflowSelect.nextElementSibling;
+    while (nextElem && nextElem.classList && nextElem.classList.contains('custom-select')) {
+        const toRemove = nextElem;
+        nextElem = nextElem.nextElementSibling;
+        toRemove.parentNode.removeChild(toRemove);
     }
     // Create new custom select
     const workflowCustomSelect = document.createElement('div');
@@ -140,10 +142,12 @@ function initializeDropdowns() {
 
     // --- WORDLIST DROPDOWN ---
     const wordlistSelect = document.getElementById('wordlistSelect');
-    // Remove old custom select if it exists
-    const oldWordlistCustom = document.getElementById('wordlistCustomSelect');
-    if (oldWordlistCustom && oldWordlistCustom.parentNode) {
-        oldWordlistCustom.parentNode.removeChild(oldWordlistCustom);
+    // Remove any existing custom-select immediately after wordlistSelect
+    nextElem = wordlistSelect.nextElementSibling;
+    while (nextElem && nextElem.classList && nextElem.classList.contains('custom-select')) {
+        const toRemove = nextElem;
+        nextElem = nextElem.nextElementSibling;
+        toRemove.parentNode.removeChild(toRemove);
     }
     // Create new custom select
     const wordlistCustomSelect = document.createElement('div');
