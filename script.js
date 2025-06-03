@@ -153,6 +153,7 @@ function initializeWorkflowDropdown() {
     optionsList.addEventListener('click', (e) => {
         console.log('Option list clicked');
         const option = e.target.closest('.option');
+        
         if (!option) {
             console.log('No option element found in click target');
             return;
@@ -181,17 +182,47 @@ function initializeWorkflowDropdown() {
         // Close dropdown
         optionsList.classList.remove('show');
         customSelect.classList.remove('show');
-        
-        // Handle special case for "create-new"
-        if (value === 'create-new') {
-            showWorkflowCreation();
-        }
     });
+    
+    // Handle touch selection
+    optionsList.addEventListener('touchstart', (e) => {
+        console.log('Option list touched');
+        const option = e.target.closest('.option');
+        
+        if (!option) {
+            console.log('No option element found in touch target');
+            return;
+        }
+        
+        e.preventDefault();
+        console.log('Option selected:', option.textContent);
+        const value = option.getAttribute('data-value');
+        const text = option.textContent;
+        
+        // Update custom select display
+        customSelect.querySelector('.selected-text').textContent = text;
+        
+        // Update native select
+        workflowSelect.value = value;
+        
+        // Update selected state
+        optionsList.querySelectorAll('.option').forEach(opt => {
+            opt.classList.remove('selected');
+        });
+        option.classList.add('selected');
+        
+        // Trigger change event
+        const event = new Event('change', { bubbles: true });
+        workflowSelect.dispatchEvent(event);
+        
+        // Close dropdown
+        optionsList.classList.remove('show');
+        customSelect.classList.remove('show');
+    }, { passive: false });
     
     // Close dropdown when clicking outside
     document.addEventListener('click', (e) => {
-        if (!customSelect.contains(e.target)) {
-            console.log('Click outside dropdown detected');
+        if (!customSelect.contains(e.target) && !optionsList.contains(e.target)) {
             optionsList.classList.remove('show');
             customSelect.classList.remove('show');
         }
@@ -199,12 +230,11 @@ function initializeWorkflowDropdown() {
     
     // Close dropdown when touching outside
     document.addEventListener('touchstart', (e) => {
-        if (!customSelect.contains(e.target)) {
-            console.log('Touch outside dropdown detected');
+        if (!customSelect.contains(e.target) && !optionsList.contains(e.target)) {
             optionsList.classList.remove('show');
             customSelect.classList.remove('show');
         }
-    });
+    }, { passive: false });
     
     // Prevent page scroll when interacting with dropdown
     optionsList.addEventListener('touchmove', (e) => {
