@@ -53,9 +53,9 @@ function initializeWorkflowDropdown() {
     // Add workflow-dropdown class to the parent dropdown
     customSelect.closest('.dropdown').classList.add('workflow-dropdown');
     
-    // Clear existing options except the first one
-    while (workflowSelect.options.length > 1) {
-        workflowSelect.remove(1);
+    // Clear existing options except the first two (Select a workflow... and New Workflow)
+    while (workflowSelect.options.length > 2) {
+        workflowSelect.remove(2);
     }
     
     // Add saved workflows to the dropdown
@@ -124,6 +124,11 @@ function initializeWorkflowDropdown() {
             selectedText.textContent = this.textContent;
             customSelect.classList.remove('show');
             optionsList.classList.remove('show');
+            
+            // If "New Workflow" is selected, show the workflow creation page
+            if (value === 'create-new') {
+                showWorkflowCreation();
+            }
         });
     });
     
