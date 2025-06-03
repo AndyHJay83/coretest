@@ -56,6 +56,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 function initializeDropdowns() {
     // --- WORKFLOW DROPDOWN ---
     const workflowSelect = document.getElementById('workflowSelect');
+    // Remove all options except the first two
+    while (workflowSelect.options.length > 2) {
+        workflowSelect.remove(2);
+    }
+    // Add options for each saved workflow
+    const savedWorkflows = JSON.parse(localStorage.getItem('workflows') || '[]');
+    savedWorkflows.forEach(workflow => {
+        const option = document.createElement('option');
+        option.value = workflow.name;
+        option.textContent = workflow.name;
+        workflowSelect.appendChild(option);
+    });
     // Remove any existing custom-select immediately after workflowSelect
     let nextElem = workflowSelect.nextElementSibling;
     while (nextElem && nextElem.classList && nextElem.classList.contains('custom-select')) {
@@ -89,7 +101,6 @@ function initializeDropdowns() {
         optionElement.dataset.value = option.value;
         workflowOptionsList.appendChild(optionElement);
     });
-    const savedWorkflows = JSON.parse(localStorage.getItem('workflows') || '[]');
     savedWorkflows.forEach(workflow => {
         const optionElement = document.createElement('div');
         optionElement.className = 'option';
