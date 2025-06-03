@@ -80,6 +80,13 @@ function initializeDropdowns() {
     ];
 
     defaultWorkflowOptions.forEach(option => {
+        // Add to native select
+        const nativeOption = document.createElement('option');
+        nativeOption.value = option.value;
+        nativeOption.textContent = option.text;
+        workflowSelect.appendChild(nativeOption);
+
+        // Add to custom dropdown
         const optionElement = document.createElement('div');
         optionElement.className = 'option';
         optionElement.textContent = option.text;
@@ -104,8 +111,12 @@ function initializeDropdowns() {
         workflowOptionsList.appendChild(optionElement);
     });
 
+    // Set initial selected text
+    workflowSelectedText.textContent = workflowSelect.options[workflowSelect.selectedIndex].textContent;
+
     // Set up workflow dropdown click handlers
-    workflowCustomSelect.addEventListener('click', () => {
+    workflowCustomSelect.addEventListener('click', (e) => {
+        e.stopPropagation();
         workflowOptionsList.classList.toggle('show');
         if (workflowOptionsList.classList.contains('show')) {
             workflowOptionsList.style.cssText = `
