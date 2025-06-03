@@ -299,8 +299,10 @@ function setupButtonListeners() {
     // Create Workflow button
     const createWorkflowButton = document.getElementById('createWorkflowButton');
     if (createWorkflowButton) {
-        createWorkflowButton.addEventListener('click', showWorkflowCreation);
-        createWorkflowButton.addEventListener('touchstart', (e) => {
+        createWorkflowButton.replaceWith(createWorkflowButton.cloneNode(true));
+        const newCreateWorkflowButton = document.getElementById('createWorkflowButton');
+        newCreateWorkflowButton.addEventListener('click', showWorkflowCreation);
+        newCreateWorkflowButton.addEventListener('touchstart', (e) => {
             e.preventDefault();
             showWorkflowCreation();
         }, { passive: false });
@@ -309,8 +311,10 @@ function setupButtonListeners() {
     // Cancel Workflow button
     const cancelWorkflowButton = document.getElementById('cancelWorkflowButton');
     if (cancelWorkflowButton) {
-        cancelWorkflowButton.addEventListener('click', hideWorkflowCreation);
-        cancelWorkflowButton.addEventListener('touchstart', (e) => {
+        cancelWorkflowButton.replaceWith(cancelWorkflowButton.cloneNode(true));
+        const newCancelWorkflowButton = document.getElementById('cancelWorkflowButton');
+        newCancelWorkflowButton.addEventListener('click', hideWorkflowCreation);
+        newCancelWorkflowButton.addEventListener('touchstart', (e) => {
             e.preventDefault();
             hideWorkflowCreation();
         }, { passive: false });
@@ -319,8 +323,10 @@ function setupButtonListeners() {
     // Save Workflow button
     const saveWorkflowButton = document.getElementById('saveWorkflowButton');
     if (saveWorkflowButton) {
-        saveWorkflowButton.addEventListener('click', saveWorkflow);
-        saveWorkflowButton.addEventListener('touchstart', (e) => {
+        saveWorkflowButton.replaceWith(saveWorkflowButton.cloneNode(true));
+        const newSaveWorkflowButton = document.getElementById('saveWorkflowButton');
+        newSaveWorkflowButton.addEventListener('click', saveWorkflow);
+        newSaveWorkflowButton.addEventListener('touchstart', (e) => {
             e.preventDefault();
             saveWorkflow();
         }, { passive: false });
@@ -329,7 +335,9 @@ function setupButtonListeners() {
     // Perform button
     const performButton = document.getElementById('performButton');
     if (performButton) {
-        performButton.addEventListener('click', async () => {
+        performButton.replaceWith(performButton.cloneNode(true));
+        const newPerformButton = document.getElementById('performButton');
+        newPerformButton.addEventListener('click', async () => {
             const selectedWorkflow = document.getElementById('workflowSelect').value;
             if (!selectedWorkflow) {
                 alert('Please select a workflow first');
@@ -350,9 +358,9 @@ function setupButtonListeners() {
                 alert('Error executing workflow: ' + error.message);
             }
         });
-        performButton.addEventListener('touchstart', (e) => {
+        newPerformButton.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            performButton.click();
+            newPerformButton.click();
         }, { passive: false });
     }
 }
