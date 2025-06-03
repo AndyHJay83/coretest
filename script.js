@@ -137,13 +137,15 @@ function initializeDropdowns() {
                 background: white;
                 box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             `;
+        } else {
+            workflowOptionsList.style.cssText = '';
         }
     };
 
     workflowCustomSelect.addEventListener('click', toggleWorkflowDropdown);
     workflowCustomSelect.addEventListener('touchstart', toggleWorkflowDropdown, { passive: false });
 
-    workflowOptionsList.addEventListener('click', (e) => {
+    const handleWorkflowOptionSelect = (e) => {
         e.preventDefault();
         e.stopPropagation();
         const option = e.target.closest('.option');
@@ -156,36 +158,18 @@ function initializeDropdowns() {
         workflowSelect.value = value;
         workflowSelectedText.textContent = text;
 
-        // Close dropdown
+        // Close dropdown and reset styles
         workflowOptionsList.classList.remove('show');
+        workflowOptionsList.style.cssText = '';
 
         // If "New Workflow" is selected, show the workflow creation page
         if (value === 'create-new') {
             showWorkflowCreation();
         }
-    });
+    };
 
-    workflowOptionsList.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const option = e.target.closest('.option');
-        if (!option) return;
-
-        const value = option.dataset.value;
-        const text = option.textContent;
-
-        // Update both dropdowns
-        workflowSelect.value = value;
-        workflowSelectedText.textContent = text;
-
-        // Close dropdown
-        workflowOptionsList.classList.remove('show');
-
-        // If "New Workflow" is selected, show the workflow creation page
-        if (value === 'create-new') {
-            showWorkflowCreation();
-        }
-    }, { passive: false });
+    workflowOptionsList.addEventListener('click', handleWorkflowOptionSelect);
+    workflowOptionsList.addEventListener('touchstart', handleWorkflowOptionSelect, { passive: false });
 
     // Initialize wordlist dropdown
     const wordlistSelect = document.getElementById('wordlistSelect');
@@ -241,13 +225,15 @@ function initializeDropdowns() {
                 background: white;
                 box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             `;
+        } else {
+            wordlistOptionsList.style.cssText = '';
         }
     };
 
     wordlistCustomSelect.addEventListener('click', toggleWordlistDropdown);
     wordlistCustomSelect.addEventListener('touchstart', toggleWordlistDropdown, { passive: false });
     
-    wordlistOptionsList.addEventListener('click', (e) => {
+    const handleWordlistOptionSelect = (e) => {
         e.preventDefault();
         e.stopPropagation();
         const option = e.target.closest('.option');
@@ -260,45 +246,28 @@ function initializeDropdowns() {
         wordlistSelect.value = value;
         wordlistSelectedText.textContent = text;
 
-        // Close dropdown
+        // Close dropdown and reset styles
         wordlistOptionsList.classList.remove('show');
-    });
+        wordlistOptionsList.style.cssText = '';
+    };
 
-    wordlistOptionsList.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const option = e.target.closest('.option');
-        if (!option) return;
-
-        const value = option.dataset.value;
-        const text = option.textContent;
-
-        // Update both dropdowns
-        wordlistSelect.value = value;
-        wordlistSelectedText.textContent = text;
-
-        // Close dropdown
-        wordlistOptionsList.classList.remove('show');
-    }, { passive: false });
+    wordlistOptionsList.addEventListener('click', handleWordlistOptionSelect);
+    wordlistOptionsList.addEventListener('touchstart', handleWordlistOptionSelect, { passive: false });
     
     // Close dropdowns when clicking/touching outside
-    document.addEventListener('click', (e) => {
+    const closeDropdowns = (e) => {
         if (!workflowCustomSelect.contains(e.target)) {
             workflowOptionsList.classList.remove('show');
+            workflowOptionsList.style.cssText = '';
         }
         if (!wordlistCustomSelect.contains(e.target)) {
             wordlistOptionsList.classList.remove('show');
+            wordlistOptionsList.style.cssText = '';
         }
-    });
+    };
 
-    document.addEventListener('touchstart', (e) => {
-        if (!workflowCustomSelect.contains(e.target)) {
-            workflowOptionsList.classList.remove('show');
-        }
-        if (!wordlistCustomSelect.contains(e.target)) {
-            wordlistOptionsList.classList.remove('show');
-        }
-    }, { passive: true });
+    document.addEventListener('click', closeDropdowns);
+    document.addEventListener('touchstart', closeDropdowns, { passive: true });
 
     // Set up button listeners
     setupButtonListeners();
