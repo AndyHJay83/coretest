@@ -2748,84 +2748,69 @@ function initializeDropdowns() {
     const dropdowns = document.querySelectorAll('.dropdown');
     
     dropdowns.forEach(dropdown => {
-        const select = dropdown.querySelector('select');
         const customSelect = dropdown.querySelector('.custom-select');
-        const selectedText = customSelect.querySelector('.selected-text');
-        const optionsList = customSelect.querySelector('.options-list');
+        const optionsList = dropdown.querySelector('.options-list');
+        const select = dropdown.querySelector('select');
         
-        // Add max-height and overflow-y to make options list scrollable
-        optionsList.style.maxHeight = '200px';
-        optionsList.style.overflowY = 'auto';
-        
-        // Clear existing options
-        optionsList.innerHTML = '';
+        if (!customSelect || !optionsList || !select) return;
         
         // Add options to custom dropdown
         Array.from(select.options).forEach(option => {
-            const customOption = document.createElement('div');
-            customOption.className = 'option';
-            customOption.textContent = option.textContent;
-            customOption.setAttribute('data-value', option.value);
-            
-            // Add click handler for desktop
-            customOption.addEventListener('click', () => {
-                select.value = option.value;
-                selectedText.textContent = option.textContent;
-                optionsList.classList.remove('show');
-                select.dispatchEvent(new Event('change'));
-                
-                // Close dropdown after selection
-                optionsList.style.display = 'none';
-            });
-            
-            // Add touch handler for mobile
-            customOption.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                select.value = option.value;
-                selectedText.textContent = option.textContent;
-                optionsList.classList.remove('show');
-                select.dispatchEvent(new Event('change'));
-                
-                // Close dropdown after selection
-                optionsList.style.display = 'none';
-            }, { passive: false });
-            
-            optionsList.appendChild(customOption);
+          const optionElement = document.createElement('div');
+          optionElement.className = 'option';
+          optionElement.textContent = option.text;
+          optionElement.dataset.value = option.value;
+          optionsList.appendChild(optionElement);
         });
         
-        // Set initial selected text
-        selectedText.textContent = select.options[select.selectedIndex].text;
+        // Set initial selected value
+        customSelect.textContent = select.options[select.selectedIndex].text;
         
-        // Add click handler for the custom select
+        // Toggle dropdown
         customSelect.addEventListener('click', (e) => {
-            e.stopPropagation();
-            optionsList.classList.toggle('show');
-            optionsList.style.display = optionsList.classList.contains('show') ? 'block' : 'none';
+          e.stopPropagation();
+          optionsList.classList.toggle('show');
         });
         
-        // Add touch handler for mobile
-        customSelect.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            optionsList.classList.toggle('show');
-            optionsList.style.display = optionsList.classList.contains('show') ? 'block' : 'none';
-        }, { passive: false });
+        // Handle option selection
+        optionsList.addEventListener('click', (e) => {
+          const option = e.target.closest('.option');
+          if (!option) return;
+          
+          select.value = option.dataset.value;
+          customSelect.textContent = option.textContent;
+          optionsList.classList.remove('show');
+          
+          // Trigger change event
+          select.dispatchEvent(new Event('change', { bubbles: true }));
+        });
         
         // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!customSelect.contains(e.target)) {
-                optionsList.classList.remove('show');
-                optionsList.style.display = 'none';
-            }
+        document.addEventListener('click', () => {
+          optionsList.classList.remove('show');
         });
         
-        // Close dropdown when touching outside (mobile)
-        document.addEventListener('touchstart', (e) => {
-            if (!customSelect.contains(e.target)) {
-                optionsList.classList.remove('show');
-                optionsList.style.display = 'none';
-            }
-        }, { passive: false });
+        // Handle keyboard navigation
+        customSelect.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            optionsList.classList.toggle('show');
+          }
+        });
+        
+        // Handle mobile touch events
+        customSelect.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          optionsList.classList.toggle('show');
+        });
+        
+        optionsList.addEventListener('touchstart', (e) => {
+          e.stopPropagation();
+        });
+        
+        document.addEventListener('touchstart', () => {
+          optionsList.classList.remove('show');
+        });
     });
 }
 

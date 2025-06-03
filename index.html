@@ -15,8 +15,6 @@
     <title>Word Filter</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="manifest" href="/manifest.json">
-    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
 </head>
 <body>
     <div class="container">
@@ -471,19 +469,6 @@
 
         // Settings button click handler
         document.getElementById('settingsButton').addEventListener('click', showSettings);
-
-        // Register service worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then((registration) => {
-                        console.log('ServiceWorker registration successful');
-                    })
-                    .catch((err) => {
-                        console.log('ServiceWorker registration failed: ', err);
-                    });
-            });
-        }
     </script>
 </body>
 </html> 
