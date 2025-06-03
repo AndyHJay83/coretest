@@ -3252,6 +3252,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Also initialize info buttons when the workflow creation page is shown
 function showWorkflowCreation() {
-    // ... existing code ...
+    document.getElementById('homepage').style.display = 'none';
+    document.getElementById('workflowExecution').style.display = 'none';
+    document.getElementById('workflowCreation').style.display = 'block';
+    
+    // Hide saved workflows initially
+    const savedWorkflows = document.getElementById('savedWorkflows');
+    if (savedWorkflows) {
+        savedWorkflows.style.display = 'none';
+    }
+    
+    // Initialize info buttons
     initializeInfoButtons();
+}
+
+// Hide workflow creation page
+function hideWorkflowCreation() {
+    document.getElementById('homepage').style.display = 'block';
+    document.getElementById('workflowCreation').style.display = 'none';
+    document.getElementById('workflowExecution').style.display = 'none';
 }
