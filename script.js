@@ -36,158 +36,149 @@ const performButton = document.getElementById('performButton');
 
 // Function to initialize workflow dropdown
 function initializeWorkflowDropdown() {
+    console.log('Initializing workflow dropdown...');
     const workflowSelect = document.getElementById('workflowSelect');
-    if (!workflowSelect) return;
+    const customSelect = document.querySelector('.custom-select');
+    const optionsList = document.querySelector('.options-list');
+    
+    if (!workflowSelect || !customSelect || !optionsList) {
+        console.error('Missing required elements:', {
+            workflowSelect: !!workflowSelect,
+            customSelect: !!customSelect,
+            optionsList: !!optionsList
+        });
+        return;
+    }
 
+    console.log('Found all required elements, proceeding with initialization');
+    
     // Clear existing options except the first one
     while (workflowSelect.options.length > 1) {
         workflowSelect.remove(1);
     }
-
-    // Add saved workflows to dropdown
-    workflows.forEach(workflow => {
+    
+    // Add saved workflows to the dropdown
+    const savedWorkflows = JSON.parse(localStorage.getItem('savedWorkflows') || '[]');
+    console.log('Found saved workflows:', savedWorkflows);
+    
+    savedWorkflows.forEach(workflow => {
         const option = document.createElement('option');
         option.value = workflow.name;
         option.textContent = workflow.name;
         workflowSelect.appendChild(option);
     });
-
-    // Initialize the custom dropdown for workflow select
-    const workflowDropdown = workflowSelect.closest('.dropdown');
-    if (workflowDropdown) {
-        const customSelect = workflowDropdown.querySelector('.custom-select');
-        const selectedText = customSelect.querySelector('.selected-text');
-        const optionsList = customSelect.querySelector('.options-list');
+    
+    // Initialize custom dropdown component
+    console.log('Setting up custom dropdown component...');
+    
+    // Click event for desktop
+    customSelect.addEventListener('click', (e) => {
+        console.log('Custom select clicked');
+        e.stopPropagation();
+        const isOpen = optionsList.classList.contains('show');
+        console.log('Current dropdown state:', isOpen ? 'open' : 'closed');
         
-        // Clear existing options
-        optionsList.innerHTML = '';
-        
-        // Add options to custom dropdown
-        Array.from(workflowSelect.options).forEach(option => {
-            const customOption = document.createElement('div');
-            customOption.className = 'option';
-            customOption.textContent = option.textContent;
-            customOption.setAttribute('data-value', option.value);
-            
-            // Add click handler for desktop
-            customOption.addEventListener('click', (e) => {
-                e.stopPropagation();
-                workflowSelect.value = option.value;
-                selectedText.textContent = option.textContent;
-                optionsList.classList.remove('show');
-                
-                if (option.value === 'create-new') {
-                    showWorkflowCreation();
-                }
-            });
-            
-            // Add touch handler for mobile
-            customOption.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                workflowSelect.value = option.value;
-                selectedText.textContent = option.textContent;
-                optionsList.classList.remove('show');
-                
-                if (option.value === 'create-new') {
-                    showWorkflowCreation();
-                }
-            }, { passive: false });
-            
-            optionsList.appendChild(customOption);
-        });
-        
-        // Set initial selected text
-        selectedText.textContent = workflowSelect.options[workflowSelect.selectedIndex].text;
-        
-        // Add click handler for the custom select
-        customSelect.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const isOpen = optionsList.classList.contains('show');
-            
-            // Close all other dropdowns first
-            document.querySelectorAll('.options-list.show').forEach(list => {
-                if (list !== optionsList) {
-                    list.classList.remove('show');
-                }
-            });
-            
-            optionsList.classList.toggle('show');
-            
-            // If opening, ensure the selected option is visible
-            if (!isOpen) {
-                const selectedOption = optionsList.querySelector('.option[data-value="' + workflowSelect.value + '"]');
-                if (selectedOption) {
-                    selectedOption.scrollIntoView({ block: 'nearest' });
-                }
+        // Close other dropdowns
+        document.querySelectorAll('.options-list.show').forEach(list => {
+            if (list !== optionsList) {
+                list.classList.remove('show');
             }
         });
         
-        // Add touch handler for mobile
-        customSelect.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            const isOpen = optionsList.classList.contains('show');
-            
-            // Close all other dropdowns first
-            document.querySelectorAll('.options-list.show').forEach(list => {
-                if (list !== optionsList) {
-                    list.classList.remove('show');
-                }
-            });
-            
-            optionsList.classList.toggle('show');
-            
-            // If opening, ensure the selected option is visible
-            if (!isOpen) {
-                const selectedOption = optionsList.querySelector('.option[data-value="' + workflowSelect.value + '"]');
-                if (selectedOption) {
-                    selectedOption.scrollIntoView({ block: 'nearest' });
-                }
-            }
-        }, { passive: false });
+        optionsList.classList.toggle('show');
+        customSelect.classList.toggle('show');
         
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!customSelect.contains(e.target)) {
-                optionsList.classList.remove('show');
+        if (!isOpen) {
+            // Scroll to selected option when opening
+            const selectedOption = optionsList.querySelector('.option.selected');
+            if (selectedOption) {
+                console.log('Scrolling to selected option');
+                selectedOption.scrollIntoView({ block: 'nearest' });
+            }
+        }
+    });
+    
+    // Touch events for mobile
+    customSelect.addEventListener('touchstart', (e) => {
+        console.log('Custom select touched');
+        e.preventDefault();
+        e.stopPropagation();
+        const isOpen = optionsList.classList.contains('show');
+        console.log('Current dropdown state:', isOpen ? 'open' : 'closed');
+        
+        // Close other dropdowns
+        document.querySelectorAll('.options-list.show').forEach(list => {
+            if (list !== optionsList) {
+                list.classList.remove('show');
             }
         });
         
-        // Close dropdown when touching outside (mobile)
-        document.addEventListener('touchstart', (e) => {
-            if (!customSelect.contains(e.target)) {
-                optionsList.classList.remove('show');
-            }
-        }, { passive: false });
+        optionsList.classList.toggle('show');
+        customSelect.classList.toggle('show');
         
-        // Prevent scrolling of the page when interacting with the dropdown
-        optionsList.addEventListener('touchmove', (e) => {
-            e.stopPropagation();
-        }, { passive: false });
-
-        // Add keyboard navigation
-        customSelect.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                optionsList.classList.toggle('show');
-            } else if (e.key === 'Escape') {
-                optionsList.classList.remove('show');
+        if (!isOpen) {
+            // Scroll to selected option when opening
+            const selectedOption = optionsList.querySelector('.option.selected');
+            if (selectedOption) {
+                console.log('Scrolling to selected option');
+                selectedOption.scrollIntoView({ block: 'nearest' });
             }
-        });
-
-        // Add focus styles
-        customSelect.addEventListener('focus', () => {
-            customSelect.classList.add('focused');
-        });
-
-        customSelect.addEventListener('blur', () => {
-            customSelect.classList.remove('focused');
-        });
-
-        // Make the custom select focusable
-        customSelect.setAttribute('tabindex', '0');
-    }
+        }
+    }, { passive: false });
+    
+    // Handle option selection
+    optionsList.addEventListener('click', (e) => {
+        console.log('Option list clicked');
+        const option = e.target.closest('.option');
+        if (!option) {
+            console.log('No option element found in click target');
+            return;
+        }
+        
+        console.log('Option selected:', option.textContent);
+        const value = option.getAttribute('data-value');
+        const text = option.textContent;
+        
+        // Update custom select display
+        customSelect.querySelector('.selected-text').textContent = text;
+        
+        // Update native select
+        workflowSelect.value = value;
+        
+        // Trigger change event
+        const event = new Event('change', { bubbles: true });
+        workflowSelect.dispatchEvent(event);
+        
+        // Close dropdown
+        optionsList.classList.remove('show');
+        customSelect.classList.remove('show');
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!customSelect.contains(e.target)) {
+            console.log('Click outside dropdown detected');
+            optionsList.classList.remove('show');
+            customSelect.classList.remove('show');
+        }
+    });
+    
+    // Close dropdown when touching outside
+    document.addEventListener('touchstart', (e) => {
+        if (!customSelect.contains(e.target)) {
+            console.log('Touch outside dropdown detected');
+            optionsList.classList.remove('show');
+            customSelect.classList.remove('show');
+        }
+    });
+    
+    // Prevent page scroll when interacting with dropdown
+    optionsList.addEventListener('touchmove', (e) => {
+        console.log('Preventing page scroll during dropdown interaction');
+        e.preventDefault();
+    }, { passive: false });
+    
+    console.log('Dropdown initialization complete');
 }
 
 // Show workflow creation page
