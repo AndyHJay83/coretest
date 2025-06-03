@@ -1087,8 +1087,11 @@ async function executeWorkflow(steps) {
         for (const step of steps) {
             console.log('Executing step:', step);
             
-            // Get the feature ID from the step object
-            const featureId = step.feature + 'Feature';
+            // Map feature name to correct element id if needed
+            let featureId = step.feature + 'Feature';
+            if (step.feature === 'consonant') {
+                featureId = 'consonantQuestion';
+            }
             console.log('Looking for feature element with ID:', featureId);
             
             // Get the feature element
