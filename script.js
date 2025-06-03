@@ -34,38 +34,57 @@ const selectedFeaturesList = document.getElementById('selectedFeaturesList');
 const workflowSelect = document.getElementById('workflowSelect');
 const performButton = document.getElementById('performButton');
 
-// Function to initialize workflow dropdown
-function initializeWorkflowDropdown() {
-    const workflowSelect = document.getElementById('workflowSelect');
-    const customSelect = workflowSelect.nextElementSibling;
-    const selectedText = customSelect.querySelector('.selected-text');
-    const optionsList = customSelect.querySelector('.options-list');
+// Initialize the app when the DOM is loaded
+document.addEventListener('DOMContentLoaded', async () => {
+    // Load word list
+    await loadWordList();
+    
+    // Load saved workflows from localStorage
+    const savedWorkflows = localStorage.getItem('workflows');
+    if (savedWorkflows) {
+        workflows = JSON.parse(savedWorkflows);
+    }
+    
+    // Initialize dropdowns and button listeners
+    initializeDropdowns();
+    
+    // Display saved workflows
+    displaySavedWorkflows();
+});
 
-    if (!workflowSelect || !customSelect || !selectedText || !optionsList) {
+// Function to initialize dropdowns
+function initializeDropdowns() {
+    // Initialize workflow dropdown
+    const workflowSelect = document.getElementById('workflowSelect');
+    const workflowCustomSelect = workflowSelect.nextElementSibling;
+    const workflowSelectedText = workflowCustomSelect.querySelector('.selected-text');
+    const workflowOptionsList = workflowCustomSelect.querySelector('.options-list');
+
+    if (!workflowSelect || !workflowCustomSelect || !workflowSelectedText || !workflowOptionsList) {
         console.error('Required workflow dropdown elements not found');
         return;
     }
 
-    // Clear existing options except the first two
+    // Clear existing workflow options except the first two
     while (workflowSelect.options.length > 2) {
         workflowSelect.remove(2);
     }
 
-    // Clear existing custom options
-    optionsList.innerHTML = '';
+    // Clear existing custom workflow options
+    workflowOptionsList.innerHTML = '';
 
-    // Add default options to custom dropdown
-    const defaultOptions = [
+    // Add default workflow options
+    const defaultWorkflowOptions = [
         { value: '', text: 'Select a workflow...' },
         { value: 'create-new', text: 'New Workflow' }
     ];
 
-    defaultOptions.forEach(option => {
+    defaultWorkflowOptions.forEach(option => {
         const optionElement = document.createElement('div');
         optionElement.className = 'option';
         optionElement.textContent = option.text;
         optionElement.dataset.value = option.value;
-        optionsList.appendChild(optionElement);
+        workflowOptionsList.appendChild(optionElement);
     });
 
     // Add saved workflows
@@ -82,14 +101,14 @@ function initializeWorkflowDropdown() {
         optionElement.className = 'option';
         optionElement.textContent = workflow.name;
         optionElement.dataset.value = workflow.name;
-        optionsList.appendChild(optionElement);
+        workflowOptionsList.appendChild(optionElement);
     });
 
-    // Set up click handlers
-    customSelect.addEventListener('click', () => {
-        optionsList.classList.toggle('show');
-        if (optionsList.classList.contains('show')) {
-            optionsList.style.cssText = `
+    // Set up workflow dropdown click handlers
+    workflowCustomSelect.addEventListener('click', () => {
+        workflowOptionsList.classList.toggle('show');
+        if (workflowOptionsList.classList.contains('show')) {
+            workflowOptionsList.style.cssText = `
                 display: block !important;
                 position: absolute;
                 width: 100%;
@@ -101,7 +120,7 @@ function initializeWorkflowDropdown() {
         }
     });
 
-    optionsList.addEventListener('click', (e) => {
+    workflowOptionsList.addEventListener('click', (e) => {
         const option = e.target.closest('.option');
         if (!option) return;
 
@@ -110,10 +129,10 @@ function initializeWorkflowDropdown() {
 
         // Update both dropdowns
         workflowSelect.value = value;
-        selectedText.textContent = text;
+        workflowSelectedText.textContent = text;
 
         // Close dropdown
-        optionsList.classList.remove('show');
+        workflowOptionsList.classList.remove('show');
 
         // If "New Workflow" is selected, show the workflow creation page
         if (value === 'create-new') {
@@ -121,58 +140,45 @@ function initializeWorkflowDropdown() {
         }
     });
 
-    // Close dropdown when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!customSelect.contains(e.target)) {
-            optionsList.classList.remove('show');
-        }
-    });
-}
-
-// Initialize wordlist dropdown
-function initializeWordlistDropdown() {
+    // Initialize wordlist dropdown
     const wordlistSelect = document.getElementById('wordlistSelect');
-    const customSelect = wordlistSelect.nextElementSibling;
-    const selectedText = customSelect.querySelector('.selected-text');
-    const optionsList = customSelect.querySelector('.options-list');
+    const wordlistCustomSelect = wordlistSelect.nextElementSibling;
+    const wordlistSelectedText = wordlistCustomSelect.querySelector('.selected-text');
+    const wordlistOptionsList = wordlistCustomSelect.querySelector('.options-list');
     
-    if (!wordlistSelect || !customSelect || !selectedText || !optionsList) {
+    if (!wordlistSelect || !wordlistCustomSelect || !wordlistSelectedText || !wordlistOptionsList) {
         console.error('Required wordlist dropdown elements not found');
         return;
     }
  
-    // Clear existing options
-    optionsList.innerHTML = '';
+    // Clear existing wordlist options
+    wordlistOptionsList.innerHTML = '';
     
-    // Add options to custom dropdown
+    // Add wordlist options to custom dropdown
     Array.from(wordlistSelect.options).forEach(option => {
         const customOption = document.createElement('div');
         customOption.className = 'option';
         customOption.textContent = option.textContent;
-        customOption.setAttribute('data-value', option.value);
+        customOption.dataset.value = option.value;
         
         if (option.selected) {
             customOption.classList.add('selected');
         }
         
-        optionsList.appendChild(customOption);
+        wordlistOptionsList.appendChild(customOption);
     });
     
-    // Set initial selected text
-    const selectedText = customSelect.querySelector('.selected-text');
-    if (selectedText) {
-        selectedText.textContent = wordlistSelect.options[wordlistSelect.selectedIndex].textContent;
-    }
+    // Set initial wordlist selected text
+    wordlistSelectedText.textContent = wordlistSelect.options[wordlistSelect.selectedIndex].textContent;
     
-    // Add click handler to custom select
-    customSelect.addEventListener('click', function(e) {
+    // Set up wordlist dropdown click handlers
+    wordlistCustomSelect.addEventListener('click', (e) => {
         e.stopPropagation();
-        this.classList.toggle('show');
-        optionsList.classList.toggle('show');
+        wordlistOptionsList.classList.toggle('show');
         
         // Force the dropdown to be fully visible
-        if (optionsList.classList.contains('show')) {
-            optionsList.style.cssText = `
+        if (wordlistOptionsList.classList.contains('show')) {
+            wordlistOptionsList.style.cssText = `
                 display: block !important;
                 position: absolute;
                 width: 100%;
@@ -184,130 +190,33 @@ function initializeWordlistDropdown() {
         }
     });
     
-    // Add click handlers to options
-    optionsList.querySelectorAll('.option').forEach(option => {
-        option.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const value = this.getAttribute('data-value');
-            wordlistSelect.value = value;
-            selectedText.textContent = this.textContent;
-            customSelect.classList.remove('show');
-            optionsList.classList.remove('show');
-        });
+    wordlistOptionsList.addEventListener('click', (e) => {
+        const option = e.target.closest('.option');
+        if (!option) return;
+
+        const value = option.dataset.value;
+        const text = option.textContent;
+
+        // Update both dropdowns
+        wordlistSelect.value = value;
+        wordlistSelectedText.textContent = text;
+
+        // Close dropdown
+        wordlistOptionsList.classList.remove('show');
     });
     
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!customSelect.contains(e.target)) {
-            customSelect.classList.remove('show');
-            optionsList.classList.remove('show');
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!workflowCustomSelect.contains(e.target)) {
+            workflowOptionsList.classList.remove('show');
+        }
+        if (!wordlistCustomSelect.contains(e.target)) {
+            wordlistOptionsList.classList.remove('show');
         }
     });
-}
 
-// Show workflow creation page
-function showWorkflowCreation() {
-    document.getElementById('homepage').style.display = 'none';
-    document.getElementById('workflowExecution').style.display = 'none';
-    document.getElementById('workflowCreation').style.display = 'block';
-    
-    // Hide saved workflows initially
-    const savedWorkflows = document.getElementById('savedWorkflows');
-    if (savedWorkflows) {
-        savedWorkflows.style.display = 'none';
-    }
-    
-    // Initialize info buttons
-    initializeInfoButtons();
-}
-
-// Hide workflow creation page
-function hideWorkflowCreation() {
-    document.getElementById('homepage').style.display = 'block';
-    document.getElementById('workflowCreation').style.display = 'none';
-    document.getElementById('workflowExecution').style.display = 'none';
-}
-
-// Initialize everything when the DOM is loaded
-document.addEventListener('DOMContentLoaded', async () => {
-    // Set viewport meta tag for consistent zoom level
-    let viewportMeta = document.querySelector('meta[name="viewport"]');
-    if (!viewportMeta) {
-        viewportMeta = document.createElement('meta');
-        viewportMeta.name = 'viewport';
-        document.head.appendChild(viewportMeta);
-    }
-    viewportMeta.content = 'width=device-width, initial-scale=0.75, maximum-scale=0.75, user-scalable=no';
-    
-    // Load word list
-    await loadWordList();
-    
-    // Load saved workflows from localStorage
-    const savedWorkflows = localStorage.getItem('workflows');
-    if (savedWorkflows) {
-        workflows = JSON.parse(savedWorkflows);
-    }
-    
-    // Initialize both dropdowns
-    initializeWorkflowDropdown();
-    initializeWordlistDropdown();
-    
-    // Display saved workflows
-    displaySavedWorkflows();
-    
     // Set up button listeners
     setupButtonListeners();
-});
-
-// Function to add feature to selected features list
-function addFeatureToList(feature) {
-    const selectedFeaturesList = document.getElementById('selectedFeaturesList');
-    if (!selectedFeaturesList) return;
-    
-    // Check if feature is already selected
-    const existingFeature = selectedFeaturesList.querySelector(`[data-feature="${feature}"]`);
-    if (!existingFeature) {
-        const featureItem = document.createElement('div');
-        featureItem.className = 'selected-feature-item';
-        featureItem.setAttribute('data-feature', feature);
-        featureItem.draggable = true;
-        
-        const featureName = document.createElement('span');
-        featureName.textContent = feature.toUpperCase();
-        featureItem.appendChild(featureName);
-        
-        const removeButton = document.createElement('button');
-        removeButton.className = 'remove-feature';
-        removeButton.textContent = '×';
-        removeButton.onclick = (e) => {
-            e.stopPropagation();
-            featureItem.remove();
-        };
-        featureItem.appendChild(removeButton);
-        
-        // Add touch and drag events for mobile
-        featureItem.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            featureItem.classList.add('dragging');
-        }, { passive: false });
-        
-        featureItem.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            featureItem.classList.remove('dragging');
-        }, { passive: false });
-        
-        featureItem.addEventListener('dragstart', (e) => {
-            e.dataTransfer.setData('text/plain', feature);
-            e.dataTransfer.effectAllowed = 'move';
-            featureItem.classList.add('dragging');
-        });
-        
-        featureItem.addEventListener('dragend', () => {
-            featureItem.classList.remove('dragging');
-        });
-        
-        selectedFeaturesList.appendChild(featureItem);
-    }
 }
 
 // Function to setup button listeners
@@ -371,29 +280,56 @@ function setupButtonListeners() {
             performButton.click();
         }, { passive: false });
     }
+}
+
+// Function to add feature to selected features list
+function addFeatureToList(feature) {
+    const selectedFeaturesList = document.getElementById('selectedFeaturesList');
+    if (!selectedFeaturesList) return;
     
-    // Settings button
-    const settingsButton = document.getElementById('settingsButton');
-    if (settingsButton) {
-        settingsButton.addEventListener('click', () => {
-            document.getElementById('settingsModal').style.display = 'block';
-        });
-        settingsButton.addEventListener('touchstart', (e) => {
+    // Check if feature is already selected
+    const existingFeature = selectedFeaturesList.querySelector(`[data-feature="${feature}"]`);
+    if (!existingFeature) {
+        const featureItem = document.createElement('div');
+        featureItem.className = 'selected-feature-item';
+        featureItem.setAttribute('data-feature', feature);
+        featureItem.draggable = true;
+        
+        const featureName = document.createElement('span');
+        featureName.textContent = feature.toUpperCase();
+        featureItem.appendChild(featureName);
+        
+        const removeButton = document.createElement('button');
+        removeButton.className = 'remove-feature';
+        removeButton.textContent = '×';
+        removeButton.onclick = (e) => {
+            e.stopPropagation();
+            featureItem.remove();
+        };
+        featureItem.appendChild(removeButton);
+        
+        // Add touch and drag events for mobile
+        featureItem.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            document.getElementById('settingsModal').style.display = 'block';
+            featureItem.classList.add('dragging');
         }, { passive: false });
-    }
-    
-    // Close settings button
-    const closeButton = document.querySelector('.close-button');
-    if (closeButton) {
-        closeButton.addEventListener('click', () => {
-            document.getElementById('settingsModal').style.display = 'none';
-        });
-        closeButton.addEventListener('touchstart', (e) => {
+        
+        featureItem.addEventListener('touchend', (e) => {
             e.preventDefault();
-            document.getElementById('settingsModal').style.display = 'none';
+            featureItem.classList.remove('dragging');
         }, { passive: false });
+        
+        featureItem.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', feature);
+            e.dataTransfer.effectAllowed = 'move';
+            featureItem.classList.add('dragging');
+        });
+        
+        featureItem.addEventListener('dragend', () => {
+            featureItem.classList.remove('dragging');
+        });
+        
+        selectedFeaturesList.appendChild(featureItem);
     }
 }
 
@@ -2758,173 +2694,6 @@ function deleteWorkflow(workflow) {
             displaySavedWorkflows();
         }
     }
-}
-
-// Function to initialize dropdowns
-function initializeDropdowns() {
-    // Initialize workflow dropdown
-    const workflowSelect = document.getElementById('workflowSelect');
-    const workflowCustomSelect = workflowSelect.nextElementSibling;
-    const workflowSelectedText = workflowCustomSelect.querySelector('.selected-text');
-    const workflowOptionsList = workflowCustomSelect.querySelector('.options-list');
-
-    if (!workflowSelect || !workflowCustomSelect || !workflowSelectedText || !workflowOptionsList) {
-        console.error('Required workflow dropdown elements not found');
-        return;
-    }
-
-    // Clear existing workflow options except the first two
-    while (workflowSelect.options.length > 2) {
-        workflowSelect.remove(2);
-    }
-
-    // Clear existing custom workflow options
-    workflowOptionsList.innerHTML = '';
-
-    // Add default workflow options
-    const defaultWorkflowOptions = [
-        { value: '', text: 'Select a workflow...' },
-        { value: 'create-new', text: 'New Workflow' }
-    ];
-
-    defaultWorkflowOptions.forEach(option => {
-        const optionElement = document.createElement('div');
-        optionElement.className = 'option';
-        optionElement.textContent = option.text;
-        optionElement.dataset.value = option.value;
-        workflowOptionsList.appendChild(optionElement);
-    });
-
-    // Add saved workflows
-    const savedWorkflows = JSON.parse(localStorage.getItem('workflows') || '[]');
-    savedWorkflows.forEach(workflow => {
-        // Add to native select
-        const option = document.createElement('option');
-        option.value = workflow.name;
-        option.textContent = workflow.name;
-        workflowSelect.appendChild(option);
-
-        // Add to custom dropdown
-        const optionElement = document.createElement('div');
-        optionElement.className = 'option';
-        optionElement.textContent = workflow.name;
-        optionElement.dataset.value = workflow.name;
-        workflowOptionsList.appendChild(optionElement);
-    });
-
-    // Set up workflow dropdown click handlers
-    workflowCustomSelect.addEventListener('click', () => {
-        workflowOptionsList.classList.toggle('show');
-        if (workflowOptionsList.classList.contains('show')) {
-            workflowOptionsList.style.cssText = `
-                display: block !important;
-                position: absolute;
-                width: 100%;
-                height: auto;
-                max-height: none;
-                overflow: visible;
-                z-index: 9999;
-            `;
-        }
-    });
-
-    workflowOptionsList.addEventListener('click', (e) => {
-        const option = e.target.closest('.option');
-        if (!option) return;
-
-        const value = option.dataset.value;
-        const text = option.textContent;
-
-        // Update both dropdowns
-        workflowSelect.value = value;
-        workflowSelectedText.textContent = text;
-
-        // Close dropdown
-        workflowOptionsList.classList.remove('show');
-
-        // If "New Workflow" is selected, show the workflow creation page
-        if (value === 'create-new') {
-            showWorkflowCreation();
-        }
-    });
-
-    // Initialize wordlist dropdown
-    const wordlistSelect = document.getElementById('wordlistSelect');
-    const wordlistCustomSelect = wordlistSelect.nextElementSibling;
-    const wordlistSelectedText = wordlistCustomSelect.querySelector('.selected-text');
-    const wordlistOptionsList = wordlistCustomSelect.querySelector('.options-list');
-    
-    if (!wordlistSelect || !wordlistCustomSelect || !wordlistSelectedText || !wordlistOptionsList) {
-        console.error('Required wordlist dropdown elements not found');
-        return;
-    }
- 
-    // Clear existing wordlist options
-    wordlistOptionsList.innerHTML = '';
-    
-    // Add wordlist options to custom dropdown
-    Array.from(wordlistSelect.options).forEach(option => {
-        const customOption = document.createElement('div');
-        customOption.className = 'option';
-        customOption.textContent = option.textContent;
-        customOption.dataset.value = option.value;
-        
-        if (option.selected) {
-            customOption.classList.add('selected');
-        }
-        
-        wordlistOptionsList.appendChild(customOption);
-    });
-    
-    // Set initial wordlist selected text
-    wordlistSelectedText.textContent = wordlistSelect.options[wordlistSelect.selectedIndex].textContent;
-    
-    // Set up wordlist dropdown click handlers
-    wordlistCustomSelect.addEventListener('click', (e) => {
-        e.stopPropagation();
-        wordlistOptionsList.classList.toggle('show');
-        
-        // Force the dropdown to be fully visible
-        if (wordlistOptionsList.classList.contains('show')) {
-            wordlistOptionsList.style.cssText = `
-                display: block !important;
-                position: absolute;
-                width: 100%;
-                height: auto;
-                max-height: none;
-                overflow: visible;
-                z-index: 9999;
-            `;
-        }
-    });
-    
-    wordlistOptionsList.addEventListener('click', (e) => {
-        const option = e.target.closest('.option');
-        if (!option) return;
-
-        const value = option.dataset.value;
-        const text = option.textContent;
-
-        // Update both dropdowns
-        wordlistSelect.value = value;
-        wordlistSelectedText.textContent = text;
-
-        // Close dropdown
-        wordlistOptionsList.classList.remove('show');
-    });
-    
-    // Close dropdowns when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!workflowCustomSelect.contains(e.target)) {
-            workflowOptionsList.classList.remove('show');
-        }
-        if (!wordlistCustomSelect.contains(e.target)) {
-            wordlistOptionsList.classList.remove('show');
-        }
-    });
-
-    // Set up button listeners
-    setupButtonListeners();
 }
 
 // Initialize drag and drop functionality
