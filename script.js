@@ -65,9 +65,9 @@ function initializeDropdowns() {
         return;
     }
 
-    // Set base z-index for workflow dropdown
-    workflowCustomSelect.style.zIndex = '1000';
-    workflowOptionsList.style.zIndex = '1001';
+    // Set base z-index for workflow dropdown - using very high values to ensure it's on top
+    workflowCustomSelect.style.zIndex = '9998';
+    workflowOptionsList.style.zIndex = '9999';
 
     // Clear existing workflow options except the first two
     while (workflowSelect.options.length > 2) {
@@ -146,7 +146,7 @@ function initializeDropdowns() {
                 height: auto;
                 max-height: none;
                 overflow: visible;
-                z-index: 1001;
+                z-index: 9999;
                 background: white;
                 box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             `;
@@ -192,9 +192,9 @@ function initializeDropdowns() {
         return;
     }
 
-    // Set base z-index for wordlist dropdown
-    wordlistCustomSelect.style.zIndex = '900';
-    wordlistOptionsList.style.zIndex = '901';
+    // Set base z-index for wordlist dropdown - using lower values
+    wordlistCustomSelect.style.zIndex = '100';
+    wordlistOptionsList.style.zIndex = '101';
  
     // Clear existing wordlist options
     wordlistOptionsList.innerHTML = '';
@@ -244,7 +244,7 @@ function initializeDropdowns() {
                 height: auto;
                 max-height: none;
                 overflow: visible;
-                z-index: 901;
+                z-index: 101;
                 background: white;
                 box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             `;
