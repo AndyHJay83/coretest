@@ -94,26 +94,32 @@ function initializeWorkflowDropdown() {
         selectedText.textContent = workflowSelect.options[workflowSelect.selectedIndex].text;
     }
     
+    // Remove any existing event listeners
+    const newCustomSelect = customSelect.cloneNode(true);
+    customSelect.parentNode.replaceChild(newCustomSelect, customSelect);
+    const newOptionsList = optionsList.cloneNode(true);
+    optionsList.parentNode.replaceChild(newOptionsList, optionsList);
+    
     // Click event for desktop
-    customSelect.addEventListener('click', (e) => {
+    newCustomSelect.addEventListener('click', (e) => {
         console.log('Custom select clicked');
         e.stopPropagation();
-        const isOpen = optionsList.classList.contains('show');
+        const isOpen = newOptionsList.classList.contains('show');
         console.log('Current dropdown state:', isOpen ? 'open' : 'closed');
         
         // Close other dropdowns
         document.querySelectorAll('.options-list.show').forEach(list => {
-            if (list !== optionsList) {
+            if (list !== newOptionsList) {
                 list.classList.remove('show');
             }
         });
         
-        optionsList.classList.toggle('show');
-        customSelect.classList.toggle('show');
+        newOptionsList.classList.toggle('show');
+        newCustomSelect.classList.toggle('show');
         
         if (!isOpen) {
             // Scroll to selected option when opening
-            const selectedOption = optionsList.querySelector('.option.selected');
+            const selectedOption = newOptionsList.querySelector('.option.selected');
             if (selectedOption) {
                 console.log('Scrolling to selected option');
                 selectedOption.scrollIntoView({ block: 'nearest' });
@@ -122,26 +128,26 @@ function initializeWorkflowDropdown() {
     });
     
     // Touch events for mobile
-    customSelect.addEventListener('touchstart', (e) => {
+    newCustomSelect.addEventListener('touchstart', (e) => {
         console.log('Custom select touched');
         e.preventDefault();
         e.stopPropagation();
-        const isOpen = optionsList.classList.contains('show');
+        const isOpen = newOptionsList.classList.contains('show');
         console.log('Current dropdown state:', isOpen ? 'open' : 'closed');
         
         // Close other dropdowns
         document.querySelectorAll('.options-list.show').forEach(list => {
-            if (list !== optionsList) {
+            if (list !== newOptionsList) {
                 list.classList.remove('show');
             }
         });
         
-        optionsList.classList.toggle('show');
-        customSelect.classList.toggle('show');
+        newOptionsList.classList.toggle('show');
+        newCustomSelect.classList.toggle('show');
         
         if (!isOpen) {
             // Scroll to selected option when opening
-            const selectedOption = optionsList.querySelector('.option.selected');
+            const selectedOption = newOptionsList.querySelector('.option.selected');
             if (selectedOption) {
                 console.log('Scrolling to selected option');
                 selectedOption.scrollIntoView({ block: 'nearest' });
