@@ -1647,6 +1647,7 @@ input:checked + .slider:before {
     position: relative;
     max-width: 300px;
     margin: 10px 0;
+    z-index: 1000;
 }
 
 .dropdown select {
@@ -1656,16 +1657,23 @@ input:checked + .slider:before {
 .custom-select {
     position: relative;
     background: #fff;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
     cursor: pointer;
     user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
 }
 
 .selected-text {
-    padding: 8px 12px;
+    padding: 12px;
     display: block;
     position: relative;
+    flex: 1;
+    font-size: 16px;
 }
 
 .selected-text::after {
@@ -1676,6 +1684,7 @@ input:checked + .slider:before {
     transform: translateY(-50%);
     font-size: 12px;
     color: #666;
+    pointer-events: none;
 }
 
 .options-list {
@@ -1684,13 +1693,16 @@ input:checked + .slider:before {
     left: 0;
     right: 0;
     background: #fff;
-    border: 1px solid #ccc;
+    border: 2px solid #ddd;
     border-top: none;
-    border-radius: 0 0 4px 4px;
+    border-radius: 0 0 8px 8px;
     max-height: 200px;
     overflow-y: auto;
     z-index: 1000;
     display: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
 }
 
 .options-list.show {
@@ -1698,13 +1710,23 @@ input:checked + .slider:before {
 }
 
 .option {
-    padding: 8px 12px;
+    padding: 12px;
     cursor: pointer;
     transition: background-color 0.2s;
+    font-size: 16px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
 }
 
 .option:hover {
-    background-color: #f0f0f0;
+    background-color: #f5f5f5;
+}
+
+.option:active {
+    background-color: #e0e0e0;
 }
 
 /* Mobile styles */
@@ -1721,7 +1743,31 @@ input:checked + .slider:before {
     .option {
         padding: 12px;
         font-size: 16px;
+        min-height: 44px;
     }
+    
+    .options-list {
+        max-height: 300px;
+    }
+}
+
+/* Scrollbar styling */
+.options-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.options-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.options-list::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.options-list::-webkit-scrollbar-thumb:hover {
+    background: #555;
 }
 
 /* Feature Info Button Styles */

@@ -70,7 +70,8 @@ function initializeWorkflowDropdown() {
             customOption.setAttribute('data-value', option.value);
             
             // Add click handler for desktop
-            customOption.addEventListener('click', () => {
+            customOption.addEventListener('click', (e) => {
+                e.stopPropagation();
                 workflowSelect.value = option.value;
                 selectedText.textContent = option.textContent;
                 optionsList.classList.remove('show');
@@ -83,6 +84,7 @@ function initializeWorkflowDropdown() {
             // Add touch handler for mobile
             customOption.addEventListener('touchstart', (e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 workflowSelect.value = option.value;
                 selectedText.textContent = option.textContent;
                 optionsList.classList.remove('show');
@@ -101,14 +103,48 @@ function initializeWorkflowDropdown() {
         // Add click handler for the custom select
         customSelect.addEventListener('click', (e) => {
             e.stopPropagation();
+            const isOpen = optionsList.classList.contains('show');
+            
+            // Close all other dropdowns first
+            document.querySelectorAll('.options-list.show').forEach(list => {
+                if (list !== optionsList) {
+                    list.classList.remove('show');
+                }
+            });
+            
             optionsList.classList.toggle('show');
+            
+            // If opening, ensure the selected option is visible
+            if (!isOpen) {
+                const selectedOption = optionsList.querySelector('.option[data-value="' + workflowSelect.value + '"]');
+                if (selectedOption) {
+                    selectedOption.scrollIntoView({ block: 'nearest' });
+                }
+            }
         });
         
         // Add touch handler for mobile
         customSelect.addEventListener('touchstart', (e) => {
             e.preventDefault();
             e.stopPropagation();
+            const isOpen = optionsList.classList.contains('show');
+            
+            // Close all other dropdowns first
+            document.querySelectorAll('.options-list.show').forEach(list => {
+                if (list !== optionsList) {
+                    list.classList.remove('show');
+                }
+            });
+            
             optionsList.classList.toggle('show');
+            
+            // If opening, ensure the selected option is visible
+            if (!isOpen) {
+                const selectedOption = optionsList.querySelector('.option[data-value="' + workflowSelect.value + '"]');
+                if (selectedOption) {
+                    selectedOption.scrollIntoView({ block: 'nearest' });
+                }
+            }
         }, { passive: false });
         
         // Close dropdown when clicking outside
@@ -123,6 +159,11 @@ function initializeWorkflowDropdown() {
             if (!customSelect.contains(e.target)) {
                 optionsList.classList.remove('show');
             }
+        }, { passive: false });
+        
+        // Prevent scrolling of the page when interacting with the dropdown
+        optionsList.addEventListener('touchmove', (e) => {
+            e.stopPropagation();
         }, { passive: false });
     }
 }
