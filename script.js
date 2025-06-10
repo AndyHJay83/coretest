@@ -49,6 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Initialize dropdowns and button listeners
     initializeDropdowns();
+    setupButtonListeners();
     
     // Display saved workflows
     displaySavedWorkflows();
