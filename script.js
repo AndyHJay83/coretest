@@ -1,5 +1,3 @@
-import { createLengthFeature, lengthFeatureCSS } from './lengthFeature.js';
-
 let wordList = [];
 let totalWords = 0;
 let isNewMode = true;

@@ -2,53 +2,6 @@
 // This module provides the LENGTH feature for filtering words by length in workflows.
 // It does not modify any existing features or files.
 
-// CSS styles for the length feature
-export const lengthFeatureCSS = `
-    .length-feature {
-        padding: 20px;
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .length-button-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        margin: 20px 0;
-    }
-
-    .length-btn-row {
-        display: flex;
-        gap: 10px;
-        justify-content: center;
-    }
-
-    .length-btn {
-        padding: 12px 20px;
-        font-size: 1.1em;
-        border: 2px solid #1B5E20;
-        border-radius: 8px;
-        background: #fff;
-        color: #1B5E20;
-        font-weight: bold;
-        cursor: pointer;
-        transition: background 0.2s, color 0.2s;
-        outline: none;
-    }
-
-    .length-btn.selected,
-    .length-btn:active {
-        background: #1B5E20;
-        color: #fff;
-    }
-
-    .length-btn:focus {
-        box-shadow: 0 0 0 2px #4CAF50;
-    }
-`;
-
-// Function to create the length feature UI
 export function createLengthFeature({ onComplete, getCurrentWords }) {
     // Create the main container
     const div = document.createElement('div');
@@ -98,15 +51,12 @@ export function createLengthFeature({ onComplete, getCurrentWords }) {
     function handleButtonClick(e) {
         const btn = e.target.closest('.length-btn');
         if (!btn) return;
-        
         // Visually highlight
         div.querySelectorAll('.length-btn').forEach(b => b.classList.remove('selected'));
         btn.classList.add('selected');
-        
         // Filtering logic
         const label = btn.textContent;
         let filtered = getCurrentWords();
-        
         if (label === 'SKIP') {
             // Do not filter, just proceed
             onComplete(filtered);
@@ -117,7 +67,6 @@ export function createLengthFeature({ onComplete, getCurrentWords }) {
             const len = parseInt(label, 10);
             filtered = filtered.filter(word => word.length === len);
         }
-        
         onComplete(filtered);
     }
 
@@ -136,4 +85,39 @@ export function createLengthFeature({ onComplete, getCurrentWords }) {
     });
 
     return div;
-} 
+}
+
+// CSS for LENGTH feature (to be injected by the main app if needed)
+export const lengthFeatureCSS = `
+#lengthFeature .length-button-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 20px 0;
+}
+#lengthFeature .length-btn-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+#lengthFeature .length-btn {
+    padding: 12px 20px;
+    font-size: 1.1em;
+    border: 2px solid #1B5E20;
+    border-radius: 8px;
+    background: #fff;
+    color: #1B5E20;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    outline: none;
+}
+#lengthFeature .length-btn.selected,
+#lengthFeature .length-btn:active {
+    background: #1B5E20;
+    color: #fff;
+}
+#lengthFeature .length-btn:focus {
+    box-shadow: 0 0 0 2px #4CAF50;
+}
+`; 
