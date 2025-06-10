@@ -2,122 +2,118 @@
 // This module provides the LENGTH feature for filtering words by length in workflows.
 // It does not modify any existing features or files.
 
-export function createLengthFeature({ onComplete, getCurrentWords }) {
-    // Create the main container
-    const div = document.createElement('div');
-    div.id = 'lengthFeature';
-    div.className = 'feature-section';
+// CSS styles for the length feature
+export const lengthFeatureCSS = `
+    .length-feature {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        padding: 20px;
+        max-width: 600px;
+        margin: 0 auto;
+    }
 
-    // Title
-    const title = document.createElement('h2');
-    title.className = 'feature-title';
-    title.textContent = 'LENGTH';
-    div.appendChild(title);
+    .length-button {
+        padding: 15px;
+        border: 2px solid #4CAF50;
+        background: white;
+        color: #4CAF50;
+        font-size: 1.2em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border-radius: 5px;
+    }
 
-    // Button grid
-    const buttonGrid = document.createElement('div');
-    buttonGrid.className = 'length-button-grid';
-    div.appendChild(buttonGrid);
+    .length-button:hover {
+        background: #4CAF50;
+        color: white;
+    }
 
-    // Button labels
-    const buttonRows = [
-        [3, 4, 5, 6],
-        [7, 8, 9, 10],
-        [11, 12, '13+', 'SKIP']
+    .length-button.selected {
+        background: #4CAF50;
+        color: white;
+    }
+
+    .length-button:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.3);
+    }
+`;
+
+// Function to create the length feature UI
+export function createLengthFeature() {
+    const container = document.createElement('div');
+    container.className = 'length-feature';
+    container.id = 'lengthFeature';
+
+    // Create the grid of buttons
+    const lengths = [
+        ['3', '4', '5', '6'],
+        ['7', '8', '9', '10'],
+        ['11', '12', '13+', 'SKIP']
     ];
 
-    // Helper to create a button
-    function createButton(label) {
-        const btn = document.createElement('button');
-        btn.className = 'length-btn';
-        btn.textContent = label;
-        btn.setAttribute('type', 'button');
-        btn.tabIndex = 0;
-        return btn;
-    }
+    lengths.forEach(row => {
+        row.forEach(length => {
+            const button = document.createElement('button');
+            button.className = 'length-button';
+            button.textContent = length;
+            button.setAttribute('tabindex', '0');
+            button.setAttribute('role', 'button');
+            button.setAttribute('aria-label', `Filter ${length}-letter words`);
 
-    // Add buttons to grid
-    buttonRows.forEach(row => {
-        const rowDiv = document.createElement('div');
-        rowDiv.className = 'length-btn-row';
-        row.forEach(label => {
-            const btn = createButton(label);
-            rowDiv.appendChild(btn);
+            // Add click handler
+            button.addEventListener('click', () => handleLengthSelection(length, button));
+            
+            // Add keyboard support
+            button.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleLengthSelection(length, button);
+                }
+            });
+
+            container.appendChild(button);
         });
-        buttonGrid.appendChild(rowDiv);
     });
 
-    // Button click handler
-    function handleButtonClick(e) {
-        const btn = e.target.closest('.length-btn');
-        if (!btn) return;
-        // Visually highlight
-        div.querySelectorAll('.length-btn').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        // Filtering logic
-        const label = btn.textContent;
-        let filtered = getCurrentWords();
-        if (label === 'SKIP') {
-            // Do not filter, just proceed
-            onComplete(filtered);
-            return;
-        } else if (label === '13+') {
-            filtered = filtered.filter(word => word.length >= 13);
-        } else {
-            const len = parseInt(label, 10);
-            filtered = filtered.filter(word => word.length === len);
-        }
-        onComplete(filtered);
+    return container;
+}
+
+// Function to handle length selection
+function handleLengthSelection(length, selectedButton) {
+    // Remove selected class from all buttons
+    document.querySelectorAll('.length-button').forEach(btn => {
+        btn.classList.remove('selected');
+    });
+
+    // Add selected class to clicked button
+    selectedButton.classList.add('selected');
+
+    // Get the current word list
+    const currentWords = window.currentFilteredWords.length > 0 
+        ? window.currentFilteredWords 
+        : window.wordList;
+
+    // Filter words based on length
+    let filteredWords;
+    if (length === 'SKIP') {
+        filteredWords = currentWords;
+    } else if (length === '13+') {
+        filteredWords = currentWords.filter(word => word.length >= 13);
+    } else {
+        const targetLength = parseInt(length);
+        filteredWords = currentWords.filter(word => word.length === targetLength);
     }
 
-    // Attach event listeners
-    div.addEventListener('click', handleButtonClick);
-    div.addEventListener('touchstart', handleButtonClick, { passive: false });
+    // Update the word list and count
+    window.currentFilteredWords = filteredWords;
+    window.displayResults(filteredWords);
+    window.updateWordCount(filteredWords.length);
 
-    // Accessibility: allow keyboard selection
-    div.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-            const btn = document.activeElement;
-            if (btn && btn.classList.contains('length-btn')) {
-                btn.click();
-            }
-        }
-    });
-
-    return div;
-}
-
-// CSS for LENGTH feature (to be injected by the main app if needed)
-export const lengthFeatureCSS = `
-#lengthFeature .length-button-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin: 20px 0;
-}
-#lengthFeature .length-btn-row {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-}
-#lengthFeature .length-btn {
-    padding: 12px 20px;
-    font-size: 1.1em;
-    border: 2px solid #1B5E20;
-    border-radius: 8px;
-    background: #fff;
-    color: #1B5E20;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.2s, color 0.2s;
-    outline: none;
-}
-#lengthFeature .length-btn.selected,
-#lengthFeature .length-btn:active {
-    background: #1B5E20;
-    color: #fff;
-}
-#lengthFeature .length-btn:focus {
-    box-shadow: 0 0 0 2px #4CAF50;
-}
-`; 
+    // Move to next feature after a short delay
+    setTimeout(() => {
+        window.showNextFeature();
+    }, 500);
+} 
