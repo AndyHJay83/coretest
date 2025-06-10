@@ -903,21 +903,10 @@ async function executeWorkflow(steps) {
             
             // Function to handle home button action
             const handleHomeAction = () => {
-                // Hide workflow execution
-                if (workflowExecution) {
-                    workflowExecution.style.display = 'none';
-                }
-                // Show homepage
-                if (homepage) {
-                    homepage.style.display = 'block';
-                }
-                // Remove reset button if it exists
-                const resetButton = document.getElementById('resetWorkflowButton');
-                if (resetButton) {
-                    resetButton.remove();
-                }
-                // Remove home button
-                homeButton.remove();
+                document.getElementById('workflowExecution').style.display = 'none';
+                document.getElementById('homepage').style.display = 'block';
+                // Reinitialize button listeners when returning to homepage
+                setupButtonListeners();
             };
             
             // Add both click and touch events
