@@ -1,5 +1,3 @@
-import { createLengthFeature, lengthFeatureCSS } from './lengthFeature.js';
-
 let wordList = [];
 let totalWords = 0;
 let isNewMode = true;
@@ -47,7 +45,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         workflows = JSON.parse(savedWorkflows);
     }
     
-    // Initialize dropdowns
+    // Initialize dropdowns and button listeners
     initializeDropdowns();
     
     // Display saved workflows
@@ -903,10 +901,21 @@ async function executeWorkflow(steps) {
             
             // Function to handle home button action
             const handleHomeAction = () => {
-                document.getElementById('workflowExecution').style.display = 'none';
-                document.getElementById('homepage').style.display = 'block';
-                // Reinitialize button listeners when returning to homepage
-                setupButtonListeners();
+                // Hide workflow execution
+                if (workflowExecution) {
+                    workflowExecution.style.display = 'none';
+                }
+                // Show homepage
+                if (homepage) {
+                    homepage.style.display = 'block';
+                }
+                // Remove reset button if it exists
+                const resetButton = document.getElementById('resetWorkflowButton');
+                if (resetButton) {
+                    resetButton.remove();
+                }
+                // Remove home button
+                homeButton.remove();
             };
             
             // Add both click and touch events
@@ -964,14 +973,7 @@ async function executeWorkflow(steps) {
             consonantQuestion: createConsonantQuestion(),
             colour3Feature: createColour3Feature(),
             shapeFeature: createShapeFeature(),
-            curvedFeature: createCurvedFeature(),
-            lengthFeature: createLengthFeature({
-                onComplete: (filtered) => {
-                    currentFilteredWords = filtered;
-                    showNextFeature();
-                },
-                getCurrentWords: () => currentFilteredWords
-            })
+            curvedFeature: createCurvedFeature()
         };
         
         // Add all feature elements to the document body (they'll be moved to feature area when needed)
@@ -1033,46 +1035,50 @@ async function executeWorkflow(steps) {
         // Execute each step in sequence
         for (const step of steps) {
             console.log('Executing step:', step);
+            
             // Map feature name to correct element id if needed
             let featureId = step.feature + 'Feature';
             if (step.feature === 'consonant') {
                 featureId = 'consonantQuestion';
             }
-            // Add support for LENGTH feature
-            if (step.feature === 'length') {
-                featureId = 'lengthFeature';
-            }
             console.log('Looking for feature element with ID:', featureId);
+            
             // Get the feature element
             const featureElement = featureElements[featureId];
             if (!featureElement) {
                 console.error(`Feature element not found for step: ${featureId}`);
                 continue;
             }
+            
             // Move the feature to the feature area
             featureArea.innerHTML = '';
             featureArea.appendChild(featureElement);
             featureElement.style.display = 'block';
             console.log(`Showing feature: ${featureId}`);
+            
             // Set up event listeners for this feature
             setupFeatureListeners(step.feature, (filteredWords) => {
                 currentFilteredWords = filteredWords;
                 // Update wordlist in the results container
                 displayResults(currentFilteredWords);
             });
+            
             // Wait for user interaction
             await new Promise((resolve) => {
                 const handleFeatureComplete = () => {
                     console.log(`Feature ${featureId} completed`);
                     featureElement.classList.add('completed');
                     featureElement.style.display = 'none';
+                    
                     // If this was the vowel feature, ensure originalLexCompleted is false
                     if (featureId === 'vowelFeature') {
                         console.log('Vowel feature completed, resetting originalLexCompleted');
                         originalLexCompleted = false;
                     }
+                    
                     resolve();
                 };
+                
                 // Add event listener for feature completion
                 featureElement.addEventListener('completed', handleFeatureComplete, { once: true });
             });
@@ -3321,11 +3327,3 @@ body.workflow-dropdown-open .custom-select:not(#workflowCustomSelect) {
 }
 `;
 document.head.appendChild(workflowDropdownCSS);
-
-// Inject LENGTH feature CSS if not already present
-if (!document.getElementById('lengthFeatureCSS')) {
-    const style = document.createElement('style');
-    style.id = 'lengthFeatureCSS';
-    style.textContent = lengthFeatureCSS;
-    document.head.appendChild(style);
-}
