@@ -47,9 +47,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         workflows = JSON.parse(savedWorkflows);
     }
     
-    // Initialize dropdowns and button listeners
+    // Initialize dropdowns
     initializeDropdowns();
-    setupButtonListeners();
     
     // Display saved workflows
     displaySavedWorkflows();
