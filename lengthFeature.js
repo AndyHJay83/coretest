@@ -11,99 +11,129 @@ export const lengthFeatureCSS = `
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
-    .length-inputs {
+    .length-button-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin: 20px 0;
+    }
+
+    .length-btn-row {
         display: flex;
         gap: 10px;
-        align-items: center;
-        margin-bottom: 15px;
+        justify-content: center;
     }
 
-    .length-input {
-        width: 60px;
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        text-align: center;
-    }
-
-    .length-label {
+    .length-btn {
+        padding: 12px 20px;
+        font-size: 1.1em;
+        border: 2px solid #1B5E20;
+        border-radius: 8px;
+        background: #fff;
+        color: #1B5E20;
         font-weight: bold;
-        color: #333;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s;
+        outline: none;
     }
 
-    .length-error {
-        color: #ff0000;
-        font-size: 0.9em;
-        margin-top: 5px;
-        display: none;
+    .length-btn.selected,
+    .length-btn:active {
+        background: #1B5E20;
+        color: #fff;
+    }
+
+    .length-btn:focus {
+        box-shadow: 0 0 0 2px #4CAF50;
     }
 `;
 
 // Function to create the length feature UI
-export function createLengthFeature() {
-    const featureDiv = document.createElement('div');
-    featureDiv.className = 'length-feature';
-    featureDiv.innerHTML = `
-        <div class="length-inputs">
-            <div>
-                <label class="length-label">Min Length:</label>
-                <input type="number" class="length-input" id="minLength" min="1" max="20" value="1">
-            </div>
-            <div>
-                <label class="length-label">Max Length:</label>
-                <input type="number" class="length-input" id="maxLength" min="1" max="20" value="20">
-            </div>
-        </div>
-        <div class="length-error" id="lengthError"></div>
-    `;
+export function createLengthFeature({ onComplete, getCurrentWords }) {
+    // Create the main container
+    const div = document.createElement('div');
+    div.id = 'lengthFeature';
+    div.className = 'feature-section';
 
-    // Add event listeners for the inputs
-    const minLengthInput = featureDiv.querySelector('#minLength');
-    const maxLengthInput = featureDiv.querySelector('#maxLength');
-    const errorDiv = featureDiv.querySelector('#lengthError');
+    // Title
+    const title = document.createElement('h2');
+    title.className = 'feature-title';
+    title.textContent = 'LENGTH';
+    div.appendChild(title);
 
-    function validateLengths() {
-        const min = parseInt(minLengthInput.value);
-        const max = parseInt(maxLengthInput.value);
-        
-        if (min > max) {
-            errorDiv.textContent = 'Minimum length cannot be greater than maximum length';
-            errorDiv.style.display = 'block';
-            return false;
-        }
-        
-        errorDiv.style.display = 'none';
-        return true;
+    // Button grid
+    const buttonGrid = document.createElement('div');
+    buttonGrid.className = 'length-button-grid';
+    div.appendChild(buttonGrid);
+
+    // Button labels
+    const buttonRows = [
+        [3, 4, 5, 6],
+        [7, 8, 9, 10],
+        [11, 12, '13+', 'SKIP']
+    ];
+
+    // Helper to create a button
+    function createButton(label) {
+        const btn = document.createElement('button');
+        btn.className = 'length-btn';
+        btn.textContent = label;
+        btn.setAttribute('type', 'button');
+        btn.tabIndex = 0;
+        return btn;
     }
 
-    minLengthInput.addEventListener('change', validateLengths);
-    maxLengthInput.addEventListener('change', validateLengths);
-
-    // Function to filter words based on length
-    function filterWordsByLength(words) {
-        if (!validateLengths()) return words;
-        
-        const min = parseInt(minLengthInput.value);
-        const max = parseInt(maxLengthInput.value);
-        
-        return words.filter(word => {
-            const length = word.length;
-            return length >= min && length <= max;
+    // Add buttons to grid
+    buttonRows.forEach(row => {
+        const rowDiv = document.createElement('div');
+        rowDiv.className = 'length-btn-row';
+        row.forEach(label => {
+            const btn = createButton(label);
+            rowDiv.appendChild(btn);
         });
+        buttonGrid.appendChild(rowDiv);
+    });
+
+    // Button click handler
+    function handleButtonClick(e) {
+        const btn = e.target.closest('.length-btn');
+        if (!btn) return;
+        
+        // Visually highlight
+        div.querySelectorAll('.length-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        
+        // Filtering logic
+        const label = btn.textContent;
+        let filtered = getCurrentWords();
+        
+        if (label === 'SKIP') {
+            // Do not filter, just proceed
+            onComplete(filtered);
+            return;
+        } else if (label === '13+') {
+            filtered = filtered.filter(word => word.length >= 13);
+        } else {
+            const len = parseInt(label, 10);
+            filtered = filtered.filter(word => word.length === len);
+        }
+        
+        onComplete(filtered);
     }
 
-    // Return the feature object
-    return {
-        element: featureDiv,
-        filterWords: filterWordsByLength,
-        getSettings: () => ({
-            minLength: parseInt(minLengthInput.value),
-            maxLength: parseInt(maxLengthInput.value)
-        }),
-        setSettings: (settings) => {
-            if (settings.minLength) minLengthInput.value = settings.minLength;
-            if (settings.maxLength) maxLengthInput.value = settings.maxLength;
-            validateLengths();
+    // Attach event listeners
+    div.addEventListener('click', handleButtonClick);
+    div.addEventListener('touchstart', handleButtonClick, { passive: false });
+
+    // Accessibility: allow keyboard selection
+    div.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            const btn = document.activeElement;
+            if (btn && btn.classList.contains('length-btn')) {
+                btn.click();
+            }
         }
-    };
+    });
+
+    return div;
 } 
