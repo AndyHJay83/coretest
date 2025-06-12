@@ -1347,12 +1347,10 @@ function createMostFrequentFeature() {
 }
 
 function createLeastFrequentFeature() {
-    const featureDiv = document.createElement('div');
-    featureDiv.id = 'leastFrequentFeature';
-    featureDiv.className = 'feature-section';
-    featureDiv.style.display = 'none';
-    
-    featureDiv.innerHTML = `
+    const div = document.createElement('div');
+    div.id = 'leastFrequentFeature';
+    div.className = 'feature-section';
+    div.innerHTML = `
         <h2 class="feature-title">LEAST FREQUENT</h2>
         <div class="frequent-letter-display">
             <div class="letter">-</div>
@@ -1363,8 +1361,22 @@ function createLeastFrequentFeature() {
             <button id="leastFrequentSkipButton" class="skip-button">SKIP</button>
         </div>
     `;
-    
-    return featureDiv;
+    return div;
+}
+
+function createNotInWordFeature() {
+    const div = document.createElement('div');
+    div.id = 'notInWordFeature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">NOT IN WORD</h2>
+        <div class="not-in-word-input">
+            <input type="text" id="notInWordInput" placeholder="Enter letters not in word..." maxlength="26">
+            <button id="notInWordButton">DONE</button>
+            <button id="notInWordSkipButton" class="skip-button">SKIP</button>
+        </div>
+    `;
+    return div;
 }
 
 // Function to setup feature listeners
@@ -3676,4 +3688,76 @@ function filterWordsByLeastFrequent(words, letter, include) {
         const hasLetter = word.includes(letter);
         return include ? hasLetter : !hasLetter;
     });
+}
+
+// Add to the featureElements array in executeWorkflow function
+featureElements = [
+    createPosition1Feature(),
+    createVowelFeature(),
+    createOFeature(),
+    createLexiconFeature(),
+    createEeeFeature(),
+    createEeeFirstFeature(),
+    createOriginalLexFeature(),
+    createConsonantFeature(),
+    createColour3Feature(),
+    createLengthFeature(),
+    createMostFrequentFeature(),
+    createLeastFrequentFeature(),
+    createNotInWordFeature()
+];
+
+// Add the event handlers for the NOT IN WORD feature
+function setupNotInWordFeature() {
+    const notInWordInput = document.getElementById('notInWordInput');
+    const notInWordButton = document.getElementById('notInWordButton');
+    const notInWordSkipButton = document.getElementById('notInWordSkipButton');
+
+    if (notInWordButton) {
+        notInWordButton.addEventListener('click', handleNotInWordSubmit);
+        notInWordButton.addEventListener('touchend', handleNotInWordSubmit);
+    }
+
+    if (notInWordSkipButton) {
+        notInWordSkipButton.addEventListener('click', () => {
+            markFeatureAsCompleted('notInWord');
+            showNextFeature();
+        });
+        notInWordSkipButton.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            markFeatureAsCompleted('notInWord');
+            showNextFeature();
+        });
+    }
+
+    if (notInWordInput) {
+        notInWordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleNotInWordSubmit();
+            }
+        });
+    }
+}
+
+function handleNotInWordSubmit() {
+    const input = document.getElementById('notInWordInput');
+    if (!input) return;
+
+    const letters = input.value.toUpperCase().replace(/[^A-Z]/g, '');
+    if (letters.length === 0) return;
+
+    // Filter out words that contain any of the specified letters
+    const filteredWords = currentWordlist.filter(word => {
+        return !letters.split('').every(letter => word.includes(letter));
+    });
+
+    updateWordlist(filteredWords);
+    markFeatureAsCompleted('notInWord');
+    showNextFeature();
+}
+
+// Add to the initializeFeatures function
+function initializeFeatures() {
+    // ... existing feature initializations ...
+    setupNotInWordFeature();
 }

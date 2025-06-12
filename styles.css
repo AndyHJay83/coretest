@@ -2198,40 +2198,74 @@ input:checked + .slider:before {
 /* Length Feature */
 .length-input {
     display: flex;
-    flex-direction: column;
     gap: 10px;
-    width: 100%;
-    padding: 15px;
+    margin: 20px 0;
+    justify-content: center;
+    align-items: center;
 }
 
-.length-input input[type="number"] {
+.not-in-word-input {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.not-in-word-input input {
     padding: 10px;
-    font-size: 16px;
     border: 2px solid #ddd;
     border-radius: 8px;
-    width: 100%;
-    text-align: center;
-    -moz-appearance: textfield;
+    font-size: 16px;
+    width: 200px;
+    text-transform: uppercase;
 }
 
-.length-input input[type="number"]::-webkit-outer-spin-button,
-.length-input input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+.not-in-word-input input:focus {
+    border-color: #2196F3;
+    outline: none;
 }
 
-/* Mobile Styles for Length Feature */
-@media (max-width: 600px) {
-    .length-input input[type="number"] {
-        padding: 15px;
-        font-size: 16px !important;
-        border-width: 2px;
-        -webkit-appearance: none;
-        appearance: none;
-        border-radius: 8px;
-        position: relative;
-        z-index: 2;
-        text-align: center;
+.not-in-word-input button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.not-in-word-input button:not(.skip-button) {
+    background-color: #2196F3;
+    color: white;
+}
+
+.not-in-word-input button:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.not-in-word-input button:active {
+    transform: translateY(0);
+}
+
+/* Mobile styles for NOT IN WORD feature */
+@media (max-width: 768px) {
+    .not-in-word-input {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .not-in-word-input input {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .not-in-word-input button {
+        width: 100%;
+        max-width: 300px;
         min-height: 44px;
     }
 }
