@@ -898,6 +898,77 @@ async function executeWorkflow(steps) {
             workflowExecution.style.height = '100vh';
         }
 
+        // Add home button if it doesn't exist
+        let homeButton = document.getElementById('homeButton');
+        if (!homeButton) {
+            homeButton = document.createElement('button');
+            homeButton.id = 'homeButton';
+            homeButton.className = 'home-button';
+            homeButton.innerHTML = '⌂';
+            homeButton.title = 'Return to Home';
+            
+            // Function to handle home button action
+            const handleHomeAction = () => {
+                // Hide workflow execution
+                if (workflowExecution) {
+                    workflowExecution.style.display = 'none';
+                }
+                // Show homepage
+                if (homepage) {
+                    homepage.style.display = 'block';
+                }
+                // Remove reset button if it exists
+                const resetButton = document.getElementById('resetWorkflowButton');
+                if (resetButton) {
+                    resetButton.remove();
+                }
+                // Remove home button
+                homeButton.remove();
+            };
+            
+            // Add both click and touch events
+            homeButton.addEventListener('click', handleHomeAction);
+            homeButton.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                handleHomeAction();
+            }, { passive: false });
+            
+            // Insert home button next to the header
+            const header = document.querySelector('.header');
+            if (header) {
+                header.insertBefore(homeButton, header.firstChild);
+            }
+        }
+
+        // Add reset button if it doesn't exist
+        let resetButton = document.getElementById('resetWorkflowButton');
+        if (!resetButton) {
+            resetButton = document.createElement('button');
+            resetButton.id = 'resetWorkflowButton';
+            resetButton.className = 'reset-workflow-button';
+            resetButton.innerHTML = '↺';
+            resetButton.title = 'Reset Workflow';
+            
+            // Function to handle reset action
+            const handleResetAction = () => {
+                if (currentWorkflow) {
+                    executeWorkflow(currentWorkflow.steps);
+                }
+            };
+            
+            // Add both click and touch events
+            resetButton.addEventListener('click', handleResetAction);
+            resetButton.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                handleResetAction();
+            }, { passive: false });
+            
+            document.body.appendChild(resetButton);
+        }
+        
+        // Store current workflow for reset functionality
+        currentWorkflow = { steps };
+
         // Create feature elements if they don't exist
         const featureElements = {
             position1Feature: createPosition1Feature(),
