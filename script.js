@@ -1997,52 +1997,30 @@ function setupFeatureListeners(featureId, onComplete) {
                 leastFrequentYesBtn.onclick = () => {
                     if (leastFrequentLetter) {
                         const filteredWords = filterWordsByLeastFrequent(currentFilteredWords, leastFrequentLetter, true);
-                        callback(filteredWords);
+                        onComplete(filteredWords);
                         document.getElementById('leastFrequentFeature').classList.add('completed');
                         document.getElementById('leastFrequentFeature').dispatchEvent(new Event('completed'));
                     }
                 };
-                
-                // Add touch event for mobile
-                leastFrequentYesBtn.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    if (!leastFrequentYesBtn.disabled) {
-                        leastFrequentYesBtn.click();
-                    }
-                }, { passive: false });
             }
             
             if (leastFrequentNoBtn) {
                 leastFrequentNoBtn.onclick = () => {
                     if (leastFrequentLetter) {
                         const filteredWords = filterWordsByLeastFrequent(currentFilteredWords, leastFrequentLetter, false);
-                        callback(filteredWords);
+                        onComplete(filteredWords);
                         document.getElementById('leastFrequentFeature').classList.add('completed');
                         document.getElementById('leastFrequentFeature').dispatchEvent(new Event('completed'));
                     }
                 };
-                
-                // Add touch event for mobile
-                leastFrequentNoBtn.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    if (!leastFrequentNoBtn.disabled) {
-                        leastFrequentNoBtn.click();
-                    }
-                }, { passive: false });
             }
             
             if (leastFrequentSkipButton) {
                 leastFrequentSkipButton.onclick = () => {
-                    callback(currentFilteredWords);
+                    onComplete(currentFilteredWords);
                     document.getElementById('leastFrequentFeature').classList.add('completed');
                     document.getElementById('leastFrequentFeature').dispatchEvent(new Event('completed'));
                 };
-                
-                // Add touch event for mobile
-                leastFrequentSkipButton.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    leastFrequentSkipButton.click();
-                }, { passive: false });
             }
             break;
         }
