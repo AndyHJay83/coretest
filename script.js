@@ -20,6 +20,8 @@ let originalLexCompleted = false;
 let originalLexPosition = -1;
 let currentPosition1Word = '';
 let mostFrequentLetter = null;
+let usedLettersInWorkflow = [];  // Track letters used in current workflow
+let letterFrequencyMap = new Map();  // Store frequency of all letters
 
 // Workflow Management
 let workflows = JSON.parse(localStorage.getItem('workflows')) || [];
@@ -859,138 +861,17 @@ async function loadWordList() {
 // Function to execute workflow
 async function executeWorkflow(steps) {
     try {
-        // Load the wordlist first
-        await loadWordList();
-        currentFilteredWords = [...wordList]; // Start with the full wordlist
+        // Reset used letters at the start of a new workflow
+        usedLettersInWorkflow = [];
         
-        // Reset all feature states
-        lexiconCompleted = false;
-        originalLexCompleted = false;
-        eeeCompleted = false;
-        hasAdjacentConsonants = null;
-        hasO = null;
-        selectedCurvedLetter = null;
-        currentVowelIndex = 0;
-        uniqueVowels = [];
-        currentFilteredWordsForVowels = [];
-        currentPosition1Word = '';
-        
-        console.log('Starting workflow with steps:', steps);
-        
-        // Hide homepage and show workflow execution
-        const homepage = document.getElementById('homepage');
-        const workflowExecution = document.getElementById('workflowExecution');
-        
-        if (homepage) {
-            homepage.style.display = 'none';
-        }
-        
-        if (workflowExecution) {
-            workflowExecution.style.display = 'flex';
-            workflowExecution.style.flexDirection = 'column';
-            workflowExecution.style.height = '100vh';
-        }
-
-        // Add home button if it doesn't exist
-        let homeButton = document.getElementById('homeButton');
-        if (!homeButton) {
-            homeButton = document.createElement('button');
-            homeButton.id = 'homeButton';
-            homeButton.className = 'home-button';
-            homeButton.innerHTML = '⌂';
-            homeButton.title = 'Return to Home';
-            
-            // Function to handle home button action
-            const handleHomeAction = () => {
-                // Hide workflow execution
-                if (workflowExecution) {
-                    workflowExecution.style.display = 'none';
-                }
-                // Show homepage
-                if (homepage) {
-                    homepage.style.display = 'block';
-                }
-                // Remove reset button if it exists
-                const resetButton = document.getElementById('resetWorkflowButton');
-                if (resetButton) {
-                    resetButton.remove();
-                }
-                // Remove home button
-                homeButton.remove();
-            };
-            
-            // Add both click and touch events
-            homeButton.addEventListener('click', handleHomeAction);
-            homeButton.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                handleHomeAction();
-            }, { passive: false });
-            
-            // Insert home button next to the header
-            const header = document.querySelector('.header');
-            if (header) {
-                header.insertBefore(homeButton, header.firstChild);
-            }
-        }
-
-        // Add reset button if it doesn't exist
-        let resetButton = document.getElementById('resetWorkflowButton');
-        if (!resetButton) {
-            resetButton = document.createElement('button');
-            resetButton.id = 'resetWorkflowButton';
-            resetButton.className = 'reset-workflow-button';
-            resetButton.innerHTML = '↺';
-            resetButton.title = 'Reset Workflow';
-            
-            // Function to handle reset action
-            const handleResetAction = () => {
-                if (currentWorkflow) {
-                    executeWorkflow(currentWorkflow.steps);
-                }
-            };
-            
-            // Add both click and touch events
-            resetButton.addEventListener('click', handleResetAction);
-            resetButton.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                handleResetAction();
-            }, { passive: false });
-            
-            document.body.appendChild(resetButton);
-        }
-        
-        // Store current workflow for reset functionality
-        currentWorkflow = { steps };
-        
-        // Create feature elements if they don't exist
-        const featureElements = {
-            position1Feature: createPosition1Feature(),
-            vowelFeature: createVowelFeature(),
-            oFeature: createOFeature(),
-            lexiconFeature: createLexiconFeature(),
-            eeeFeature: createEeeFeature(),
-            eeeFirstFeature: createEeeFirstFeature(),
-            originalLexFeature: createOriginalLexFeature(),
-            consonantQuestion: createConsonantQuestion(),
-            colour3Feature: createColour3Feature(),
-            shapeFeature: createShapeFeature(),
-            curvedFeature: createCurvedFeature(),
-            lengthFeature: createLengthFeature(),
-            mostFrequentFeature: createMostFrequentFeature()
-        };
-        
-        // Add all feature elements to the document body (they'll be moved to feature area when needed)
+        // Add all feature elements to the document body
         Object.values(featureElements).forEach(element => {
             if (element) {
-                // Remove from any existing parent
                 if (element.parentNode) {
                     element.parentNode.removeChild(element);
                 }
-                // Add to document body
                 document.body.appendChild(element);
-                // Hide initially
                 element.style.display = 'none';
-                // Reset completed state
                 element.classList.remove('completed');
             }
         });
@@ -1025,28 +906,25 @@ async function executeWorkflow(steps) {
         resultsContainer.style.padding = '20px';
         resultsContainer.style.backgroundColor = '#fff';
         
-        // Clear any existing content in both areas
+        // Clear any existing content
         featureArea.innerHTML = '';
         resultsContainer.innerHTML = '';
         
-        console.log('Feature area:', featureArea);
-        console.log('Results container:', resultsContainer);
-        
-        // Display initial wordlist in the results container
+        // Display initial wordlist
         displayResults(currentFilteredWords);
+        
+        // Track the rank of MOST FREQUENT features
+        let mostFrequentRank = 1;
         
         // Execute each step in sequence
         for (const step of steps) {
             console.log('Executing step:', step);
             
-            // Map feature name to correct element id if needed
             let featureId = step.feature + 'Feature';
             if (step.feature === 'consonant') {
                 featureId = 'consonantQuestion';
             }
-            console.log('Looking for feature element with ID:', featureId);
             
-            // Get the feature element
             const featureElement = featureElements[featureId];
             if (!featureElement) {
                 console.error(`Feature element not found for step: ${featureId}`);
@@ -1057,12 +935,21 @@ async function executeWorkflow(steps) {
             featureArea.innerHTML = '';
             featureArea.appendChild(featureElement);
             featureElement.style.display = 'block';
-            console.log(`Showing feature: ${featureId}`);
+            
+            // For MOST FREQUENT feature, use the current rank
+            if (step.feature === 'mostFrequent') {
+                mostFrequentLetter = findMostFrequentLetter(currentFilteredWords, mostFrequentRank);
+                if (mostFrequentLetter) {
+                    const letterDisplay = featureElement.querySelector('.letter');
+                    if (letterDisplay) {
+                        letterDisplay.textContent = mostFrequentLetter;
+                    }
+                }
+            }
             
             // Set up event listeners for this feature
             setupFeatureListeners(step.feature, (filteredWords) => {
                 currentFilteredWords = filteredWords;
-                // Update wordlist in the results container
                 displayResults(currentFilteredWords);
             });
             
@@ -1073,21 +960,20 @@ async function executeWorkflow(steps) {
                     featureElement.classList.add('completed');
                     featureElement.style.display = 'none';
                     
-                    // If this was the vowel feature, ensure originalLexCompleted is false
-                    if (featureId === 'vowelFeature') {
-                        console.log('Vowel feature completed, resetting originalLexCompleted');
-                        originalLexCompleted = false;
+                    // If this was the MOST FREQUENT feature and YES was selected, increment the rank
+                    if (step.feature === 'mostFrequent' && mostFrequentLetter) {
+                        usedLettersInWorkflow.push(mostFrequentLetter);
+                        mostFrequentRank++;
                     }
                     
                     resolve();
                 };
                 
-                // Add event listener for feature completion
                 featureElement.addEventListener('completed', handleFeatureComplete, { once: true });
             });
         }
         
-        // Show final results in the results container
+        // Show final results
         displayResults(currentFilteredWords);
     } catch (error) {
         console.error('Error executing workflow:', error);
@@ -1858,7 +1744,17 @@ function setupFeatureListeners(feature, callback) {
             // Find and display most frequent letter
             mostFrequentLetter = findMostFrequentLetter(currentFilteredWords);
             if (letterDisplay) {
-                letterDisplay.textContent = mostFrequentLetter;
+                if (mostFrequentLetter) {
+                    letterDisplay.textContent = mostFrequentLetter;
+                    // Enable buttons if we have a letter
+                    if (frequentYesBtn) frequentYesBtn.disabled = false;
+                    if (frequentNoBtn) frequentNoBtn.disabled = false;
+                } else {
+                    letterDisplay.textContent = 'No more unique letters';
+                    // Disable buttons if no more letters
+                    if (frequentYesBtn) frequentYesBtn.disabled = true;
+                    if (frequentNoBtn) frequentNoBtn.disabled = true;
+                }
             }
             
             if (frequentYesBtn) {
@@ -1874,7 +1770,9 @@ function setupFeatureListeners(feature, callback) {
                 // Add touch event for mobile
                 frequentYesBtn.addEventListener('touchstart', (e) => {
                     e.preventDefault();
-                    frequentYesBtn.click();
+                    if (!frequentYesBtn.disabled) {
+                        frequentYesBtn.click();
+                    }
                 }, { passive: false });
             }
             
@@ -1891,7 +1789,9 @@ function setupFeatureListeners(feature, callback) {
                 // Add touch event for mobile
                 frequentNoBtn.addEventListener('touchstart', (e) => {
                     e.preventDefault();
-                    frequentNoBtn.click();
+                    if (!frequentNoBtn.disabled) {
+                        frequentNoBtn.click();
+                    }
                 }, { passive: false });
             }
             
@@ -3495,30 +3395,31 @@ function filterWordsByLength(words, length) {
 }
 
 // Add helper function to find most frequent letter
-function findMostFrequentLetter(words) {
-    const letterCounts = new Map();
-    
-    // Count occurrences of each letter
+function findMostFrequentLetter(words, rank = 1) {
+    // Count frequencies of all letters
+    const frequencyMap = new Map();
     words.forEach(word => {
-        const wordUpper = word.toUpperCase();
-        for (let i = 0; i < wordUpper.length; i++) {
-            const letter = wordUpper[i];
-            letterCounts.set(letter, (letterCounts.get(letter) || 0) + 1);
-        }
+        [...word].forEach(letter => {
+            frequencyMap.set(letter, (frequencyMap.get(letter) || 0) + 1);
+        });
     });
     
-    // Find letter with highest count
-    let mostFrequent = '';
-    let highestCount = 0;
+    // Sort letters by frequency
+    const sortedLetters = [...frequencyMap.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .map(entry => entry[0]);
     
-    letterCounts.forEach((count, letter) => {
-        if (count > highestCount) {
-            highestCount = count;
-            mostFrequent = letter;
+    // Find the nth most frequent letter that hasn't been used
+    let count = 0;
+    for (const letter of sortedLetters) {
+        if (!usedLettersInWorkflow.includes(letter)) {
+            count++;
+            if (count === rank) {
+                return letter;
+            }
         }
-    });
-    
-    return mostFrequent;
+    }
+    return null;  // No more unique frequent letters
 }
 
 // Add filtering function
