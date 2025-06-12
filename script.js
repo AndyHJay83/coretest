@@ -864,6 +864,23 @@ async function executeWorkflow(steps) {
         // Reset used letters at the start of a new workflow
         usedLettersInWorkflow = [];
         
+        // Create feature elements if they don't exist
+        const featureElements = {
+            position1Feature: createPosition1Feature(),
+            vowelFeature: createVowelFeature(),
+            oFeature: createOFeature(),
+            lexiconFeature: createLexiconFeature(),
+            eeeFeature: createEeeFeature(),
+            eeeFirstFeature: createEeeFirstFeature(),
+            originalLexFeature: createOriginalLexFeature(),
+            consonantQuestion: createConsonantQuestion(),
+            colour3Feature: createColour3Feature(),
+            shapeFeature: createShapeFeature(),
+            curvedFeature: createCurvedFeature(),
+            lengthFeature: createLengthFeature(),
+            mostFrequentFeature: createMostFrequentFeature()
+        };
+        
         // Add all feature elements to the document body
         Object.values(featureElements).forEach(element => {
             if (element) {
