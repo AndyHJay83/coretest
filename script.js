@@ -877,6 +877,7 @@ async function executeWorkflow(steps) {
         uniqueVowels = [];
         currentFilteredWordsForVowels = [];
         currentPosition1Word = '';
+        leastFrequentLetter = null;  // Reset least frequent letter state
         
         // Reset used letters at the start of a new workflow
         usedLettersInWorkflow = [];
@@ -897,77 +898,6 @@ async function executeWorkflow(steps) {
             workflowExecution.style.height = '100vh';
         }
 
-        // Add home button if it doesn't exist
-        let homeButton = document.getElementById('homeButton');
-        if (!homeButton) {
-            homeButton = document.createElement('button');
-            homeButton.id = 'homeButton';
-            homeButton.className = 'home-button';
-            homeButton.innerHTML = '⌂';
-            homeButton.title = 'Return to Home';
-            
-            // Function to handle home button action
-            const handleHomeAction = () => {
-                // Hide workflow execution
-                if (workflowExecution) {
-                    workflowExecution.style.display = 'none';
-                }
-                // Show homepage
-                if (homepage) {
-                    homepage.style.display = 'block';
-                }
-                // Remove reset button if it exists
-                const resetButton = document.getElementById('resetWorkflowButton');
-                if (resetButton) {
-                    resetButton.remove();
-                }
-                // Remove home button
-                homeButton.remove();
-            };
-            
-            // Add both click and touch events
-            homeButton.addEventListener('click', handleHomeAction);
-            homeButton.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                handleHomeAction();
-            }, { passive: false });
-            
-            // Insert home button next to the header
-            const header = document.querySelector('.header');
-            if (header) {
-                header.insertBefore(homeButton, header.firstChild);
-            }
-        }
-
-        // Add reset button if it doesn't exist
-        let resetButton = document.getElementById('resetWorkflowButton');
-        if (!resetButton) {
-            resetButton = document.createElement('button');
-            resetButton.id = 'resetWorkflowButton';
-            resetButton.className = 'reset-workflow-button';
-            resetButton.innerHTML = '↺';
-            resetButton.title = 'Reset Workflow';
-            
-            // Function to handle reset action
-            const handleResetAction = () => {
-                if (currentWorkflow) {
-                    executeWorkflow(currentWorkflow.steps);
-                }
-            };
-            
-            // Add both click and touch events
-            resetButton.addEventListener('click', handleResetAction);
-            resetButton.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                handleResetAction();
-            }, { passive: false });
-            
-            document.body.appendChild(resetButton);
-        }
-        
-        // Store current workflow for reset functionality
-        currentWorkflow = { steps };
-        
         // Create feature elements if they don't exist
         const featureElements = {
             position1Feature: createPosition1Feature(),
@@ -1065,6 +995,16 @@ async function executeWorkflow(steps) {
                     const letterDisplay = featureElement.querySelector('.letter');
                     if (letterDisplay) {
                         letterDisplay.textContent = mostFrequentLetter;
+                    }
+                }
+            }
+            // For LEAST FREQUENT feature
+            else if (step.feature === 'leastFrequent') {
+                leastFrequentLetter = findLeastFrequentLetter(currentFilteredWords);
+                if (leastFrequentLetter) {
+                    const letterDisplay = featureElement.querySelector('.letter');
+                    if (letterDisplay) {
+                        letterDisplay.textContent = leastFrequentLetter;
                     }
                 }
             }
@@ -2193,27 +2133,11 @@ function filterWordsByColour3(words) {
 
 // Function to show next feature
 function showNextFeature() {
-    console.log('Showing next feature');
-    console.log('Current states:', {
-        originalLexCompleted,
-        lexiconCompleted,
-        eeeCompleted,
-        isVowelMode,
-        isColour3Mode,
-        isShapeMode
-    });
-    
-    // Hide all features first
     const features = [
-        'consonantQuestion',
         'position1Feature',
         'vowelFeature',
-        'colour3Feature',
-        'shapeFeature',
         'oFeature',
-        'curvedFeature',
         'lexiconFeature',
-        'originalLexFeature',
         'eeeFeature',
         'eeeFirstFeature',
         'lengthFeature',
@@ -2221,40 +2145,26 @@ function showNextFeature() {
         'leastFrequentFeature'
     ];
     
-    features.forEach(featureId => {
-        const feature = document.getElementById(featureId);
-        if (feature) {
-            feature.style.display = 'none';
+    // Hide all features first
+    features.forEach(feature => {
+        const element = document.getElementById(feature);
+        if (element) {
+            element.style.display = 'none';
         }
     });
-
-    // Show the next incomplete feature
-    if (!document.getElementById('consonantQuestion').classList.contains('completed')) {
-        document.getElementById('consonantQuestion').style.display = 'block';
-    }
-    else if (!document.getElementById('position1Feature').classList.contains('completed')) {
+    
+    // Show the first non-completed feature
+    if (!document.getElementById('position1Feature').classList.contains('completed')) {
         document.getElementById('position1Feature').style.display = 'block';
     }
     else if (!document.getElementById('vowelFeature').classList.contains('completed')) {
         document.getElementById('vowelFeature').style.display = 'block';
     }
-    else if (!document.getElementById('colour3Feature').classList.contains('completed')) {
-        document.getElementById('colour3Feature').style.display = 'block';
-    }
-    else if (!document.getElementById('shapeFeature').classList.contains('completed')) {
-        document.getElementById('shapeFeature').style.display = 'block';
-    }
     else if (!document.getElementById('oFeature').classList.contains('completed')) {
         document.getElementById('oFeature').style.display = 'block';
     }
-    else if (!document.getElementById('curvedFeature').classList.contains('completed')) {
-        document.getElementById('curvedFeature').style.display = 'block';
-    }
     else if (!document.getElementById('lexiconFeature').classList.contains('completed')) {
         document.getElementById('lexiconFeature').style.display = 'block';
-    }
-    else if (!document.getElementById('originalLexFeature').classList.contains('completed')) {
-        document.getElementById('originalLexFeature').style.display = 'block';
     }
     else if (!document.getElementById('eeeFeature').classList.contains('completed')) {
         document.getElementById('eeeFeature').style.display = 'block';
