@@ -1374,7 +1374,7 @@ function createNotInWordFeature() {
     featureDiv.innerHTML = `
         <div class="feature-title">NOT IN WORD</div>
         <div class="input-group">
-            <input type="text" id="notInWordInput" placeholder="Enter letters not in the word...">
+            <input type="text" id="notInWordInput" placeholder="Enter letters (case doesn't matter)...">
             <button id="notInWordButton">DONE</button>
             <button id="notInWordSkipButton" class="skip-button">SKIP</button>
         </div>
