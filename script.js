@@ -2001,8 +2001,8 @@ function setupFeatureListeners(featureId, onComplete) {
             }
             
             if (leastFrequentYesBtn) {
-                leastFrequentYesBtn.onclick = () => {
-                    if (leastFrequentLetter) {
+                const handleYesClick = () => {
+                    if (leastFrequentLetter && !leastFrequentYesBtn.disabled) {
                         const filteredWords = filterWordsByLeastFrequent(currentFilteredWords, leastFrequentLetter, true);
                         onComplete(filteredWords);
                         document.getElementById('leastFrequentFeature').classList.add('completed');
@@ -2010,18 +2010,16 @@ function setupFeatureListeners(featureId, onComplete) {
                     }
                 };
                 
-                // Add touch event for mobile
-                leastFrequentYesBtn.addEventListener('touchstart', (e) => {
+                leastFrequentYesBtn.onclick = handleYesClick;
+                leastFrequentYesBtn.ontouchstart = (e) => {
                     e.preventDefault();
-                    if (!leastFrequentYesBtn.disabled) {
-                        leastFrequentYesBtn.click();
-                    }
-                }, { passive: false });
+                    handleYesClick();
+                };
             }
             
             if (leastFrequentNoBtn) {
-                leastFrequentNoBtn.onclick = () => {
-                    if (leastFrequentLetter) {
+                const handleNoClick = () => {
+                    if (leastFrequentLetter && !leastFrequentNoBtn.disabled) {
                         const filteredWords = filterWordsByLeastFrequent(currentFilteredWords, leastFrequentLetter, false);
                         onComplete(filteredWords);
                         document.getElementById('leastFrequentFeature').classList.add('completed');
@@ -2029,27 +2027,25 @@ function setupFeatureListeners(featureId, onComplete) {
                     }
                 };
                 
-                // Add touch event for mobile
-                leastFrequentNoBtn.addEventListener('touchstart', (e) => {
+                leastFrequentNoBtn.onclick = handleNoClick;
+                leastFrequentNoBtn.ontouchstart = (e) => {
                     e.preventDefault();
-                    if (!leastFrequentNoBtn.disabled) {
-                        leastFrequentNoBtn.click();
-                    }
-                }, { passive: false });
+                    handleNoClick();
+                };
             }
             
             if (leastFrequentSkipButton) {
-                leastFrequentSkipButton.onclick = () => {
+                const handleSkipClick = () => {
                     onComplete(currentFilteredWords);
                     document.getElementById('leastFrequentFeature').classList.add('completed');
                     document.getElementById('leastFrequentFeature').dispatchEvent(new Event('completed'));
                 };
                 
-                // Add touch event for mobile
-                leastFrequentSkipButton.addEventListener('touchstart', (e) => {
+                leastFrequentSkipButton.onclick = handleSkipClick;
+                leastFrequentSkipButton.ontouchstart = (e) => {
                     e.preventDefault();
-                    leastFrequentSkipButton.click();
-                }, { passive: false });
+                    handleSkipClick();
+                };
             }
             break;
         }
@@ -2060,7 +2056,7 @@ function setupFeatureListeners(featureId, onComplete) {
             const notInWordSkipButton = document.getElementById('notInWordSkipButton');
             
             if (notInWordButton) {
-                notInWordButton.onclick = () => {
+                const handleNotInWordClick = () => {
                     const letters = notInWordInput.value.toLowerCase();
                     console.log('Input letters:', letters);
                     console.log('Current wordlist size:', currentFilteredWords.length);
@@ -2095,16 +2091,28 @@ function setupFeatureListeners(featureId, onComplete) {
                         featureElement.dispatchEvent(new Event('completed'));
                     }
                 };
+                
+                notInWordButton.onclick = handleNotInWordClick;
+                notInWordButton.ontouchstart = (e) => {
+                    e.preventDefault();
+                    handleNotInWordClick();
+                };
             }
             
             if (notInWordSkipButton) {
-                notInWordSkipButton.onclick = () => {
+                const handleSkipClick = () => {
                     onComplete(currentFilteredWords);
                     const featureElement = document.getElementById('notInWordFeature');
                     if (featureElement) {
                         featureElement.classList.add('completed');
                         featureElement.dispatchEvent(new Event('completed'));
                     }
+                };
+                
+                notInWordSkipButton.onclick = handleSkipClick;
+                notInWordSkipButton.ontouchstart = (e) => {
+                    e.preventDefault();
+                    handleSkipClick();
                 };
             }
             
