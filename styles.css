@@ -2113,4 +2113,45 @@ input:checked + .slider:before {
   height: auto;
   max-height: none;
   overflow: visible;
+}
+
+.length-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 12px;
+  margin: 20px 0;
+}
+
+.length-feature-btn {
+  border: 2px solid #1B5E20;
+  background: #fff;
+  color: #1B5E20;
+  font-size: 1.2em;
+  font-weight: bold;
+  border-radius: 8px;
+  padding: 16px 0;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  outline: none;
+  min-width: 60px;
+  min-height: 44px;
+  user-select: none;
+}
+
+.length-feature-btn.selected, .length-feature-btn:focus {
+  background: #1B5E20;
+  color: #fff;
+  border-color: #1B5E20;
+}
+
+.length-feature-btn.skip {
+  border: 2px solid #888;
+  color: #888;
+  background: #fff;
+}
+
+.length-feature-btn.skip.selected, .length-feature-btn.skip:focus {
+  background: #888;
+  color: #fff;
+  border-color: #888;
 } 
