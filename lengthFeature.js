@@ -33,14 +33,14 @@ export function createLengthFeature() {
       }
       // Filter the word list by length
       const wordList = document.getElementById('wordList');
-      const words = wordList.textContent.split('\n');
+      const words = wordList.textContent.split('\\n');
       const filteredWords = words.filter(word => {
         if (length === '13+') {
           return word.length >= 13;
         }
         return word.length === parseInt(length, 10);
       });
-      wordList.textContent = filteredWords.join('\n');
+      wordList.textContent = filteredWords.join('\\n');
       container.dispatchEvent(new Event('completed'));
     });
   });
@@ -58,20 +58,12 @@ export const lengthFeatureCSS = `
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 10px;
-    width: 100%;
-    max-width: 400px;
   }
   .length-feature-grid button {
     padding: 10px;
     border: 1px solid #ccc;
     background: white;
     cursor: pointer;
-    font-size: 16px;
-    min-width: 60px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
   .length-feature-grid button:hover {
     background: #f0f0f0;
