@@ -1,3 +1,5 @@
+import { createLengthFeature } from './lengthFeature.js';
+
 let wordList = [];
 let totalWords = 0;
 let isNewMode = true;
@@ -973,7 +975,8 @@ async function executeWorkflow(steps) {
             consonantQuestion: createConsonantQuestion(),
             colour3Feature: createColour3Feature(),
             shapeFeature: createShapeFeature(),
-            curvedFeature: createCurvedFeature()
+            curvedFeature: createCurvedFeature(),
+            lengthFeature: createLengthFeature() // Add LENGTH feature
         };
         
         // Add all feature elements to the document body (they'll be moved to feature area when needed)
