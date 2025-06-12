@@ -1918,29 +1918,12 @@ function setupFeatureListeners(featureId, onComplete) {
         }
 
         case 'mostFrequent': {
-            const frequentYesBtn = document.getElementById('frequentYesBtn');
-            const frequentNoBtn = document.getElementById('frequentNoBtn');
-            const frequentSkipButton = document.getElementById('frequentSkipButton');
-            const letterDisplay = document.querySelector('#mostFrequentFeature .letter');
+            const mostFrequentYesBtn = document.getElementById('mostFrequentYesBtn');
+            const mostFrequentNoBtn = document.getElementById('mostFrequentNoBtn');
+            const mostFrequentSkipButton = document.getElementById('mostFrequentSkipButton');
             
-            // Find and display most frequent letter
-            mostFrequentLetter = findMostFrequentLetter(currentFilteredWords);
-            if (letterDisplay) {
-                if (mostFrequentLetter) {
-                    letterDisplay.textContent = mostFrequentLetter;
-                    // Enable buttons if we have a letter
-                    if (frequentYesBtn) frequentYesBtn.disabled = false;
-                    if (frequentNoBtn) frequentNoBtn.disabled = false;
-                } else {
-                    letterDisplay.textContent = 'No more unique letters';
-                    // Disable buttons if no more letters
-                    if (frequentYesBtn) frequentYesBtn.disabled = true;
-                    if (frequentNoBtn) frequentNoBtn.disabled = true;
-                }
-            }
-            
-            if (frequentYesBtn) {
-                frequentYesBtn.onclick = () => {
+            if (mostFrequentYesBtn) {
+                mostFrequentYesBtn.onclick = () => {
                     if (mostFrequentLetter) {
                         const filteredWords = filterWordsByMostFrequent(currentFilteredWords, mostFrequentLetter, true);
                         onComplete(filteredWords);
@@ -1948,18 +1931,10 @@ function setupFeatureListeners(featureId, onComplete) {
                         document.getElementById('mostFrequentFeature').dispatchEvent(new Event('completed'));
                     }
                 };
-                
-                // Add touch event for mobile
-                frequentYesBtn.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    if (!frequentYesBtn.disabled) {
-                        frequentYesBtn.click();
-                    }
-                }, { passive: false });
             }
             
-            if (frequentNoBtn) {
-                frequentNoBtn.onclick = () => {
+            if (mostFrequentNoBtn) {
+                mostFrequentNoBtn.onclick = () => {
                     if (mostFrequentLetter) {
                         const filteredWords = filterWordsByMostFrequent(currentFilteredWords, mostFrequentLetter, false);
                         onComplete(filteredWords);
@@ -2077,49 +2052,51 @@ function setupFeatureListeners(featureId, onComplete) {
             
             if (notInWordButton) {
                 notInWordButton.onclick = () => {
-                    const input = notInWordInput?.value.trim();
-                    if (input) {
-                        const letters = input.toUpperCase().replace(/[^A-Z]/g, '');
-                        if (letters.length > 0) {
-                            const filteredWords = currentFilteredWords.filter(word => {
-                                return !letters.split('').every(letter => word.includes(letter));
-                            });
-                            callback(filteredWords);
-                            document.getElementById('notInWordFeature').dispatchEvent(new Event('completed'));
-                        } else {
-                            alert('Please enter at least one letter');
-                        }
-                    } else {
-                        alert('Please enter letters');
+                    const letters = notInWordInput.value.toLowerCase();
+                    if (!letters) {
+                        alert('Please enter at least one letter');
+                        return;
+                    }
+                    
+                    // Filter out words containing any of the specified letters
+                    const filteredWords = currentFilteredWords.filter(word => 
+                        !letters.split('').some(letter => word.includes(letter))
+                    );
+                    
+                    if (filteredWords.length === 0) {
+                        alert('No words remain after filtering. Please try different letters.');
+                        return;
+                    }
+                    
+                    currentFilteredWords = filteredWords;
+                    onComplete(filteredWords);
+                    
+                    // Mark feature as completed
+                    const featureElement = document.getElementById('notInWordFeature');
+                    if (featureElement) {
+                        featureElement.classList.add('completed');
+                        featureElement.dispatchEvent(new Event('completed'));
                     }
                 };
-                
-                // Add touch event for mobile
-                notInWordButton.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    notInWordButton.click();
-                }, { passive: false });
             }
             
             if (notInWordSkipButton) {
                 notInWordSkipButton.onclick = () => {
-                    callback(currentFilteredWords);
-                    document.getElementById('notInWordFeature').dispatchEvent(new Event('completed'));
+                    onComplete(currentFilteredWords);
+                    const featureElement = document.getElementById('notInWordFeature');
+                    if (featureElement) {
+                        featureElement.classList.add('completed');
+                        featureElement.dispatchEvent(new Event('completed'));
+                    }
                 };
-                
-                // Add touch event for mobile
-                notInWordSkipButton.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    notInWordSkipButton.click();
-                }, { passive: false });
             }
-
+            
             if (notInWordInput) {
-                notInWordInput.addEventListener('keypress', (e) => {
+                notInWordInput.onkeypress = (e) => {
                     if (e.key === 'Enter') {
                         notInWordButton.click();
                     }
-                });
+                };
             }
             break;
         }
