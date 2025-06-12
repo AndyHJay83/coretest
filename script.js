@@ -1918,12 +1918,29 @@ function setupFeatureListeners(featureId, onComplete) {
         }
 
         case 'mostFrequent': {
-            const mostFrequentYesBtn = document.getElementById('mostFrequentYesBtn');
-            const mostFrequentNoBtn = document.getElementById('mostFrequentNoBtn');
-            const mostFrequentSkipButton = document.getElementById('mostFrequentSkipButton');
+            const frequentYesBtn = document.getElementById('frequentYesBtn');
+            const frequentNoBtn = document.getElementById('frequentNoBtn');
+            const frequentSkipButton = document.getElementById('frequentSkipButton');
+            const letterDisplay = document.querySelector('#mostFrequentFeature .letter');
             
-            if (mostFrequentYesBtn) {
-                mostFrequentYesBtn.onclick = () => {
+            // Find and display most frequent letter
+            mostFrequentLetter = findMostFrequentLetter(currentFilteredWords);
+            if (letterDisplay) {
+                if (mostFrequentLetter) {
+                    letterDisplay.textContent = mostFrequentLetter;
+                    // Enable buttons if we have a letter
+                    if (frequentYesBtn) frequentYesBtn.disabled = false;
+                    if (frequentNoBtn) frequentNoBtn.disabled = false;
+                } else {
+                    letterDisplay.textContent = 'No more unique letters';
+                    // Disable buttons if no more letters
+                    if (frequentYesBtn) frequentYesBtn.disabled = true;
+                    if (frequentNoBtn) frequentNoBtn.disabled = true;
+                }
+            }
+            
+            if (frequentYesBtn) {
+                frequentYesBtn.onclick = () => {
                     if (mostFrequentLetter) {
                         const filteredWords = filterWordsByMostFrequent(currentFilteredWords, mostFrequentLetter, true);
                         onComplete(filteredWords);
@@ -1933,38 +1950,23 @@ function setupFeatureListeners(featureId, onComplete) {
                 };
             }
             
-            if (mostFrequentNoBtn) {
-                mostFrequentNoBtn.onclick = () => {
+            if (frequentNoBtn) {
+                frequentNoBtn.onclick = () => {
                     if (mostFrequentLetter) {
                         const filteredWords = filterWordsByMostFrequent(currentFilteredWords, mostFrequentLetter, false);
                         onComplete(filteredWords);
-                        callback(filteredWords);
                         document.getElementById('mostFrequentFeature').classList.add('completed');
                         document.getElementById('mostFrequentFeature').dispatchEvent(new Event('completed'));
                     }
                 };
-                
-                // Add touch event for mobile
-                frequentNoBtn.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    if (!frequentNoBtn.disabled) {
-                        frequentNoBtn.click();
-                    }
-                }, { passive: false });
             }
             
             if (frequentSkipButton) {
                 frequentSkipButton.onclick = () => {
-                    callback(currentFilteredWords);
+                    onComplete(currentFilteredWords);
                     document.getElementById('mostFrequentFeature').classList.add('completed');
                     document.getElementById('mostFrequentFeature').dispatchEvent(new Event('completed'));
                 };
-                
-                // Add touch event for mobile
-                frequentSkipButton.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    frequentSkipButton.click();
-                }, { passive: false });
             }
             break;
         }
