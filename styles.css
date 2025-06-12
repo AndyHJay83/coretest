@@ -1438,10 +1438,12 @@ input:checked + .slider:before {
     gap: 10px;
     width: 100%;
     margin-bottom: 20px;
+    flex-wrap: wrap;
 }
 
 .workflow-name-input {
     flex: 1;
+    min-width: 200px;
     padding: 12px;
     font-size: 16px;
     border: 2px solid #ddd;
@@ -1457,6 +1459,34 @@ input:checked + .slider:before {
     font-size: 16px;
     cursor: pointer;
     white-space: nowrap;
+}
+
+.toggle-saved-workflows {
+    padding: 12px 24px;
+    background: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.3s;
+}
+
+.toggle-saved-workflows:hover {
+    background: #1976D2;
+}
+
+@media (max-width: 768px) {
+    .workflow-name-section {
+        flex-direction: column;
+    }
+    
+    .workflow-name-input,
+    .save-workflow-button,
+    .toggle-saved-workflows {
+        width: 100%;
+    }
 }
 
 /* Features section */

@@ -253,6 +253,18 @@ function setupButtonListeners() {
         }, { passive: false });
     }
     
+    // Toggle Saved Workflows button
+    const toggleSavedWorkflowsButton = document.getElementById('toggleSavedWorkflows');
+    if (toggleSavedWorkflowsButton) {
+        toggleSavedWorkflowsButton.replaceWith(toggleSavedWorkflowsButton.cloneNode(true));
+        const newToggleButton = document.getElementById('toggleSavedWorkflows');
+        newToggleButton.addEventListener('click', toggleSavedWorkflows);
+        newToggleButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            toggleSavedWorkflows();
+        }, { passive: false });
+    }
+    
     // Cancel Workflow button
     const cancelWorkflowButton = document.getElementById('cancelWorkflowButton');
     if (cancelWorkflowButton) {
