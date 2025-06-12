@@ -1494,6 +1494,9 @@ function setupFeatureListeners(featureId, onComplete) {
             if (vowelYesBtn) {
                 vowelYesBtn.onclick = () => {
                     handleVowelSelection(true);
+                    if (currentVowelIndex >= uniqueVowels.length) {
+                        onComplete(currentFilteredWordsForVowels);
+                    }
                 };
                 
                 // Add touch event for mobile
@@ -1506,6 +1509,9 @@ function setupFeatureListeners(featureId, onComplete) {
             if (vowelNoBtn) {
                 vowelNoBtn.onclick = () => {
                     handleVowelSelection(false);
+                    if (currentVowelIndex >= uniqueVowels.length) {
+                        onComplete(currentFilteredWordsForVowels);
+                    }
                 };
                 
                 // Add touch event for mobile
@@ -2183,7 +2189,7 @@ function handleVowelSelection(includeVowel) {
         currentFilteredWordsForVowels = currentFilteredWordsForVowels.filter(word => 
             word.toLowerCase().includes(currentVowel)
         );
-        } else {
+    } else {
         currentFilteredWordsForVowels = currentFilteredWordsForVowels.filter(word => 
             !word.toLowerCase().includes(currentVowel)
         );
@@ -2219,9 +2225,6 @@ function handleVowelSelection(includeVowel) {
         console.log('Dispatching vowel feature completed event');
         const completedEvent = new Event('completed');
         vowelFeature.dispatchEvent(completedEvent);
-        
-        // Show next feature
-        showNextFeature();
     }
 }
 
