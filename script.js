@@ -974,7 +974,8 @@ async function executeWorkflow(steps) {
             colour3Feature: createColour3Feature(),
             shapeFeature: createShapeFeature(),
             curvedFeature: createCurvedFeature(),
-            lengthFeature: createLengthFeature()
+            lengthFeature: createLengthFeature(),
+            mostFrequentFeature: createMostFrequentFeature()
         };
         
         // Add all feature elements to the document body (they'll be moved to feature area when needed)
@@ -1290,6 +1291,24 @@ function createLengthFeature() {
             <input type="number" id="lengthInput" placeholder="Enter length (3+)" min="3">
             <button id="lengthButton">SUBMIT</button>
             <button id="lengthSkipButton" class="skip-button">SKIP</button>
+        </div>
+    `;
+    return div;
+}
+
+function createMostFrequentFeature() {
+    const div = document.createElement('div');
+    div.id = 'mostFrequentFeature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">MOST FREQUENT</h2>
+        <div class="frequent-letter-display">
+            <div class="letter">-</div>
+        </div>
+        <div class="button-container">
+            <button id="frequentYesBtn" class="yes-btn">YES</button>
+            <button id="frequentNoBtn" class="no-btn">NO</button>
+            <button id="frequentSkipButton" class="skip-button">SKIP</button>
         </div>
     `;
     return div;
@@ -1828,6 +1847,61 @@ function setupFeatureListeners(feature, callback) {
             }
             break;
         }
+
+        case 'mostFrequent': {
+            const frequentYesBtn = document.getElementById('frequentYesBtn');
+            const frequentNoBtn = document.getElementById('frequentNoBtn');
+            const frequentSkipButton = document.getElementById('frequentSkipButton');
+            const letterDisplay = document.querySelector('#mostFrequentFeature .letter');
+            
+            // Find and display most frequent letter
+            const mostFrequentLetter = findMostFrequentLetter(currentFilteredWords);
+            if (letterDisplay) {
+                letterDisplay.textContent = mostFrequentLetter;
+            }
+            
+            if (frequentYesBtn) {
+                frequentYesBtn.onclick = () => {
+                    const filteredWords = filterWordsByMostFrequent(currentFilteredWords, mostFrequentLetter, true);
+                    callback(filteredWords);
+                    document.getElementById('mostFrequentFeature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                frequentYesBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    frequentYesBtn.click();
+                }, { passive: false });
+            }
+            
+            if (frequentNoBtn) {
+                frequentNoBtn.onclick = () => {
+                    const filteredWords = filterWordsByMostFrequent(currentFilteredWords, mostFrequentLetter, false);
+                    callback(filteredWords);
+                    document.getElementById('mostFrequentFeature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                frequentNoBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    frequentNoBtn.click();
+                }, { passive: false });
+            }
+            
+            if (frequentSkipButton) {
+                frequentSkipButton.onclick = () => {
+                    callback(currentFilteredWords);
+                    document.getElementById('mostFrequentFeature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                frequentSkipButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    frequentSkipButton.click();
+                }, { passive: false });
+            }
+            break;
+        }
     }
 }
 
@@ -2015,7 +2089,8 @@ function showNextFeature() {
         'originalLexFeature',
         'eeeFeature',
         'eeeFirstFeature',
-        'lengthFeature'
+        'lengthFeature',
+        'mostFrequentFeature'
     ];
     
     features.forEach(featureId => {
@@ -2105,7 +2180,8 @@ function resetApp() {
         'originalLexFeature',
         'eeeFeature',
         'eeeFirstFeature',
-        'lengthFeature'
+        'lengthFeature',
+        'mostFrequentFeature'
     ];
     
     features.forEach(featureId => {
@@ -3396,4 +3472,39 @@ document.head.appendChild(workflowDropdownCSS);
 // Add filtering function
 function filterWordsByLength(words, length) {
     return words.filter(word => word.length === length);
+}
+
+// Add helper function to find most frequent letter
+function findMostFrequentLetter(words) {
+    const letterCounts = new Map();
+    
+    // Count occurrences of each letter
+    words.forEach(word => {
+        const wordUpper = word.toUpperCase();
+        for (let i = 0; i < wordUpper.length; i++) {
+            const letter = wordUpper[i];
+            letterCounts.set(letter, (letterCounts.get(letter) || 0) + 1);
+        }
+    });
+    
+    // Find letter with highest count
+    let mostFrequent = '';
+    let highestCount = 0;
+    
+    letterCounts.forEach((count, letter) => {
+        if (count > highestCount) {
+            highestCount = count;
+            mostFrequent = letter;
+        }
+    });
+    
+    return mostFrequent;
+}
+
+// Add filtering function
+function filterWordsByMostFrequent(words, letter, include) {
+    return words.filter(word => {
+        const hasLetter = word.toUpperCase().includes(letter);
+        return include ? hasLetter : !hasLetter;
+    });
 }
