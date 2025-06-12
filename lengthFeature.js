@@ -28,18 +28,20 @@ export function createLengthFeature() {
       const length = button.getAttribute('data-length');
       if (length === 'skip') {
         // Skip filtering
+        container.dispatchEvent(new Event('completed'));
         return;
       }
       // Filter the word list by length
       const wordList = document.getElementById('wordList');
-      const words = wordList.textContent.split('\\n');
+      const words = wordList.textContent.split('\n');
       const filteredWords = words.filter(word => {
         if (length === '13+') {
           return word.length >= 13;
         }
         return word.length === parseInt(length, 10);
       });
-      wordList.textContent = filteredWords.join('\\n');
+      wordList.textContent = filteredWords.join('\n');
+      container.dispatchEvent(new Event('completed'));
     });
   });
 
