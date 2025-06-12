@@ -3749,21 +3749,21 @@ function filterWordsByLeastFrequent(words, letter, include) {
 }
 
 // Add to the featureElements array in executeWorkflow function
-featureElements = [
-    createPosition1Feature(),
-    createVowelFeature(),
-    createOFeature(),
-    createLexiconFeature(),
-    createEeeFeature(),
-    createEeeFirstFeature(),
-    createOriginalLexFeature(),
-    createConsonantFeature(),
-    createColour3Feature(),
-    createLengthFeature(),
-    createMostFrequentFeature(),
-    createLeastFrequentFeature(),
-    createNotInWordFeature()
-];
+featureElements = {
+    position1Feature: createPosition1Feature(),
+    vowelFeature: createVowelFeature(),
+    oFeature: createOFeature(),
+    lexiconFeature: createLexiconFeature(),
+    eeeFeature: createEeeFeature(),
+    eeeFirstFeature: createEeeFirstFeature(),
+    originalLexFeature: createOriginalLexFeature(),
+    consonantQuestion: createConsonantQuestion(),
+    colour3Feature: createColour3Feature(),
+    lengthFeature: createLengthFeature(),
+    mostFrequentFeature: createMostFrequentFeature(),
+    leastFrequentFeature: createLeastFrequentFeature(),
+    notInWordFeature: createNotInWordFeature()
+};
 
 // Add the event handlers for the NOT IN WORD feature
 function setupNotInWordFeature() {
