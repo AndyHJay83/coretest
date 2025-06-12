@@ -18,7 +18,6 @@
     <style>
       /* ... existing styles ... */
     </style>
-    <style id="lengthFeatureStyle"></style>
 </head>
 <body>
     <div class="container">
@@ -279,7 +278,7 @@
                     </div>
                 </div>
 
-                <!-- Length feature -->
+                <!-- LENGTH feature -->
                 <div id="lengthFeatureContainer"></div>
             </div>
         </div>
@@ -387,7 +386,6 @@
         import { createColour3Feature, colour3FeatureCSS } from './colour3Feature.js';
         import { createShapeFeature, shapeFeatureCSS } from './shapeFeature.js';
         import { createOriginalLexFeature, originalLexFeatureCSS } from './originalLexFeature.js';
-        import { createLengthFeature, lengthFeatureCSS } from './lengthFeature.js';
 
         document.addEventListener('DOMContentLoaded', () => {
             // Prevent double-tap zoom
@@ -494,12 +492,6 @@
 
             // Settings button click handler
             document.getElementById('settingsButton').addEventListener('click', showSettings);
-
-            // Initialize LENGTH feature
-            const lengthFeatureContainer = document.getElementById('lengthFeatureContainer');
-            const lengthFeature = createLengthFeature();
-            lengthFeatureContainer.appendChild(lengthFeature);
-            document.getElementById('lengthFeatureStyle').textContent = lengthFeatureCSS;
         });
     </script>
 </body>
