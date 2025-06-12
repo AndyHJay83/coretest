@@ -1351,6 +1351,7 @@ function createLeastFrequentFeature() {
     const div = document.createElement('div');
     div.id = 'leastFrequentFeature';
     div.className = 'feature-section';
+    div.style.display = 'none';  // Ensure it's hidden by default
     div.innerHTML = `
         <h2 class="feature-title">LEAST FREQUENT</h2>
         <div class="frequent-letter-display">
@@ -2008,6 +2009,14 @@ function setupFeatureListeners(featureId, onComplete) {
                         document.getElementById('leastFrequentFeature').dispatchEvent(new Event('completed'));
                     }
                 };
+                
+                // Add touch event for mobile
+                leastFrequentYesBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    if (!leastFrequentYesBtn.disabled) {
+                        leastFrequentYesBtn.click();
+                    }
+                }, { passive: false });
             }
             
             if (leastFrequentNoBtn) {
@@ -2019,6 +2028,14 @@ function setupFeatureListeners(featureId, onComplete) {
                         document.getElementById('leastFrequentFeature').dispatchEvent(new Event('completed'));
                     }
                 };
+                
+                // Add touch event for mobile
+                leastFrequentNoBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    if (!leastFrequentNoBtn.disabled) {
+                        leastFrequentNoBtn.click();
+                    }
+                }, { passive: false });
             }
             
             if (leastFrequentSkipButton) {
@@ -2027,6 +2044,12 @@ function setupFeatureListeners(featureId, onComplete) {
                     document.getElementById('leastFrequentFeature').classList.add('completed');
                     document.getElementById('leastFrequentFeature').dispatchEvent(new Event('completed'));
                 };
+                
+                // Add touch event for mobile
+                leastFrequentSkipButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    leastFrequentSkipButton.click();
+                }, { passive: false });
             }
             break;
         }
