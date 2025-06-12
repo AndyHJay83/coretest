@@ -15,6 +15,10 @@
     <title>Word Filter</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+      /* ... existing styles ... */
+    </style>
+    <style id="lengthFeatureStyle"></style>
 </head>
 <body>
     <div class="container">
@@ -270,6 +274,9 @@
                         <div class="category-buttons"></div>
                     </div>
                 </div>
+
+                <!-- Length feature -->
+                <div id="lengthFeatureContainer"></div>
             </div>
         </div>
 
@@ -364,111 +371,132 @@
     </div>
 
     <script src="script.js"></script>
-    <script>
-        // Prevent double-tap zoom
-        document.addEventListener('touchend', function(e) {
-            if (!e.target.matches('input[type="text"]')) {
-                e.preventDefault();
+    <script type="module">
+        import { createShortWordFeature, shortWordFeatureCSS } from './shortWordFeature.js';
+        import { createVowelFeature, vowelFeatureCSS } from './vowelFeature.js';
+        import { createOFeature, oFeatureCSS } from './oFeature.js';
+        import { createCurvedFeature, curvedFeatureCSS } from './curvedFeature.js';
+        import { createEeeFeature, eeeFeatureCSS } from './eeeFeature.js';
+        import { createEeeFirstFeature, eeeFirstFeatureCSS } from './eeeFirstFeature.js';
+        import { createLexiconFeature, lexiconFeatureCSS } from './lexiconFeature.js';
+        import { createConsonantQuestion, consonantQuestionCSS } from './consonantQuestion.js';
+        import { createColour3Feature, colour3FeatureCSS } from './colour3Feature.js';
+        import { createShapeFeature, shapeFeatureCSS } from './shapeFeature.js';
+        import { createOriginalLexFeature, originalLexFeatureCSS } from './originalLexFeature.js';
+        import { createLengthFeature, lengthFeatureCSS } from './lengthFeature.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Prevent double-tap zoom
+            document.addEventListener('touchend', function(e) {
+                if (!e.target.matches('input[type="text"]')) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+
+            // Prevent double-tap zoom on specific elements
+            document.querySelectorAll('button, .results-container').forEach(element => {
+                element.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                }, { passive: false });
+            });
+
+            // Hide address bar on mobile
+            window.addEventListener('load', function() {
+                setTimeout(function() {
+                    window.scrollTo(0, 1);
+                }, 0);
+            });
+
+            // Prevent bounce effect on iOS
+            document.body.addEventListener('touchmove', function(e) {
+                if (e.target.closest('.results-container') === null) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+
+            // Add touch event listeners to all buttons
+            document.querySelectorAll('button').forEach(button => {
+                button.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    this.style.opacity = '0.8';
+                }, { passive: false });
+
+                button.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    this.style.opacity = '1';
+                    this.click(); // Trigger the click event
+                }, { passive: false });
+
+                button.addEventListener('touchcancel', function(e) {
+                    e.preventDefault();
+                    this.style.opacity = '1';
+                }, { passive: false });
+            });
+
+            // Improve text input handling on mobile
+            document.querySelectorAll('input[type="text"]').forEach(input => {
+                // Prevent zoom on focus
+                input.addEventListener('focus', function() {
+                    this.style.fontSize = '16px';
+                    // Scroll the input into view
+                    setTimeout(() => {
+                        this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 300);
+                });
+
+                // Handle input events
+                input.addEventListener('input', function() {
+                    // Ensure proper value handling
+                    this.value = this.value.trim();
+                });
+
+                // Handle blur events
+                input.addEventListener('blur', function() {
+                    // Clean up the value when input loses focus
+                    this.value = this.value.trim();
+                });
+
+                // Prevent unwanted behaviors
+                input.addEventListener('touchstart', function(e) {
+                    e.stopPropagation();
+                }, { passive: false });
+
+                input.addEventListener('touchend', function(e) {
+                    e.stopPropagation();
+                }, { passive: false });
+
+                // Ensure keyboard shows up
+                input.addEventListener('click', function() {
+                    this.focus();
+                });
+            });
+
+            // Settings Modal Functions
+            function showSettings() {
+                document.getElementById('settingsModal').style.display = 'block';
             }
-        }, { passive: false });
 
-        // Prevent double-tap zoom on specific elements
-        document.querySelectorAll('button, .results-container').forEach(element => {
-            element.addEventListener('touchend', function(e) {
-                e.preventDefault();
-            }, { passive: false });
-        });
-
-        // Hide address bar on mobile
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                window.scrollTo(0, 1);
-            }, 0);
-        });
-
-        // Prevent bounce effect on iOS
-        document.body.addEventListener('touchmove', function(e) {
-            if (e.target.closest('.results-container') === null) {
-                e.preventDefault();
+            function hideSettings() {
+                document.getElementById('settingsModal').style.display = 'none';
             }
-        }, { passive: false });
 
-        // Add touch event listeners to all buttons
-        document.querySelectorAll('button').forEach(button => {
-            button.addEventListener('touchstart', function(e) {
-                e.preventDefault();
-                this.style.opacity = '0.8';
-            }, { passive: false });
-
-            button.addEventListener('touchend', function(e) {
-                e.preventDefault();
-                this.style.opacity = '1';
-                this.click(); // Trigger the click event
-            }, { passive: false });
-
-            button.addEventListener('touchcancel', function(e) {
-                e.preventDefault();
-                this.style.opacity = '1';
-            }, { passive: false });
-        });
-
-        // Improve text input handling on mobile
-        document.querySelectorAll('input[type="text"]').forEach(input => {
-            // Prevent zoom on focus
-            input.addEventListener('focus', function() {
-                this.style.fontSize = '16px';
-                // Scroll the input into view
-                setTimeout(() => {
-                    this.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 300);
-            });
-
-            // Handle input events
-            input.addEventListener('input', function() {
-                // Ensure proper value handling
-                this.value = this.value.trim();
-            });
-
-            // Handle blur events
-            input.addEventListener('blur', function() {
-                // Clean up the value when input loses focus
-                this.value = this.value.trim();
-            });
-
-            // Prevent unwanted behaviors
-            input.addEventListener('touchstart', function(e) {
-                e.stopPropagation();
-            }, { passive: false });
-
-            input.addEventListener('touchend', function(e) {
-                e.stopPropagation();
-            }, { passive: false });
-
-            // Ensure keyboard shows up
-            input.addEventListener('click', function() {
-                this.focus();
-            });
-        });
-
-        // Settings Modal Functions
-        function showSettings() {
-            document.getElementById('settingsModal').style.display = 'block';
-        }
-
-        function hideSettings() {
-            document.getElementById('settingsModal').style.display = 'none';
-        }
-
-        // Close settings when clicking outside
-        window.onclick = function(event) {
-            const modal = document.getElementById('settingsModal');
-            if (event.target === modal) {
-                hideSettings();
+            // Close settings when clicking outside
+            window.onclick = function(event) {
+                const modal = document.getElementById('settingsModal');
+                if (event.target === modal) {
+                    hideSettings();
+                }
             }
-        }
 
-        // Settings button click handler
-        document.getElementById('settingsButton').addEventListener('click', showSettings);
+            // Settings button click handler
+            document.getElementById('settingsButton').addEventListener('click', showSettings);
+
+            // Initialize LENGTH feature
+            const lengthFeatureContainer = document.getElementById('lengthFeatureContainer');
+            const lengthFeature = createLengthFeature();
+            lengthFeatureContainer.appendChild(lengthFeature);
+            document.getElementById('lengthFeatureStyle').textContent = lengthFeatureCSS;
+        });
     </script>
 </body>
 </html> 
