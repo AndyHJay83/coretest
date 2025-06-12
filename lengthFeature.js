@@ -58,12 +58,20 @@ export const lengthFeatureCSS = `
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 10px;
+    width: 100%;
+    max-width: 400px;
   }
   .length-feature-grid button {
     padding: 10px;
     border: 1px solid #ccc;
     background: white;
     cursor: pointer;
+    font-size: 16px;
+    min-width: 60px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .length-feature-grid button:hover {
     background: #f0f0f0;
