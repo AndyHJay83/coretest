@@ -2237,7 +2237,8 @@ function showNextFeature() {
         'eeeFirstFeature',
         'lengthFeature',
         'mostFrequentFeature',
-        'leastFrequentFeature'
+        'leastFrequentFeature',
+        'notInWordFeature'
     ];
     
     // Hide all features first
@@ -2275,6 +2276,9 @@ function showNextFeature() {
     }
     else if (!document.getElementById('leastFrequentFeature').classList.contains('completed')) {
         document.getElementById('leastFrequentFeature').style.display = 'block';
+    }
+    else if (!document.getElementById('notInWordFeature').classList.contains('completed')) {
+        document.getElementById('notInWordFeature').style.display = 'block';
     }
     else {
         expandWordList();
