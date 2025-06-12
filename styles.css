@@ -1533,6 +1533,8 @@ input:checked + .slider:before {
     -webkit-overflow-scrolling: touch;
     flex: 1;
     min-height: 0; /* Important for flex child scrolling */
+    align-content: flex-start; /* Align items to the top */
+    height: 100%; /* Ensure full height */
 }
 
 #selectedFeaturesList {
@@ -1558,6 +1560,13 @@ input:checked + .slider:before {
     
     .available-features, .selected-features {
         height: 300px; /* Fixed height on mobile */
+        overflow: hidden; /* Ensure overflow is hidden on container */
+    }
+
+    #availableFeatures {
+        height: 100%; /* Ensure full height in mobile/PWA */
+        overflow-y: auto; /* Ensure scrolling is enabled */
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
     }
 }
 
@@ -1810,8 +1819,9 @@ input:checked + .slider:before {
 .feature-group {
     display: flex;
     align-items: center;
-    gap: 4px;
-    margin-bottom: 8px;
+    gap: 5px;
+    margin: 2px;
+    flex-shrink: 0; /* Prevent feature groups from shrinking */
 }
 
 .info-button {
