@@ -20,6 +20,7 @@ let originalLexCompleted = false;
 let originalLexPosition = -1;
 let currentPosition1Word = '';
 let mostFrequentLetter = null;
+let leastFrequentLetter = null;
 let usedLettersInWorkflow = [];  // Track letters used in current workflow
 let letterFrequencyMap = new Map();  // Store frequency of all letters
 
@@ -981,7 +982,8 @@ async function executeWorkflow(steps) {
             shapeFeature: createShapeFeature(),
             curvedFeature: createCurvedFeature(),
             lengthFeature: createLengthFeature(),
-            mostFrequentFeature: createMostFrequentFeature()
+            mostFrequentFeature: createMostFrequentFeature(),
+            leastFrequentFeature: createLeastFrequentFeature()
         };
         
         // Add all feature elements to the document body
@@ -1319,6 +1321,27 @@ function createMostFrequentFeature() {
         </div>
     `;
     return div;
+}
+
+function createLeastFrequentFeature() {
+    const featureDiv = document.createElement('div');
+    featureDiv.id = 'leastFrequentFeature';
+    featureDiv.className = 'feature-section';
+    featureDiv.style.display = 'none';
+    
+    featureDiv.innerHTML = `
+        <h2 class="feature-title">LEAST FREQUENT</h2>
+        <div class="frequent-letter-display">
+            <div class="letter">-</div>
+        </div>
+        <div class="button-container">
+            <button id="leastFrequentYesBtn" class="yes-btn">YES</button>
+            <button id="leastFrequentNoBtn" class="no-btn">NO</button>
+            <button id="leastFrequentSkipButton" class="skip-button">SKIP</button>
+        </div>
+    `;
+    
+    return featureDiv;
 }
 
 // Function to setup feature listeners
@@ -1930,6 +1953,82 @@ function setupFeatureListeners(feature, callback) {
             }
             break;
         }
+
+        case 'leastFrequent': {
+            const leastFrequentYesBtn = document.getElementById('leastFrequentYesBtn');
+            const leastFrequentNoBtn = document.getElementById('leastFrequentNoBtn');
+            const leastFrequentSkipButton = document.getElementById('leastFrequentSkipButton');
+            const letterDisplay = document.querySelector('#leastFrequentFeature .letter');
+            
+            // Find and display least frequent letter
+            leastFrequentLetter = findLeastFrequentLetter(currentFilteredWords);
+            if (letterDisplay) {
+                if (leastFrequentLetter) {
+                    letterDisplay.textContent = leastFrequentLetter;
+                    // Enable buttons if we have a letter
+                    if (leastFrequentYesBtn) leastFrequentYesBtn.disabled = false;
+                    if (leastFrequentNoBtn) leastFrequentNoBtn.disabled = false;
+                } else {
+                    letterDisplay.textContent = 'No letters found';
+                    // Disable buttons if no letters
+                    if (leastFrequentYesBtn) leastFrequentYesBtn.disabled = true;
+                    if (leastFrequentNoBtn) leastFrequentNoBtn.disabled = true;
+                }
+            }
+            
+            if (leastFrequentYesBtn) {
+                leastFrequentYesBtn.onclick = () => {
+                    if (leastFrequentLetter) {
+                        const filteredWords = filterWordsByLeastFrequent(currentFilteredWords, leastFrequentLetter, true);
+                        callback(filteredWords);
+                        document.getElementById('leastFrequentFeature').classList.add('completed');
+                        document.getElementById('leastFrequentFeature').dispatchEvent(new Event('completed'));
+                    }
+                };
+                
+                // Add touch event for mobile
+                leastFrequentYesBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    if (!leastFrequentYesBtn.disabled) {
+                        leastFrequentYesBtn.click();
+                    }
+                }, { passive: false });
+            }
+            
+            if (leastFrequentNoBtn) {
+                leastFrequentNoBtn.onclick = () => {
+                    if (leastFrequentLetter) {
+                        const filteredWords = filterWordsByLeastFrequent(currentFilteredWords, leastFrequentLetter, false);
+                        callback(filteredWords);
+                        document.getElementById('leastFrequentFeature').classList.add('completed');
+                        document.getElementById('leastFrequentFeature').dispatchEvent(new Event('completed'));
+                    }
+                };
+                
+                // Add touch event for mobile
+                leastFrequentNoBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    if (!leastFrequentNoBtn.disabled) {
+                        leastFrequentNoBtn.click();
+                    }
+                }, { passive: false });
+            }
+            
+            if (leastFrequentSkipButton) {
+                leastFrequentSkipButton.onclick = () => {
+                    callback(currentFilteredWords);
+                    document.getElementById('leastFrequentFeature').classList.add('completed');
+                    document.getElementById('leastFrequentFeature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                leastFrequentSkipButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    leastFrequentSkipButton.click();
+                }, { passive: false });
+            }
+            break;
+        }
     }
 }
 
@@ -2118,7 +2217,8 @@ function showNextFeature() {
         'eeeFeature',
         'eeeFirstFeature',
         'lengthFeature',
-        'mostFrequentFeature'
+        'mostFrequentFeature',
+        'leastFrequentFeature'
     ];
     
     features.forEach(featureId => {
@@ -2168,6 +2268,9 @@ function showNextFeature() {
     else if (!document.getElementById('mostFrequentFeature').classList.contains('completed')) {
         document.getElementById('mostFrequentFeature').style.display = 'block';
     }
+    else if (!document.getElementById('leastFrequentFeature').classList.contains('completed')) {
+        document.getElementById('leastFrequentFeature').style.display = 'block';
+    }
     else {
         expandWordList();
     }
@@ -2211,7 +2314,8 @@ function resetApp() {
         'eeeFeature',
         'eeeFirstFeature',
         'lengthFeature',
-        'mostFrequentFeature'
+        'mostFrequentFeature',
+        'leastFrequentFeature'
     ];
     
     features.forEach(featureId => {
@@ -3546,6 +3650,34 @@ function findMostFrequentLetter(words, rank = 1) {
 function filterWordsByMostFrequent(words, letter, include) {
     return words.filter(word => {
         const hasLetter = word.toUpperCase().includes(letter);
+        return include ? hasLetter : !hasLetter;
+    });
+}
+
+// Function to find the least frequent letter
+function findLeastFrequentLetter(words) {
+    // Count frequencies of all letters
+    const frequencyMap = new Map();
+    words.forEach(word => {
+        [...word].forEach(letter => {
+            frequencyMap.set(letter, (frequencyMap.get(letter) || 0) + 1);
+        });
+    });
+    
+    // Sort letters by frequency (ascending)
+    const sortedLetters = [...frequencyMap.entries()]
+        .sort((a, b) => a[1] - b[1])
+        .map(entry => entry[0]);
+    
+    // Return the least frequent letter
+    return sortedLetters[0] || null;
+}
+
+// Function to filter words based on least frequent letter
+function filterWordsByLeastFrequent(words, letter, include) {
+    if (!letter) return words;
+    return words.filter(word => {
+        const hasLetter = word.includes(letter);
         return include ? hasLetter : !hasLetter;
     });
 }
