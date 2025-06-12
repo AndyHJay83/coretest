@@ -2053,15 +2053,23 @@ function setupFeatureListeners(featureId, onComplete) {
             if (notInWordButton) {
                 notInWordButton.onclick = () => {
                     const letters = notInWordInput.value.toLowerCase();
+                    console.log('Input letters:', letters);
+                    console.log('Current wordlist size:', currentFilteredWords.length);
+                    
                     if (!letters) {
                         alert('Please enter at least one letter');
                         return;
                     }
                     
                     // Filter out words containing any of the specified letters
-                    const filteredWords = currentFilteredWords.filter(word => 
-                        !letters.split('').some(letter => word.includes(letter))
-                    );
+                    const filteredWords = currentFilteredWords.filter(word => {
+                        const wordLower = word.toLowerCase();
+                        const hasAnyLetter = letters.split('').some(letter => wordLower.includes(letter));
+                        return !hasAnyLetter;
+                    });
+                    
+                    console.log('Filtered wordlist size:', filteredWords.length);
+                    console.log('Sample of filtered words:', filteredWords.slice(0, 5));
                     
                     if (filteredWords.length === 0) {
                         alert('No words remain after filtering. Please try different letters.');
