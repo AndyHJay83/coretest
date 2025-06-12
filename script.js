@@ -2933,6 +2933,11 @@ function handleDrop(e) {
 
 function isFeatureAlreadySelected(featureType) {
     const selectedFeatures = document.getElementById('selectedFeaturesList');
+    // Allow multiple instances of MOST FREQUENT feature
+    if (featureType === 'mostFrequent') {
+        return false;
+    }
+    // For all other features, maintain the single instance rule
     return selectedFeatures.querySelector(`[data-feature="${featureType}"]`) !== null;
 }
 
@@ -3026,6 +3031,11 @@ function initializeFeatureSelection() {
 
 function isFeatureAlreadySelected(featureType) {
     const selectedFeatures = document.getElementById('selectedFeaturesList');
+    // Allow multiple instances of MOST FREQUENT feature
+    if (featureType === 'mostFrequent') {
+        return false;
+    }
+    // For all other features, maintain the single instance rule
     return selectedFeatures.querySelector(`[data-feature="${featureType}"]`) !== null;
 }
 
