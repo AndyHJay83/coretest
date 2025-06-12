@@ -2967,8 +2967,8 @@ function handleDrop(e) {
 
 function isFeatureAlreadySelected(featureType) {
     const selectedFeatures = document.getElementById('selectedFeaturesList');
-    // Allow multiple instances of MOST FREQUENT feature
-    if (featureType === 'mostFrequent') {
+    // Allow multiple instances of MOST FREQUENT and LEAST FREQUENT features
+    if (featureType === 'mostFrequent' || featureType === 'leastFrequent') {
         return false;
     }
     // For all other features, maintain the single instance rule
@@ -3065,8 +3065,8 @@ function initializeFeatureSelection() {
 
 function isFeatureAlreadySelected(featureType) {
     const selectedFeatures = document.getElementById('selectedFeaturesList');
-    // Allow multiple instances of MOST FREQUENT feature
-    if (featureType === 'mostFrequent') {
+    // Allow multiple instances of MOST FREQUENT and LEAST FREQUENT features
+    if (featureType === 'mostFrequent' || featureType === 'leastFrequent') {
         return false;
     }
     // For all other features, maintain the single instance rule
@@ -3570,7 +3570,10 @@ function findLeastFrequentLetter(words) {
     const frequencyMap = new Map();
     words.forEach(word => {
         [...word].forEach(letter => {
-            frequencyMap.set(letter, (frequencyMap.get(letter) || 0) + 1);
+            // Only count letters A-Z
+            if (/^[A-Z]$/.test(letter)) {
+                frequencyMap.set(letter, (frequencyMap.get(letter) || 0) + 1);
+            }
         });
     });
     
