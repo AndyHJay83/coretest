@@ -2064,6 +2064,60 @@ function setupFeatureListeners(feature, callback) {
             }
             break;
         }
+
+        case 'notInWord': {
+            const notInWordInput = document.getElementById('notInWordInput');
+            const notInWordButton = document.getElementById('notInWordButton');
+            const notInWordSkipButton = document.getElementById('notInWordSkipButton');
+            
+            if (notInWordButton) {
+                notInWordButton.onclick = () => {
+                    const input = notInWordInput?.value.trim();
+                    if (input) {
+                        const letters = input.toUpperCase().replace(/[^A-Z]/g, '');
+                        if (letters.length > 0) {
+                            const filteredWords = currentFilteredWords.filter(word => {
+                                return !letters.split('').every(letter => word.includes(letter));
+                            });
+                            callback(filteredWords);
+                            document.getElementById('notInWordFeature').dispatchEvent(new Event('completed'));
+                        } else {
+                            alert('Please enter at least one letter');
+                        }
+                    } else {
+                        alert('Please enter letters');
+                    }
+                };
+                
+                // Add touch event for mobile
+                notInWordButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    notInWordButton.click();
+                }, { passive: false });
+            }
+            
+            if (notInWordSkipButton) {
+                notInWordSkipButton.onclick = () => {
+                    callback(currentFilteredWords);
+                    document.getElementById('notInWordFeature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                notInWordSkipButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    notInWordSkipButton.click();
+                }, { passive: false });
+            }
+
+            if (notInWordInput) {
+                notInWordInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        notInWordButton.click();
+                    }
+                });
+            }
+            break;
+        }
     }
 }
 
