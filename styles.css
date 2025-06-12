@@ -2113,4 +2113,45 @@ input:checked + .slider:before {
   height: auto;
   max-height: none;
   overflow: visible;
+}
+
+/* Length Feature */
+.length-input {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    padding: 15px;
+}
+
+.length-input input[type="number"] {
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    width: 100%;
+    text-align: center;
+    -moz-appearance: textfield;
+}
+
+.length-input input[type="number"]::-webkit-outer-spin-button,
+.length-input input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Mobile Styles for Length Feature */
+@media (max-width: 600px) {
+    .length-input input[type="number"] {
+        padding: 15px;
+        font-size: 16px !important;
+        border-width: 2px;
+        -webkit-appearance: none;
+        appearance: none;
+        border-radius: 8px;
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        min-height: 44px;
+    }
 } 

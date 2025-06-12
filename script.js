@@ -973,7 +973,8 @@ async function executeWorkflow(steps) {
             consonantQuestion: createConsonantQuestion(),
             colour3Feature: createColour3Feature(),
             shapeFeature: createShapeFeature(),
-            curvedFeature: createCurvedFeature()
+            curvedFeature: createCurvedFeature(),
+            lengthFeature: createLengthFeature()
         };
         
         // Add all feature elements to the document body (they'll be moved to feature area when needed)
@@ -1275,6 +1276,21 @@ function createCurvedFeature() {
             <button class="curved-btn">U</button>
         </div>
         <button id="curvedSkipBtn" class="skip-button">SKIP</button>
+    `;
+    return div;
+}
+
+function createLengthFeature() {
+    const div = document.createElement('div');
+    div.id = 'lengthFeature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">LENGTH</h2>
+        <div class="length-input">
+            <input type="number" id="lengthInput" placeholder="Enter length (3+)" min="3">
+            <button id="lengthButton">SUBMIT</button>
+            <button id="lengthSkipButton" class="skip-button">SKIP</button>
+        </div>
     `;
     return div;
 }
@@ -1768,6 +1784,50 @@ function setupFeatureListeners(feature, callback) {
             }
             break;
         }
+
+        case 'length': {
+            const lengthButton = document.getElementById('lengthButton');
+            const lengthSkipButton = document.getElementById('lengthSkipButton');
+            const lengthInput = document.getElementById('lengthInput');
+            
+            if (lengthButton) {
+                lengthButton.onclick = () => {
+                    const input = lengthInput?.value.trim();
+                    if (input) {
+                        const length = parseInt(input);
+                        if (length >= 3) {
+                            const filteredWords = filterWordsByLength(currentFilteredWords, length);
+                            callback(filteredWords);
+                            document.getElementById('lengthFeature').dispatchEvent(new Event('completed'));
+                        } else {
+                            alert('Please enter a length of 3 or more');
+                        }
+                    } else {
+                        alert('Please enter a length');
+                    }
+                };
+                
+                // Add touch event for mobile
+                lengthButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    lengthButton.click();
+                }, { passive: false });
+            }
+            
+            if (lengthSkipButton) {
+                lengthSkipButton.onclick = () => {
+                    callback(currentFilteredWords);
+                    document.getElementById('lengthFeature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                lengthSkipButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    lengthSkipButton.click();
+                }, { passive: false });
+            }
+            break;
+        }
     }
 }
 
@@ -1954,7 +2014,8 @@ function showNextFeature() {
         'lexiconFeature',
         'originalLexFeature',
         'eeeFeature',
-        'eeeFirstFeature'
+        'eeeFirstFeature',
+        'lengthFeature'
     ];
     
     features.forEach(featureId => {
@@ -1999,6 +2060,9 @@ function showNextFeature() {
     else if (!document.getElementById('eeeFirstFeature').classList.contains('completed')) {
         document.getElementById('eeeFirstFeature').style.display = 'block';
     }
+    else if (!document.getElementById('lengthFeature').classList.contains('completed')) {
+        document.getElementById('lengthFeature').style.display = 'block';
+    }
     else {
         expandWordList();
     }
@@ -2040,7 +2104,8 @@ function resetApp() {
         'lexiconFeature',
         'originalLexFeature',
         'eeeFeature',
-        'eeeFirstFeature'
+        'eeeFirstFeature',
+        'lengthFeature'
     ];
     
     features.forEach(featureId => {
@@ -3327,3 +3392,8 @@ body.workflow-dropdown-open .custom-select:not(#workflowCustomSelect) {
 }
 `;
 document.head.appendChild(workflowDropdownCSS);
+
+// Add filtering function
+function filterWordsByLength(words, length) {
+    return words.filter(word => word.length === length);
+}
