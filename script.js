@@ -996,7 +996,8 @@ async function executeWorkflow(steps) {
             curvedFeature: createCurvedFeature(),
             lengthFeature: createLengthFeature(),
             mostFrequentFeature: createMostFrequentFeature(),
-            leastFrequentFeature: createLeastFrequentFeature()
+            leastFrequentFeature: createLeastFrequentFeature(),
+            notInWordFeature: createNotInWordFeature()
         };
         
         // Add all feature elements to the document body
@@ -1365,23 +1366,26 @@ function createLeastFrequentFeature() {
 }
 
 function createNotInWordFeature() {
-    const div = document.createElement('div');
-    div.id = 'notInWordFeature';
-    div.className = 'feature-section';
-    div.innerHTML = `
-        <h2 class="feature-title">NOT IN WORD</h2>
-        <div class="not-in-word-input">
-            <input type="text" id="notInWordInput" placeholder="Enter letters not in word..." maxlength="26">
+    const featureDiv = document.createElement('div');
+    featureDiv.id = 'notInWordFeature';
+    featureDiv.className = 'feature-section';
+    featureDiv.style.display = 'none';
+    
+    featureDiv.innerHTML = `
+        <div class="feature-title">NOT IN WORD</div>
+        <div class="input-group">
+            <input type="text" id="notInWordInput" placeholder="Enter letters not in the word...">
             <button id="notInWordButton">DONE</button>
             <button id="notInWordSkipButton" class="skip-button">SKIP</button>
         </div>
     `;
-    return div;
+    
+    return featureDiv;
 }
 
 // Function to setup feature listeners
-function setupFeatureListeners(feature, callback) {
-    switch (feature) {
+function setupFeatureListeners(featureId, onComplete) {
+    switch (featureId) {
         case 'position1': {
             const position1Button = document.getElementById('position1Button');
             const position1DoneButton = document.getElementById('position1DoneButton');
@@ -1396,7 +1400,7 @@ function setupFeatureListeners(feature, callback) {
                             const filteredWords = filterWordsByPosition1(currentFilteredWords, consonants);
                             // Store the input word for vowel feature
                             currentPosition1Word = input.toUpperCase(); // Ensure it's uppercase
-                            callback(filteredWords);
+                            onComplete(filteredWords);
                             document.getElementById('position1Feature').dispatchEvent(new Event('completed'));
     } else {
                             alert('Please enter a word with at least 2 consonants');
@@ -1415,7 +1419,7 @@ function setupFeatureListeners(feature, callback) {
             
             if (position1DoneButton) {
                 position1DoneButton.onclick = () => {
-                    callback(currentFilteredWords);
+                    onComplete(currentFilteredWords);
                     document.getElementById('position1Feature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1474,7 +1478,7 @@ function setupFeatureListeners(feature, callback) {
                     const currentVowel = uniqueVowels[currentVowelIndex];
                     if (currentVowel) {
                         const filteredWords = filterWordsByVowelPosition(currentFilteredWords, currentVowel, position);
-                        callback(filteredWords);
+                        onComplete(filteredWords);
                         document.getElementById('vowelFeature').dispatchEvent(new Event('completed'));
                     }
                 };
@@ -1521,7 +1525,7 @@ function setupFeatureListeners(feature, callback) {
             if (oYesBtn) {
                 oYesBtn.onclick = () => {
                     const filteredWords = filterWordsByO(currentFilteredWords, true);
-                    callback(filteredWords);
+                    onComplete(filteredWords);
                     document.getElementById('oFeature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1535,7 +1539,7 @@ function setupFeatureListeners(feature, callback) {
             if (oNoBtn) {
                 oNoBtn.onclick = () => {
                     const filteredWords = filterWordsByO(currentFilteredWords, false);
-                    callback(filteredWords);
+                    onComplete(filteredWords);
                     document.getElementById('oFeature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1548,7 +1552,7 @@ function setupFeatureListeners(feature, callback) {
             
             if (oSkipBtn) {
                 oSkipBtn.onclick = () => {
-                    callback(currentFilteredWords);
+                    onComplete(currentFilteredWords);
                     document.getElementById('oFeature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1569,7 +1573,7 @@ function setupFeatureListeners(feature, callback) {
                 button.onclick = () => {
                     const letter = button.textContent;
                     const filteredWords = filterWordsByCurvedPositions(currentFilteredWords, letter);
-                    callback(filteredWords);
+                    onComplete(filteredWords);
                     document.getElementById('curvedFeature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1582,7 +1586,7 @@ function setupFeatureListeners(feature, callback) {
             
             if (curvedSkipBtn) {
                 curvedSkipBtn.onclick = () => {
-                    callback(currentFilteredWords);
+                    onComplete(currentFilteredWords);
                     document.getElementById('curvedFeature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1602,7 +1606,7 @@ function setupFeatureListeners(feature, callback) {
             if (colour3YesBtn) {
                 colour3YesBtn.onclick = () => {
                     const filteredWords = filterWordsByColour3(currentFilteredWords);
-                    callback(filteredWords);
+                    onComplete(filteredWords);
                     document.getElementById('colour3Feature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1615,7 +1619,7 @@ function setupFeatureListeners(feature, callback) {
             
             if (colour3SkipButton) {
                 colour3SkipButton.onclick = () => {
-                    callback(currentFilteredWords);
+                    onComplete(currentFilteredWords);
                     document.getElementById('colour3Feature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1637,7 +1641,7 @@ function setupFeatureListeners(feature, callback) {
                     const input = document.getElementById('lexiconInput')?.value.trim();
                     if (input) {
                         const filteredWords = filterWordsByLexicon(currentFilteredWords, input);
-                        callback(filteredWords);
+                        onComplete(filteredWords);
                         document.getElementById('lexiconFeature').dispatchEvent(new Event('completed'));
                     } else {
                         alert('Please enter positions (e.g., 123)');
@@ -1653,7 +1657,7 @@ function setupFeatureListeners(feature, callback) {
             
             if (lexiconSkipButton) {
                 lexiconSkipButton.onclick = () => {
-                    callback(currentFilteredWords);
+                    onComplete(currentFilteredWords);
                     document.getElementById('lexiconFeature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1674,7 +1678,7 @@ function setupFeatureListeners(feature, callback) {
                 consonantYesBtn.onclick = () => {
                     hasAdjacentConsonants = true;
                     const filteredWords = currentFilteredWords.filter(word => hasWordAdjacentConsonants(word));
-                    callback(filteredWords);
+                    onComplete(filteredWords);
                     document.getElementById('consonantQuestion').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1689,7 +1693,7 @@ function setupFeatureListeners(feature, callback) {
                 consonantNoBtn.onclick = () => {
                     hasAdjacentConsonants = false;
                     const filteredWords = currentFilteredWords.filter(word => !hasWordAdjacentConsonants(word));
-                    callback(filteredWords);
+                    onComplete(filteredWords);
                     document.getElementById('consonantQuestion').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1710,7 +1714,7 @@ function setupFeatureListeners(feature, callback) {
             if (eeeButton) {
                 eeeButton.onclick = () => {
                     const filteredWords = filterWordsByEee(currentFilteredWords, 'E');
-                    callback(filteredWords);
+                    onComplete(filteredWords);
                     document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1724,7 +1728,7 @@ function setupFeatureListeners(feature, callback) {
             if (eeeYesBtn) {
                 eeeYesBtn.onclick = () => {
                     const filteredWords = filterWordsByEee(currentFilteredWords, 'YES');
-                    callback(filteredWords);
+                    onComplete(filteredWords);
                     document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1738,7 +1742,7 @@ function setupFeatureListeners(feature, callback) {
             if (eeeNoBtn) {
                 eeeNoBtn.onclick = () => {
                     const filteredWords = filterWordsByEee(currentFilteredWords, 'NO');
-                    callback(filteredWords);
+                    onComplete(filteredWords);
                     document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1760,7 +1764,7 @@ function setupFeatureListeners(feature, callback) {
             if (eeeFirstButton) {
                 eeeFirstButton.onclick = () => {
                     const filteredWords = filterWordsByEeeFirst(currentFilteredWords, 'E');
-                    callback(filteredWords);
+                    onComplete(filteredWords);
                     document.getElementById('eeeFirstFeature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1774,7 +1778,7 @@ function setupFeatureListeners(feature, callback) {
             if (eeeFirstYesBtn) {
                 eeeFirstYesBtn.onclick = () => {
                     const filteredWords = filterWordsByEeeFirst(currentFilteredWords, 'YES');
-                    callback(filteredWords);
+                    onComplete(filteredWords);
                     document.getElementById('eeeFirstFeature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1788,7 +1792,7 @@ function setupFeatureListeners(feature, callback) {
             if (eeeFirstNoBtn) {
                 eeeFirstNoBtn.onclick = () => {
                     const filteredWords = filterWordsByEeeFirst(currentFilteredWords, 'NO');
-                    callback(filteredWords);
+                    onComplete(filteredWords);
                     document.getElementById('eeeFirstFeature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1801,7 +1805,7 @@ function setupFeatureListeners(feature, callback) {
 
             if (eeeFirstSkipButton) {
                 eeeFirstSkipButton.onclick = () => {
-                    callback(currentFilteredWords); // Keep the current word list unchanged
+                    onComplete(currentFilteredWords); // Keep the current word list unchanged
                     document.getElementById('eeeFirstFeature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1840,7 +1844,7 @@ function setupFeatureListeners(feature, callback) {
                     const input = originalLexInput?.value.trim();
                     if (input) {
                         const filteredWords = filterWordsByOriginalLex(currentFilteredWords, originalLexPosition, input);
-                        callback(filteredWords);
+                        onComplete(filteredWords);
                         document.getElementById('originalLexFeature').dispatchEvent(new Event('completed'));
                     } else {
                         alert('Please enter a word');
@@ -1856,7 +1860,7 @@ function setupFeatureListeners(feature, callback) {
             
             if (originalLexSkipButton) {
                 originalLexSkipButton.onclick = () => {
-                    callback(currentFilteredWords);
+                    onComplete(currentFilteredWords);
                     document.getElementById('originalLexFeature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1881,7 +1885,7 @@ function setupFeatureListeners(feature, callback) {
                         const length = parseInt(input);
                         if (length >= 3) {
                             const filteredWords = filterWordsByLength(currentFilteredWords, length);
-                            callback(filteredWords);
+                            onComplete(filteredWords);
                             document.getElementById('lengthFeature').dispatchEvent(new Event('completed'));
                         } else {
                             alert('Please enter a length of 3 or more');
@@ -1900,7 +1904,7 @@ function setupFeatureListeners(feature, callback) {
             
             if (lengthSkipButton) {
                 lengthSkipButton.onclick = () => {
-                    callback(currentFilteredWords);
+                    onComplete(currentFilteredWords);
                     document.getElementById('lengthFeature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1939,7 +1943,7 @@ function setupFeatureListeners(feature, callback) {
                 frequentYesBtn.onclick = () => {
                     if (mostFrequentLetter) {
                         const filteredWords = filterWordsByMostFrequent(currentFilteredWords, mostFrequentLetter, true);
-                        callback(filteredWords);
+                        onComplete(filteredWords);
                         document.getElementById('mostFrequentFeature').classList.add('completed');
                         document.getElementById('mostFrequentFeature').dispatchEvent(new Event('completed'));
                     }
@@ -1958,6 +1962,7 @@ function setupFeatureListeners(feature, callback) {
                 frequentNoBtn.onclick = () => {
                     if (mostFrequentLetter) {
                         const filteredWords = filterWordsByMostFrequent(currentFilteredWords, mostFrequentLetter, false);
+                        onComplete(filteredWords);
                         callback(filteredWords);
                         document.getElementById('mostFrequentFeature').classList.add('completed');
                         document.getElementById('mostFrequentFeature').dispatchEvent(new Event('completed'));
