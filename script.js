@@ -19,6 +19,7 @@ let lexiconCompleted = false;
 let originalLexCompleted = false;
 let originalLexPosition = -1;
 let currentPosition1Word = '';
+let mostFrequentLetter = null;
 
 // Workflow Management
 let workflows = JSON.parse(localStorage.getItem('workflows')) || [];
@@ -1855,16 +1856,19 @@ function setupFeatureListeners(feature, callback) {
             const letterDisplay = document.querySelector('#mostFrequentFeature .letter');
             
             // Find and display most frequent letter
-            const mostFrequentLetter = findMostFrequentLetter(currentFilteredWords);
+            mostFrequentLetter = findMostFrequentLetter(currentFilteredWords);
             if (letterDisplay) {
                 letterDisplay.textContent = mostFrequentLetter;
             }
             
             if (frequentYesBtn) {
                 frequentYesBtn.onclick = () => {
-                    const filteredWords = filterWordsByMostFrequent(currentFilteredWords, mostFrequentLetter, true);
-                    callback(filteredWords);
-                    document.getElementById('mostFrequentFeature').dispatchEvent(new Event('completed'));
+                    if (mostFrequentLetter) {
+                        const filteredWords = filterWordsByMostFrequent(currentFilteredWords, mostFrequentLetter, true);
+                        callback(filteredWords);
+                        document.getElementById('mostFrequentFeature').classList.add('completed');
+                        document.getElementById('mostFrequentFeature').dispatchEvent(new Event('completed'));
+                    }
                 };
                 
                 // Add touch event for mobile
@@ -1876,9 +1880,12 @@ function setupFeatureListeners(feature, callback) {
             
             if (frequentNoBtn) {
                 frequentNoBtn.onclick = () => {
-                    const filteredWords = filterWordsByMostFrequent(currentFilteredWords, mostFrequentLetter, false);
-                    callback(filteredWords);
-                    document.getElementById('mostFrequentFeature').dispatchEvent(new Event('completed'));
+                    if (mostFrequentLetter) {
+                        const filteredWords = filterWordsByMostFrequent(currentFilteredWords, mostFrequentLetter, false);
+                        callback(filteredWords);
+                        document.getElementById('mostFrequentFeature').classList.add('completed');
+                        document.getElementById('mostFrequentFeature').dispatchEvent(new Event('completed'));
+                    }
                 };
                 
                 // Add touch event for mobile
@@ -1891,6 +1898,7 @@ function setupFeatureListeners(feature, callback) {
             if (frequentSkipButton) {
                 frequentSkipButton.onclick = () => {
                     callback(currentFilteredWords);
+                    document.getElementById('mostFrequentFeature').classList.add('completed');
                     document.getElementById('mostFrequentFeature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -2107,36 +2115,38 @@ function showNextFeature() {
     else if (!document.getElementById('position1Feature').classList.contains('completed')) {
         document.getElementById('position1Feature').style.display = 'block';
     }
-    else if (isVowelMode && !document.getElementById('vowelFeature').classList.contains('completed')) {
+    else if (!document.getElementById('vowelFeature').classList.contains('completed')) {
         document.getElementById('vowelFeature').style.display = 'block';
     }
-    else if (!originalLexCompleted) {
-        console.log('Showing originalLex feature');
-        document.getElementById('originalLexFeature').style.display = 'block';
+    else if (!document.getElementById('colour3Feature').classList.contains('completed')) {
+        document.getElementById('colour3Feature').style.display = 'block';
     }
-    else if (!lexiconCompleted) {
-        document.getElementById('lexiconFeature').style.display = 'block';
+    else if (!document.getElementById('shapeFeature').classList.contains('completed')) {
+        document.getElementById('shapeFeature').style.display = 'block';
     }
     else if (!document.getElementById('oFeature').classList.contains('completed')) {
         document.getElementById('oFeature').style.display = 'block';
     }
-    else if (!eeeCompleted) {
-        document.getElementById('eeeFeature').style.display = 'block';
-    }
-    else if (isColour3Mode && !document.getElementById('colour3Feature').classList.contains('completed')) {
-        document.getElementById('colour3Feature').style.display = 'block';
-    }
-    else if (isShapeMode && !document.getElementById('shapeFeature').classList.contains('completed')) {
-        document.getElementById('shapeFeature').style.display = 'block';
-    }
     else if (!document.getElementById('curvedFeature').classList.contains('completed')) {
         document.getElementById('curvedFeature').style.display = 'block';
+    }
+    else if (!document.getElementById('lexiconFeature').classList.contains('completed')) {
+        document.getElementById('lexiconFeature').style.display = 'block';
+    }
+    else if (!document.getElementById('originalLexFeature').classList.contains('completed')) {
+        document.getElementById('originalLexFeature').style.display = 'block';
+    }
+    else if (!document.getElementById('eeeFeature').classList.contains('completed')) {
+        document.getElementById('eeeFeature').style.display = 'block';
     }
     else if (!document.getElementById('eeeFirstFeature').classList.contains('completed')) {
         document.getElementById('eeeFirstFeature').style.display = 'block';
     }
     else if (!document.getElementById('lengthFeature').classList.contains('completed')) {
         document.getElementById('lengthFeature').style.display = 'block';
+    }
+    else if (!document.getElementById('mostFrequentFeature').classList.contains('completed')) {
+        document.getElementById('mostFrequentFeature').style.display = 'block';
     }
     else {
         expandWordList();
