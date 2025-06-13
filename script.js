@@ -3693,3 +3693,94 @@ function filterWordsByLeastFrequent(words, letter, include) {
         return include ? hasLetter : !hasLetter;
     });
 }
+
+// Add a cooldown map to track when features were last added
+const featureCooldown = new Map();
+
+function initializeFeatureSelection() {
+    const availableFeatures = document.getElementById('availableFeatures');
+    const selectedFeaturesList = document.getElementById('selectedFeaturesList');
+    
+    if (availableFeatures) {
+        const featureButtons = availableFeatures.querySelectorAll('.feature-button');
+        
+        featureButtons.forEach(button => {
+            // Remove existing event listeners
+            const newButton = button.cloneNode(true);
+            button.parentNode.replaceChild(newButton, button);
+            
+            // Single handler for both click and touch
+            const handleFeatureSelection = (e) => {
+                e.preventDefault();
+                const featureType = newButton.dataset.feature;
+                
+                // Check cooldown
+                const lastAdded = featureCooldown.get(featureType);
+                const now = Date.now();
+                if (lastAdded && (now - lastAdded) < 1000) {
+                    return; // Ignore if within cooldown period
+                }
+                
+                if (!isFeatureAlreadySelected(featureType)) {
+                    addFeatureToSelected(featureType);
+                    featureCooldown.set(featureType, now);
+                }
+            };
+            
+            // Add both click and touch events
+            newButton.addEventListener('click', handleFeatureSelection);
+            newButton.addEventListener('touchstart', handleFeatureSelection, { passive: false });
+        });
+    }
+}
+
+function isFeatureAlreadySelected(featureType) {
+    const selectedFeatures = document.getElementById('selectedFeaturesList');
+    // Allow multiple instances of MOST FREQUENT and LEAST FREQUENT features
+    if (featureType === 'mostFrequent' || featureType === 'leastFrequent') {
+        return false;
+    }
+    // For all other features, maintain the single instance rule
+    return selectedFeatures.querySelector(`[data-feature="${featureType}"]`) !== null;
+}
+
+function addFeatureToSelected(featureType) {
+    const selectedFeatures = document.getElementById('selectedFeaturesList');
+    const featureButton = document.querySelector(`.feature-button[data-feature="${featureType}"]`);
+    
+    if (!featureButton) return;
+    
+    const selectedFeature = document.createElement('div');
+    selectedFeature.className = 'selected-feature-item';
+    selectedFeature.dataset.feature = featureType;
+    
+    const featureName = document.createElement('span');
+    featureName.textContent = featureButton.textContent;
+    selectedFeature.appendChild(featureName);
+    
+    const removeButton = document.createElement('button');
+    removeButton.className = 'remove-feature';
+    removeButton.textContent = '×';
+    removeButton.onclick = (e) => {
+        e.stopPropagation();
+        selectedFeature.remove();
+    };
+    selectedFeature.appendChild(removeButton);
+    
+    // Add click event to move feature back to available
+    selectedFeature.addEventListener('click', (e) => {
+        if (e.target !== removeButton) {
+            selectedFeature.remove();
+        }
+    });
+    
+    // Add touch event for mobile
+    selectedFeature.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (e.target !== removeButton) {
+            selectedFeature.remove();
+        }
+    }, { passive: false });
+    
+    selectedFeatures.appendChild(selectedFeature);
+}
