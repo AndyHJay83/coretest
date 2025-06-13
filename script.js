@@ -996,8 +996,7 @@ async function executeWorkflow(steps) {
             curvedFeature: createCurvedFeature(),
             lengthFeature: createLengthFeature(),
             mostFrequentFeature: createMostFrequentFeature(),
-            leastFrequentFeature: createLeastFrequentFeature(),
-            notInWordFeature: createNotInWordFeature()
+            leastFrequentFeature: createLeastFrequentFeature()
         };
         
         // Add all feature elements to the document body
@@ -1348,10 +1347,12 @@ function createMostFrequentFeature() {
 }
 
 function createLeastFrequentFeature() {
-    const div = document.createElement('div');
-    div.id = 'leastFrequentFeature';
-    div.className = 'feature-section';
-    div.innerHTML = `
+    const featureDiv = document.createElement('div');
+    featureDiv.id = 'leastFrequentFeature';
+    featureDiv.className = 'feature-section';
+    featureDiv.style.display = 'none';
+    
+    featureDiv.innerHTML = `
         <h2 class="feature-title">LEAST FREQUENT</h2>
         <div class="frequent-letter-display">
             <div class="letter">-</div>
@@ -1362,30 +1363,13 @@ function createLeastFrequentFeature() {
             <button id="leastFrequentSkipButton" class="skip-button">SKIP</button>
         </div>
     `;
-    return div;
-}
-
-function createNotInWordFeature() {
-    const featureDiv = document.createElement('div');
-    featureDiv.id = 'notInWordFeature';
-    featureDiv.className = 'feature-section';
-    featureDiv.style.display = 'none';
-    
-    featureDiv.innerHTML = `
-        <div class="feature-title">NOT IN WORD</div>
-        <div class="input-group">
-            <input type="text" id="notInWordInput" placeholder="Enter letters (case doesn't matter)...">
-            <button id="notInWordButton">DONE</button>
-            <button id="notInWordSkipButton" class="skip-button">SKIP</button>
-        </div>
-    `;
     
     return featureDiv;
 }
 
 // Function to setup feature listeners
-function setupFeatureListeners(featureId, onComplete) {
-    switch (featureId) {
+function setupFeatureListeners(feature, callback) {
+    switch (feature) {
         case 'position1': {
             const position1Button = document.getElementById('position1Button');
             const position1DoneButton = document.getElementById('position1DoneButton');
@@ -1400,7 +1384,7 @@ function setupFeatureListeners(featureId, onComplete) {
                             const filteredWords = filterWordsByPosition1(currentFilteredWords, consonants);
                             // Store the input word for vowel feature
                             currentPosition1Word = input.toUpperCase(); // Ensure it's uppercase
-                            onComplete(filteredWords);
+                            callback(filteredWords);
                             document.getElementById('position1Feature').dispatchEvent(new Event('completed'));
     } else {
                             alert('Please enter a word with at least 2 consonants');
@@ -1419,7 +1403,7 @@ function setupFeatureListeners(featureId, onComplete) {
             
             if (position1DoneButton) {
                 position1DoneButton.onclick = () => {
-                    onComplete(currentFilteredWords);
+                    callback(currentFilteredWords);
                     document.getElementById('position1Feature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1478,7 +1462,7 @@ function setupFeatureListeners(featureId, onComplete) {
                     const currentVowel = uniqueVowels[currentVowelIndex];
                     if (currentVowel) {
                         const filteredWords = filterWordsByVowelPosition(currentFilteredWords, currentVowel, position);
-                        onComplete(filteredWords);
+                        callback(filteredWords);
                         document.getElementById('vowelFeature').dispatchEvent(new Event('completed'));
                     }
                 };
@@ -1525,7 +1509,7 @@ function setupFeatureListeners(featureId, onComplete) {
             if (oYesBtn) {
                 oYesBtn.onclick = () => {
                     const filteredWords = filterWordsByO(currentFilteredWords, true);
-                    onComplete(filteredWords);
+                    callback(filteredWords);
                     document.getElementById('oFeature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1539,7 +1523,7 @@ function setupFeatureListeners(featureId, onComplete) {
             if (oNoBtn) {
                 oNoBtn.onclick = () => {
                     const filteredWords = filterWordsByO(currentFilteredWords, false);
-                    onComplete(filteredWords);
+                    callback(filteredWords);
                     document.getElementById('oFeature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1552,7 +1536,7 @@ function setupFeatureListeners(featureId, onComplete) {
             
             if (oSkipBtn) {
                 oSkipBtn.onclick = () => {
-                    onComplete(currentFilteredWords);
+                    callback(currentFilteredWords);
                     document.getElementById('oFeature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1573,7 +1557,7 @@ function setupFeatureListeners(featureId, onComplete) {
                 button.onclick = () => {
                     const letter = button.textContent;
                     const filteredWords = filterWordsByCurvedPositions(currentFilteredWords, letter);
-                    onComplete(filteredWords);
+                    callback(filteredWords);
                     document.getElementById('curvedFeature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1586,7 +1570,7 @@ function setupFeatureListeners(featureId, onComplete) {
             
             if (curvedSkipBtn) {
                 curvedSkipBtn.onclick = () => {
-                    onComplete(currentFilteredWords);
+                    callback(currentFilteredWords);
                     document.getElementById('curvedFeature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1606,7 +1590,7 @@ function setupFeatureListeners(featureId, onComplete) {
             if (colour3YesBtn) {
                 colour3YesBtn.onclick = () => {
                     const filteredWords = filterWordsByColour3(currentFilteredWords);
-                    onComplete(filteredWords);
+                    callback(filteredWords);
                     document.getElementById('colour3Feature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1619,7 +1603,7 @@ function setupFeatureListeners(featureId, onComplete) {
             
             if (colour3SkipButton) {
                 colour3SkipButton.onclick = () => {
-                    onComplete(currentFilteredWords);
+                    callback(currentFilteredWords);
                     document.getElementById('colour3Feature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1641,7 +1625,7 @@ function setupFeatureListeners(featureId, onComplete) {
                     const input = document.getElementById('lexiconInput')?.value.trim();
                     if (input) {
                         const filteredWords = filterWordsByLexicon(currentFilteredWords, input);
-                        onComplete(filteredWords);
+                        callback(filteredWords);
                         document.getElementById('lexiconFeature').dispatchEvent(new Event('completed'));
                     } else {
                         alert('Please enter positions (e.g., 123)');
@@ -1657,7 +1641,7 @@ function setupFeatureListeners(featureId, onComplete) {
             
             if (lexiconSkipButton) {
                 lexiconSkipButton.onclick = () => {
-                    onComplete(currentFilteredWords);
+                    callback(currentFilteredWords);
                     document.getElementById('lexiconFeature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1678,7 +1662,7 @@ function setupFeatureListeners(featureId, onComplete) {
                 consonantYesBtn.onclick = () => {
                     hasAdjacentConsonants = true;
                     const filteredWords = currentFilteredWords.filter(word => hasWordAdjacentConsonants(word));
-                    onComplete(filteredWords);
+                    callback(filteredWords);
                     document.getElementById('consonantQuestion').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1693,7 +1677,7 @@ function setupFeatureListeners(featureId, onComplete) {
                 consonantNoBtn.onclick = () => {
                     hasAdjacentConsonants = false;
                     const filteredWords = currentFilteredWords.filter(word => !hasWordAdjacentConsonants(word));
-                    onComplete(filteredWords);
+                    callback(filteredWords);
                     document.getElementById('consonantQuestion').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1714,7 +1698,7 @@ function setupFeatureListeners(featureId, onComplete) {
             if (eeeButton) {
                 eeeButton.onclick = () => {
                     const filteredWords = filterWordsByEee(currentFilteredWords, 'E');
-                    onComplete(filteredWords);
+                    callback(filteredWords);
                     document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1728,7 +1712,7 @@ function setupFeatureListeners(featureId, onComplete) {
             if (eeeYesBtn) {
                 eeeYesBtn.onclick = () => {
                     const filteredWords = filterWordsByEee(currentFilteredWords, 'YES');
-                    onComplete(filteredWords);
+                    callback(filteredWords);
                     document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1742,7 +1726,7 @@ function setupFeatureListeners(featureId, onComplete) {
             if (eeeNoBtn) {
                 eeeNoBtn.onclick = () => {
                     const filteredWords = filterWordsByEee(currentFilteredWords, 'NO');
-                    onComplete(filteredWords);
+                    callback(filteredWords);
                     document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1764,7 +1748,7 @@ function setupFeatureListeners(featureId, onComplete) {
             if (eeeFirstButton) {
                 eeeFirstButton.onclick = () => {
                     const filteredWords = filterWordsByEeeFirst(currentFilteredWords, 'E');
-                    onComplete(filteredWords);
+                    callback(filteredWords);
                     document.getElementById('eeeFirstFeature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1778,7 +1762,7 @@ function setupFeatureListeners(featureId, onComplete) {
             if (eeeFirstYesBtn) {
                 eeeFirstYesBtn.onclick = () => {
                     const filteredWords = filterWordsByEeeFirst(currentFilteredWords, 'YES');
-                    onComplete(filteredWords);
+                    callback(filteredWords);
                     document.getElementById('eeeFirstFeature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1792,7 +1776,7 @@ function setupFeatureListeners(featureId, onComplete) {
             if (eeeFirstNoBtn) {
                 eeeFirstNoBtn.onclick = () => {
                     const filteredWords = filterWordsByEeeFirst(currentFilteredWords, 'NO');
-                    onComplete(filteredWords);
+                    callback(filteredWords);
                     document.getElementById('eeeFirstFeature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1805,7 +1789,7 @@ function setupFeatureListeners(featureId, onComplete) {
 
             if (eeeFirstSkipButton) {
                 eeeFirstSkipButton.onclick = () => {
-                    onComplete(currentFilteredWords); // Keep the current word list unchanged
+                    callback(currentFilteredWords); // Keep the current word list unchanged
                     document.getElementById('eeeFirstFeature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1844,7 +1828,7 @@ function setupFeatureListeners(featureId, onComplete) {
                     const input = originalLexInput?.value.trim();
                     if (input) {
                         const filteredWords = filterWordsByOriginalLex(currentFilteredWords, originalLexPosition, input);
-                        onComplete(filteredWords);
+                        callback(filteredWords);
                         document.getElementById('originalLexFeature').dispatchEvent(new Event('completed'));
                     } else {
                         alert('Please enter a word');
@@ -1860,7 +1844,7 @@ function setupFeatureListeners(featureId, onComplete) {
             
             if (originalLexSkipButton) {
                 originalLexSkipButton.onclick = () => {
-                    onComplete(currentFilteredWords);
+                    callback(currentFilteredWords);
                     document.getElementById('originalLexFeature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1885,7 +1869,7 @@ function setupFeatureListeners(featureId, onComplete) {
                         const length = parseInt(input);
                         if (length >= 3) {
                             const filteredWords = filterWordsByLength(currentFilteredWords, length);
-                            onComplete(filteredWords);
+                            callback(filteredWords);
                             document.getElementById('lengthFeature').dispatchEvent(new Event('completed'));
                         } else {
                             alert('Please enter a length of 3 or more');
@@ -1904,7 +1888,7 @@ function setupFeatureListeners(featureId, onComplete) {
             
             if (lengthSkipButton) {
                 lengthSkipButton.onclick = () => {
-                    onComplete(currentFilteredWords);
+                    callback(currentFilteredWords);
                     document.getElementById('lengthFeature').dispatchEvent(new Event('completed'));
                 };
                 
@@ -1943,30 +1927,52 @@ function setupFeatureListeners(featureId, onComplete) {
                 frequentYesBtn.onclick = () => {
                     if (mostFrequentLetter) {
                         const filteredWords = filterWordsByMostFrequent(currentFilteredWords, mostFrequentLetter, true);
-                        onComplete(filteredWords);
+                        callback(filteredWords);
                         document.getElementById('mostFrequentFeature').classList.add('completed');
                         document.getElementById('mostFrequentFeature').dispatchEvent(new Event('completed'));
                     }
                 };
+                
+                // Add touch event for mobile
+                frequentYesBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    if (!frequentYesBtn.disabled) {
+                        frequentYesBtn.click();
+                    }
+                }, { passive: false });
             }
             
             if (frequentNoBtn) {
                 frequentNoBtn.onclick = () => {
                     if (mostFrequentLetter) {
                         const filteredWords = filterWordsByMostFrequent(currentFilteredWords, mostFrequentLetter, false);
-                        onComplete(filteredWords);
+                        callback(filteredWords);
                         document.getElementById('mostFrequentFeature').classList.add('completed');
                         document.getElementById('mostFrequentFeature').dispatchEvent(new Event('completed'));
                     }
                 };
+                
+                // Add touch event for mobile
+                frequentNoBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    if (!frequentNoBtn.disabled) {
+                        frequentNoBtn.click();
+                    }
+                }, { passive: false });
             }
             
             if (frequentSkipButton) {
                 frequentSkipButton.onclick = () => {
-                    onComplete(currentFilteredWords);
+                    callback(currentFilteredWords);
                     document.getElementById('mostFrequentFeature').classList.add('completed');
                     document.getElementById('mostFrequentFeature').dispatchEvent(new Event('completed'));
                 };
+                
+                // Add touch event for mobile
+                frequentSkipButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    frequentSkipButton.click();
+                }, { passive: false });
             }
             break;
         }
@@ -1997,94 +2003,52 @@ function setupFeatureListeners(featureId, onComplete) {
                 leastFrequentYesBtn.onclick = () => {
                     if (leastFrequentLetter) {
                         const filteredWords = filterWordsByLeastFrequent(currentFilteredWords, leastFrequentLetter, true);
-                        onComplete(filteredWords);
+                        callback(filteredWords);
                         document.getElementById('leastFrequentFeature').classList.add('completed');
                         document.getElementById('leastFrequentFeature').dispatchEvent(new Event('completed'));
                     }
                 };
+                
+                // Add touch event for mobile
+                leastFrequentYesBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    if (!leastFrequentYesBtn.disabled) {
+                        leastFrequentYesBtn.click();
+                    }
+                }, { passive: false });
             }
             
             if (leastFrequentNoBtn) {
                 leastFrequentNoBtn.onclick = () => {
                     if (leastFrequentLetter) {
                         const filteredWords = filterWordsByLeastFrequent(currentFilteredWords, leastFrequentLetter, false);
-                        onComplete(filteredWords);
+                        callback(filteredWords);
                         document.getElementById('leastFrequentFeature').classList.add('completed');
                         document.getElementById('leastFrequentFeature').dispatchEvent(new Event('completed'));
                     }
                 };
+                
+                // Add touch event for mobile
+                leastFrequentNoBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    if (!leastFrequentNoBtn.disabled) {
+                        leastFrequentNoBtn.click();
+                    }
+                }, { passive: false });
             }
             
             if (leastFrequentSkipButton) {
                 leastFrequentSkipButton.onclick = () => {
-                    onComplete(currentFilteredWords);
+                    callback(currentFilteredWords);
                     document.getElementById('leastFrequentFeature').classList.add('completed');
                     document.getElementById('leastFrequentFeature').dispatchEvent(new Event('completed'));
                 };
-            }
-            break;
-        }
-
-        case 'notInWord': {
-            const notInWordInput = document.getElementById('notInWordInput');
-            const notInWordButton = document.getElementById('notInWordButton');
-            const notInWordSkipButton = document.getElementById('notInWordSkipButton');
-            
-            if (notInWordButton) {
-                notInWordButton.onclick = () => {
-                    const letters = notInWordInput.value.toLowerCase();
-                    console.log('Input letters:', letters);
-                    console.log('Current wordlist size:', currentFilteredWords.length);
-                    
-                    if (!letters) {
-                        alert('Please enter at least one letter');
-                        return;
-                    }
-                    
-                    // Filter out words containing any of the specified letters
-                    const filteredWords = currentFilteredWords.filter(word => {
-                        const wordLower = word.toLowerCase();
-                        const hasAnyLetter = letters.split('').some(letter => wordLower.includes(letter));
-                        return !hasAnyLetter;
-                    });
-                    
-                    console.log('Filtered wordlist size:', filteredWords.length);
-                    console.log('Sample of filtered words:', filteredWords.slice(0, 5));
-                    
-                    if (filteredWords.length === 0) {
-                        alert('No words remain after filtering. Please try different letters.');
-                        return;
-                    }
-                    
-                    currentFilteredWords = filteredWords;
-                    onComplete(filteredWords);
-                    
-                    // Mark feature as completed
-                    const featureElement = document.getElementById('notInWordFeature');
-                    if (featureElement) {
-                        featureElement.classList.add('completed');
-                        featureElement.dispatchEvent(new Event('completed'));
-                    }
-                };
-            }
-            
-            if (notInWordSkipButton) {
-                notInWordSkipButton.onclick = () => {
-                    onComplete(currentFilteredWords);
-                    const featureElement = document.getElementById('notInWordFeature');
-                    if (featureElement) {
-                        featureElement.classList.add('completed');
-                        featureElement.dispatchEvent(new Event('completed'));
-                    }
-                };
-            }
-            
-            if (notInWordInput) {
-                notInWordInput.onkeypress = (e) => {
-                    if (e.key === 'Enter') {
-                        notInWordButton.click();
-                    }
-                };
+                
+                // Add touch event for mobile
+                leastFrequentSkipButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    leastFrequentSkipButton.click();
+                }, { passive: false });
             }
             break;
         }
@@ -2261,8 +2225,7 @@ function showNextFeature() {
         'eeeFirstFeature',
         'lengthFeature',
         'mostFrequentFeature',
-        'leastFrequentFeature',
-        'notInWordFeature'
+        'leastFrequentFeature'
     ];
     
     // Hide all features first
@@ -2300,9 +2263,6 @@ function showNextFeature() {
     }
     else if (!document.getElementById('leastFrequentFeature').classList.contains('completed')) {
         document.getElementById('leastFrequentFeature').style.display = 'block';
-    }
-    else if (!document.getElementById('notInWordFeature').classList.contains('completed')) {
-        document.getElementById('notInWordFeature').style.display = 'block';
     }
     else {
         expandWordList();
@@ -3716,76 +3676,4 @@ function filterWordsByLeastFrequent(words, letter, include) {
         const hasLetter = word.includes(letter);
         return include ? hasLetter : !hasLetter;
     });
-}
-
-// Add to the featureElements array in executeWorkflow function
-featureElements = {
-    position1Feature: createPosition1Feature(),
-    vowelFeature: createVowelFeature(),
-    oFeature: createOFeature(),
-    lexiconFeature: createLexiconFeature(),
-    eeeFeature: createEeeFeature(),
-    eeeFirstFeature: createEeeFirstFeature(),
-    originalLexFeature: createOriginalLexFeature(),
-    consonantQuestion: createConsonantQuestion(),
-    colour3Feature: createColour3Feature(),
-    lengthFeature: createLengthFeature(),
-    mostFrequentFeature: createMostFrequentFeature(),
-    leastFrequentFeature: createLeastFrequentFeature(),
-    notInWordFeature: createNotInWordFeature()
-};
-
-// Add the event handlers for the NOT IN WORD feature
-function setupNotInWordFeature() {
-    const notInWordInput = document.getElementById('notInWordInput');
-    const notInWordButton = document.getElementById('notInWordButton');
-    const notInWordSkipButton = document.getElementById('notInWordSkipButton');
-
-    if (notInWordButton) {
-        notInWordButton.addEventListener('click', handleNotInWordSubmit);
-        notInWordButton.addEventListener('touchend', handleNotInWordSubmit);
-    }
-
-    if (notInWordSkipButton) {
-        notInWordSkipButton.addEventListener('click', () => {
-            markFeatureAsCompleted('notInWord');
-            showNextFeature();
-        });
-        notInWordSkipButton.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            markFeatureAsCompleted('notInWord');
-            showNextFeature();
-        });
-    }
-
-    if (notInWordInput) {
-        notInWordInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                handleNotInWordSubmit();
-            }
-        });
-    }
-}
-
-function handleNotInWordSubmit() {
-    const input = document.getElementById('notInWordInput');
-    if (!input) return;
-
-    const letters = input.value.toUpperCase().replace(/[^A-Z]/g, '');
-    if (letters.length === 0) return;
-
-    // Filter out words that contain any of the specified letters
-    const filteredWords = currentWordlist.filter(word => {
-        return !letters.split('').every(letter => word.includes(letter));
-    });
-
-    updateWordlist(filteredWords);
-    markFeatureAsCompleted('notInWord');
-    showNextFeature();
-}
-
-// Add to the initializeFeatures function
-function initializeFeatures() {
-    // ... existing feature initializations ...
-    setupNotInWordFeature();
 }

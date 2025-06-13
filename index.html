@@ -130,10 +130,6 @@
                                 <button class="feature-button" data-feature="leastFrequent" draggable="true">LEAST FREQUENT</button>
                                 <button class="info-button" data-feature="leastFrequent"><i class="fas fa-info-circle"></i></button>
                             </div>
-                            <div class="feature-group">
-                                <button class="feature-button" data-feature="notInWord" draggable="true">NOT IN WORD</button>
-                                <button class="info-button" data-feature="notInWord"><i class="fas fa-info-circle"></i></button>
-                            </div>
                         </div>
                     </div>
 
@@ -321,14 +317,6 @@
                         <button id="leastFrequentSkipButton" class="skip-button">SKIP</button>
                     </div>
                 </div>
-                <div id="notInWordFeature" class="feature-section" style="display: none;">
-                    <h2 class="feature-title">NOT IN WORD</h2>
-                    <div class="not-in-word-input">
-                        <input type="text" id="notInWordInput" placeholder="Enter letters not in word">
-                        <button id="notInWordButton">DONE</button>
-                        <button id="notInWordSkipButton" class="skip-button">SKIP</button>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -438,13 +426,6 @@
             <div class="feature-info-content">
                 <h3>LEAST FREQUENT</h3>
                 <p><strong>Least Frequent Letter</strong><br>The least frequent letter in the combined wordlist. (Can be used more than once)</p>
-                <button class="close-info-button">&times;</button>
-            </div>
-        </div>
-        <div id="notInWordInfo" class="feature-info-modal">
-            <div class="feature-info-content">
-                <h3>NOT IN WORD</h3>
-                <p><strong>Letters Not in Word</strong><br>Enter letters that are NOT in the word. All words containing these letters will be filtered out.</p>
                 <button class="close-info-button">&times;</button>
             </div>
         </div>
