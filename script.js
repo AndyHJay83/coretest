@@ -2075,26 +2075,48 @@ function setupFeatureListeners(feature, callback) {
             const notInInput = document.getElementById('notInInput');
 
             if (notInButton && notInInput && notInSkipButton) {
-                notInButton.addEventListener('click', () => {
-                    const letters = notInInput.value.toLowerCase();
+                // Remove any existing event listeners
+                const newNotInButton = notInButton.cloneNode(true);
+                const newNotInSkipButton = notInSkipButton.cloneNode(true);
+                const newNotInInput = notInInput.cloneNode(true);
+                
+                notInButton.parentNode.replaceChild(newNotInButton, notInButton);
+                notInSkipButton.parentNode.replaceChild(newNotInSkipButton, notInSkipButton);
+                notInInput.parentNode.replaceChild(newNotInInput, notInInput);
+
+                newNotInButton.addEventListener('click', () => {
+                    const letters = newNotInInput.value.toLowerCase();
                     if (letters) {
                         filterWordsByNotIn(letters);
-                        hideFeature('notIn');
-                        showNextFeature();
+                        callback(currentFilteredWords);
+                        document.getElementById('notInFeature').classList.add('completed');
+                        document.getElementById('notInFeature').dispatchEvent(new Event('completed'));
                     }
                 });
 
-                notInSkipButton.addEventListener('click', () => {
-                    hideFeature('notIn');
-                    showNextFeature();
+                newNotInSkipButton.addEventListener('click', () => {
+                    callback(currentFilteredWords);
+                    document.getElementById('notInFeature').classList.add('completed');
+                    document.getElementById('notInFeature').dispatchEvent(new Event('completed'));
                 });
 
                 // Add enter key support
-                notInInput.addEventListener('keypress', (e) => {
+                newNotInInput.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') {
-                        notInButton.click();
+                        newNotInButton.click();
                     }
                 });
+
+                // Add touch events for mobile
+                newNotInButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    newNotInButton.click();
+                }, { passive: false });
+
+                newNotInSkipButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    newNotInSkipButton.click();
+                }, { passive: false });
             }
             break;
         }
@@ -3850,26 +3872,48 @@ function initializeNotInFeature() {
     const notInSkipButton = document.getElementById('notInSkipButton');
 
     if (notInButton && notInInput && notInSkipButton) {
-        notInButton.addEventListener('click', () => {
-            const letters = notInInput.value.toLowerCase();
+        // Remove any existing event listeners
+        const newNotInButton = notInButton.cloneNode(true);
+        const newNotInSkipButton = notInSkipButton.cloneNode(true);
+        const newNotInInput = notInInput.cloneNode(true);
+        
+        notInButton.parentNode.replaceChild(newNotInButton, notInButton);
+        notInSkipButton.parentNode.replaceChild(newNotInSkipButton, notInSkipButton);
+        notInInput.parentNode.replaceChild(newNotInInput, notInInput);
+
+        newNotInButton.addEventListener('click', () => {
+            const letters = newNotInInput.value.toLowerCase();
             if (letters) {
                 filterWordsByNotIn(letters);
-                hideFeature('notIn');
-                showNextFeature();
+                callback(currentFilteredWords);
+                document.getElementById('notInFeature').classList.add('completed');
+                document.getElementById('notInFeature').dispatchEvent(new Event('completed'));
             }
         });
 
-        notInSkipButton.addEventListener('click', () => {
-            hideFeature('notIn');
-            showNextFeature();
+        newNotInSkipButton.addEventListener('click', () => {
+            callback(currentFilteredWords);
+            document.getElementById('notInFeature').classList.add('completed');
+            document.getElementById('notInFeature').dispatchEvent(new Event('completed'));
         });
 
         // Add enter key support
-        notInInput.addEventListener('keypress', (e) => {
+        newNotInInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
-                notInButton.click();
+                newNotInButton.click();
             }
         });
+
+        // Add touch events for mobile
+        newNotInButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            newNotInButton.click();
+        }, { passive: false });
+
+        newNotInSkipButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            newNotInSkipButton.click();
+        }, { passive: false });
     }
 }
 
