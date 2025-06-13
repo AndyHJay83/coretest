@@ -1501,13 +1501,22 @@ input:checked + .slider:before {
     overflow: hidden;
 }
 
-.available-features, .selected-features {
-    display: flex;
-    flex-direction: column;
+.available-features {
     background-color: #fafafa;
     border-radius: 8px;
     overflow: hidden;
-    height: 100%;
+    height: calc(100% + 100px);
+    display: flex;
+    flex-direction: column;
+}
+
+.selected-features {
+    background-color: #fafafa;
+    border-radius: 8px;
+    overflow: hidden;
+    height: calc(100% - 100px);
+    display: flex;
+    flex-direction: column;
 }
 
 .feature-header {
