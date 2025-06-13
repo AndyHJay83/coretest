@@ -1136,21 +1136,32 @@ function createLengthFeature() {
 }
 
 function createMostFrequentFeature() {
-    const div = document.createElement('div');
-    div.id = 'mostFrequentFeature';
-    div.className = 'feature-section';
-    div.innerHTML = `
-        <h2 class="feature-title">MOST FREQUENT</h2>
+    const feature = document.createElement('div');
+    feature.id = 'mostFrequentFeature';
+    feature.className = 'feature-section';
+    feature.style.display = 'none';
+    
+    feature.innerHTML = `
+        <h3>MOST FREQUENT</h3>
         <div class="frequent-letter-display">
-            <div class="letter">-</div>
+            <div class="letter">${mostFrequentLetter}</div>
         </div>
         <div class="button-container">
-            <button id="frequentYesBtn" class="yes-btn">YES</button>
-            <button id="frequentNoBtn" class="no-btn">NO</button>
-            <button id="frequentSkipButton" class="skip-button">SKIP</button>
+            <button type="button" id="mostFrequentYesBtn" class="yes-btn">YES</button>
+            <button type="button" id="mostFrequentNoBtn" class="no-btn">NO</button>
+            <button type="button" id="mostFrequentSkipButton" class="skip-button">SKIP</button>
         </div>
     `;
-    return div;
+    
+    // Add debug logging
+    console.log('Created MOST FREQUENT feature:', feature);
+    console.log('Button elements:', {
+        yesButton: feature.querySelector('#mostFrequentYesBtn'),
+        noButton: feature.querySelector('#mostFrequentNoBtn'),
+        skipButton: feature.querySelector('#mostFrequentSkipButton')
+    });
+    
+    return feature;
 }
 
 function createLeastFrequentFeature() {
@@ -1205,35 +1216,25 @@ function setupFeatureListeners(featureId, onComplete) {
     console.log('Setting up listeners for feature:', featureId);
     
     switch(featureId) {
-        case 'notInWord':
-            console.log('Setting up NOT IN WORD listeners');
-            const notInWordButton = document.getElementById('notInWordButton');
-            const notInWordSkipButton = document.getElementById('notInWordSkipButton');
-            const notInWordInput = document.getElementById('notInWordInput');
+        case 'mostFrequent':
+            console.log('Setting up MOST FREQUENT listeners');
+            const mostFrequentYesBtn = document.getElementById('mostFrequentYesBtn');
+            const mostFrequentNoBtn = document.getElementById('mostFrequentNoBtn');
+            const mostFrequentSkipButton = document.getElementById('mostFrequentSkipButton');
             
             console.log('Found elements:', {
-                button: notInWordButton,
-                skipButton: notInWordSkipButton,
-                input: notInWordInput
+                yesButton: mostFrequentYesBtn,
+                noButton: mostFrequentNoBtn,
+                skipButton: mostFrequentSkipButton
             });
 
-            if (notInWordButton) {
-                notInWordButton.onclick = function(e) {
-                    console.log('DONE button clicked');
+            if (mostFrequentYesBtn) {
+                mostFrequentYesBtn.onclick = function(e) {
+                    console.log('YES button clicked');
                     e.preventDefault();
-                    const letters = notInWordInput.value.trim().toLowerCase();
-                    if (!letters) {
-                        alert('Please enter at least one letter');
-                        return;
-                    }
-                    console.log('Filtering words without letters:', letters);
-                    console.log('Before filtering:', currentFilteredWords.length, 'words');
-                    
                     const filteredWords = currentFilteredWords.filter(word => 
-                        !letters.split('').some(letter => word.toLowerCase().includes(letter))
+                        word.includes(mostFrequentLetter)
                     );
-                    
-                    console.log('After filtering:', filteredWords.length, 'words');
                     if (filteredWords.length === 0) {
                         alert('No words remain after filtering. Please try different letters.');
                         return;
