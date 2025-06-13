@@ -2001,7 +2001,9 @@ function setupFeatureListeners(featureId, onComplete) {
             }
             
             if (leastFrequentYesBtn) {
-                const handleYesClick = () => {
+                const handleYesClick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     if (leastFrequentLetter && !leastFrequentYesBtn.disabled) {
                         const filteredWords = filterWordsByLeastFrequent(currentFilteredWords, leastFrequentLetter, true);
                         onComplete(filteredWords);
@@ -2010,15 +2012,14 @@ function setupFeatureListeners(featureId, onComplete) {
                     }
                 };
                 
-                leastFrequentYesBtn.onclick = handleYesClick;
-                leastFrequentYesBtn.ontouchstart = (e) => {
-                    e.preventDefault();
-                    handleYesClick();
-                };
+                leastFrequentYesBtn.addEventListener('click', handleYesClick, { passive: false });
+                leastFrequentYesBtn.addEventListener('touchstart', handleYesClick, { passive: false });
             }
             
             if (leastFrequentNoBtn) {
-                const handleNoClick = () => {
+                const handleNoClick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     if (leastFrequentLetter && !leastFrequentNoBtn.disabled) {
                         const filteredWords = filterWordsByLeastFrequent(currentFilteredWords, leastFrequentLetter, false);
                         onComplete(filteredWords);
@@ -2027,25 +2028,21 @@ function setupFeatureListeners(featureId, onComplete) {
                     }
                 };
                 
-                leastFrequentNoBtn.onclick = handleNoClick;
-                leastFrequentNoBtn.ontouchstart = (e) => {
-                    e.preventDefault();
-                    handleNoClick();
-                };
+                leastFrequentNoBtn.addEventListener('click', handleNoClick, { passive: false });
+                leastFrequentNoBtn.addEventListener('touchstart', handleNoClick, { passive: false });
             }
             
             if (leastFrequentSkipButton) {
-                const handleSkipClick = () => {
+                const handleSkipClick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     onComplete(currentFilteredWords);
                     document.getElementById('leastFrequentFeature').classList.add('completed');
                     document.getElementById('leastFrequentFeature').dispatchEvent(new Event('completed'));
                 };
                 
-                leastFrequentSkipButton.onclick = handleSkipClick;
-                leastFrequentSkipButton.ontouchstart = (e) => {
-                    e.preventDefault();
-                    handleSkipClick();
-                };
+                leastFrequentSkipButton.addEventListener('click', handleSkipClick, { passive: false });
+                leastFrequentSkipButton.addEventListener('touchstart', handleSkipClick, { passive: false });
             }
             break;
         }
@@ -2056,7 +2053,9 @@ function setupFeatureListeners(featureId, onComplete) {
             const notInWordSkipButton = document.getElementById('notInWordSkipButton');
             
             if (notInWordButton) {
-                const handleNotInWordClick = () => {
+                const handleNotInWordClick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     const letters = notInWordInput.value.toLowerCase();
                     console.log('Input letters:', letters);
                     console.log('Current wordlist size:', currentFilteredWords.length);
@@ -2092,15 +2091,14 @@ function setupFeatureListeners(featureId, onComplete) {
                     }
                 };
                 
-                notInWordButton.onclick = handleNotInWordClick;
-                notInWordButton.ontouchstart = (e) => {
-                    e.preventDefault();
-                    handleNotInWordClick();
-                };
+                notInWordButton.addEventListener('click', handleNotInWordClick, { passive: false });
+                notInWordButton.addEventListener('touchstart', handleNotInWordClick, { passive: false });
             }
             
             if (notInWordSkipButton) {
-                const handleSkipClick = () => {
+                const handleSkipClick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     onComplete(currentFilteredWords);
                     const featureElement = document.getElementById('notInWordFeature');
                     if (featureElement) {
@@ -2109,11 +2107,8 @@ function setupFeatureListeners(featureId, onComplete) {
                     }
                 };
                 
-                notInWordSkipButton.onclick = handleSkipClick;
-                notInWordSkipButton.ontouchstart = (e) => {
-                    e.preventDefault();
-                    handleSkipClick();
-                };
+                notInWordSkipButton.addEventListener('click', handleSkipClick, { passive: false });
+                notInWordSkipButton.addEventListener('touchstart', handleSkipClick, { passive: false });
             }
             
             if (notInWordInput) {
