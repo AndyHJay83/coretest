@@ -1554,7 +1554,7 @@ input:checked + .slider:before {
     }
     
     .available-features {
-        height: 80vh; /* Increased by another 20% */
+        height: 100vh; /* Full viewport height */
         display: flex;
         flex-direction: column;
         overflow: hidden;
@@ -1563,7 +1563,7 @@ input:checked + .slider:before {
     }
 
     .selected-features {
-        height: 60px; /* Shorter to match */
+        height: 40px; /* Very compact */
         display: flex;
         flex-direction: column;
         overflow: hidden;
