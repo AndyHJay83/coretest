@@ -3135,13 +3135,19 @@ function initializeFeatureSelection() {
                 }
             });
             
-            // Add touch event for mobile
+            // Add touch event for mobile with debounce
+            let touchTimeout;
             newButton.addEventListener('touchstart', (e) => {
                 e.preventDefault();
-                const featureType = newButton.dataset.feature;
-                if (!isFeatureAlreadySelected(featureType)) {
-                    addFeatureToSelected(featureType);
+                if (touchTimeout) {
+                    clearTimeout(touchTimeout);
                 }
+                touchTimeout = setTimeout(() => {
+                    const featureType = newButton.dataset.feature;
+                    if (!isFeatureAlreadySelected(featureType)) {
+                        addFeatureToSelected(featureType);
+                    }
+                }, 100);
             }, { passive: false });
         });
     }
@@ -3151,6 +3157,17 @@ function isFeatureAlreadySelected(featureType) {
     const selectedFeatures = document.getElementById('selectedFeaturesList');
     // Allow multiple instances of MOST FREQUENT and LEAST FREQUENT features
     if (featureType === 'mostFrequent' || featureType === 'leastFrequent') {
+        // Check if the feature was just added (within the last 500ms)
+        const lastAdded = selectedFeatures.getAttribute('lastAdded');
+        const lastAddedTime = selectedFeatures.getAttribute('lastAddedTime');
+        const now = Date.now();
+        
+        if (lastAdded === featureType && lastAddedTime && (now - parseInt(lastAddedTime)) < 500) {
+            return true;
+        }
+        
+        selectedFeatures.setAttribute('lastAdded', featureType);
+        selectedFeatures.setAttribute('lastAddedTime', now.toString());
         return false;
     }
     // For all other features, maintain the single instance rule
