@@ -1554,7 +1554,7 @@ input:checked + .slider:before {
     }
     
     .available-features {
-        height: 400px; /* Increased from 300px */
+        height: 60vh; /* Much taller to show all features */
         display: flex;
         flex-direction: column;
         overflow: hidden;
@@ -1563,7 +1563,7 @@ input:checked + .slider:before {
     }
 
     .selected-features {
-        height: 300px; /* Kept at 300px */
+        height: 140px; /* Shorter to compensate */
         display: flex;
         flex-direction: column;
         overflow: hidden;
@@ -1589,9 +1589,17 @@ input:checked + .slider:before {
         padding: 10px;
         display: flex;
         flex-wrap: wrap;
-        gap: 10px;
+        gap: 7.5px; /* Reduced gap by 25% from 10px */
         align-content: flex-start;
-        height: calc(100% - 45px); /* Subtract header height */
+        height: calc(100% - 45px);
+    }
+
+    .feature-group {
+        display: flex;
+        align-items: center;
+        gap: 3.75px; /* Reduced gap by 25% from 5px */
+        margin: 2px;
+        flex-shrink: 0;
     }
 }
 
