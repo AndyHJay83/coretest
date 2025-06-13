@@ -1000,7 +1000,7 @@ async function executeWorkflow(steps) {
             lengthFeature: createLengthFeature(),
             mostFrequentFeature: createMostFrequentFeature(),
             leastFrequentFeature: createLeastFrequentFeature(),
-            notIn: createNotInFeature(),
+            notInFeature: createNotInFeature(),
         };
         
         // Add all feature elements to the document body
