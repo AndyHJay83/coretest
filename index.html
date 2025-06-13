@@ -130,6 +130,10 @@
                                 <button class="feature-button" data-feature="leastFrequent" draggable="true">LEAST FREQUENT</button>
                                 <button class="info-button" data-feature="leastFrequent"><i class="fas fa-info-circle"></i></button>
                             </div>
+                            <div class="feature-group">
+                                <button class="feature-button" data-feature="notIn" draggable="true">NOT IN</button>
+                                <button class="info-button" data-feature="notIn"><i class="fas fa-info-circle"></i></button>
+                            </div>
                         </div>
                     </div>
 
@@ -317,6 +321,16 @@
                         <button id="leastFrequentSkipButton" class="skip-button">SKIP</button>
                     </div>
                 </div>
+
+                <!-- NOT IN feature -->
+                <div id="notInFeature" class="feature-section" style="display: none;">
+                    <h2 class="feature-title">NOT IN</h2>
+                    <div class="input-group">
+                        <input type="text" id="notInInput" placeholder="Enter letters...">
+                        <button id="notInButton">SUBMIT</button>
+                        <button id="notInSkipButton" class="skip-button">SKIP</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -426,6 +440,13 @@
             <div class="feature-info-content">
                 <h3>LEAST FREQUENT</h3>
                 <p><strong>Least Frequent Letter</strong><br>The least frequent letter in the combined wordlist. (Can be used more than once)</p>
+                <button class="close-info-button">&times;</button>
+            </div>
+        </div>
+        <div id="notInInfo" class="feature-info-modal">
+            <div class="feature-info-content">
+                <h3>NOT IN</h3>
+                <p><strong>Letters Not In Word</strong><br>Type in a string of letters. If all these letters are in the word, it will be removed from the wordlist.</p>
                 <button class="close-info-button">&times;</button>
             </div>
         </div>

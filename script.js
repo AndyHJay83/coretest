@@ -54,6 +54,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Display saved workflows
     displaySavedWorkflows();
+    
+    // Initialize NOT IN feature
+    initializeNotInFeature();
 });
 
 // Function to initialize dropdowns
@@ -996,7 +999,8 @@ async function executeWorkflow(steps) {
             curvedFeature: createCurvedFeature(),
             lengthFeature: createLengthFeature(),
             mostFrequentFeature: createMostFrequentFeature(),
-            leastFrequentFeature: createLeastFrequentFeature()
+            leastFrequentFeature: createLeastFrequentFeature(),
+            notIn: createNotInFeature(),
         };
         
         // Add all feature elements to the document body
@@ -1347,12 +1351,10 @@ function createMostFrequentFeature() {
 }
 
 function createLeastFrequentFeature() {
-    const featureDiv = document.createElement('div');
-    featureDiv.id = 'leastFrequentFeature';
-    featureDiv.className = 'feature-section';
-    featureDiv.style.display = 'none';
-    
-    featureDiv.innerHTML = `
+    const div = document.createElement('div');
+    div.id = 'leastFrequentFeature';
+    div.className = 'feature-section';
+    div.innerHTML = `
         <h2 class="feature-title">LEAST FREQUENT</h2>
         <div class="frequent-letter-display">
             <div class="letter">-</div>
@@ -1363,8 +1365,22 @@ function createLeastFrequentFeature() {
             <button id="leastFrequentSkipButton" class="skip-button">SKIP</button>
         </div>
     `;
-    
-    return featureDiv;
+    return div;
+}
+
+function createNotInFeature() {
+    const div = document.createElement('div');
+    div.id = 'notInFeature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">NOT IN</h2>
+        <div class="input-group">
+            <input type="text" id="notInInput" placeholder="Enter letters...">
+            <button id="notInButton">SUBMIT</button>
+            <button id="notInSkipButton" class="skip-button">SKIP</button>
+        </div>
+    `;
+    return div;
 }
 
 // Function to setup feature listeners
@@ -2052,6 +2068,36 @@ function setupFeatureListeners(feature, callback) {
             }
             break;
         }
+
+        case 'notIn': {
+            const notInButton = document.getElementById('notInButton');
+            const notInSkipButton = document.getElementById('notInSkipButton');
+            const notInInput = document.getElementById('notInInput');
+
+            if (notInButton && notInInput && notInSkipButton) {
+                notInButton.addEventListener('click', () => {
+                    const letters = notInInput.value.toLowerCase();
+                    if (letters) {
+                        filterWordsByNotIn(letters);
+                        hideFeature('notIn');
+                        showNextFeature();
+                    }
+                });
+
+                notInSkipButton.addEventListener('click', () => {
+                    hideFeature('notIn');
+                    showNextFeature();
+                });
+
+                // Add enter key support
+                notInInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        notInButton.click();
+                    }
+                });
+            }
+            break;
+        }
     }
 }
 
@@ -2225,7 +2271,8 @@ function showNextFeature() {
         'eeeFirstFeature',
         'lengthFeature',
         'mostFrequentFeature',
-        'leastFrequentFeature'
+        'leastFrequentFeature',
+        'notInFeature',
     ];
     
     // Hide all features first
@@ -2263,6 +2310,9 @@ function showNextFeature() {
     }
     else if (!document.getElementById('leastFrequentFeature').classList.contains('completed')) {
         document.getElementById('leastFrequentFeature').style.display = 'block';
+    }
+    else if (!document.getElementById('notInFeature').classList.contains('completed')) {
+        document.getElementById('notInFeature').style.display = 'block';
     }
     else {
         expandWordList();
@@ -2308,7 +2358,8 @@ function resetApp() {
         'eeeFirstFeature',
         'lengthFeature',
         'mostFrequentFeature',
-        'leastFrequentFeature'
+        'leastFrequentFeature',
+        'notInFeature',
     ];
     
     features.forEach(featureId => {
@@ -2323,6 +2374,7 @@ function resetApp() {
     document.getElementById('position1Input').value = '';
     document.getElementById('originalLexInput').value = '';
     document.getElementById('lexiconInput').value = '';
+    document.getElementById('notInInput').value = '';
     
     // Show the first feature (consonant question)
     document.getElementById('consonantQuestion').style.display = 'block';
@@ -3783,4 +3835,49 @@ function addFeatureToSelected(featureType) {
     }, { passive: false });
     
     selectedFeatures.appendChild(selectedFeature);
+}
+
+// Add NOT IN feature to the featureElements object
+const featureElements = {
+    // ... existing features ...
+    notIn: createNotInFeature(),
+};
+
+// Add NOT IN feature handlers
+function initializeNotInFeature() {
+    const notInButton = document.getElementById('notInButton');
+    const notInInput = document.getElementById('notInInput');
+    const notInSkipButton = document.getElementById('notInSkipButton');
+
+    if (notInButton && notInInput && notInSkipButton) {
+        notInButton.addEventListener('click', () => {
+            const letters = notInInput.value.toLowerCase();
+            if (letters) {
+                filterWordsByNotIn(letters);
+                hideFeature('notIn');
+                showNextFeature();
+            }
+        });
+
+        notInSkipButton.addEventListener('click', () => {
+            hideFeature('notIn');
+            showNextFeature();
+        });
+
+        // Add enter key support
+        notInInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                notInButton.click();
+            }
+        });
+    }
+}
+
+function filterWordsByNotIn(letters) {
+    const letterSet = new Set(letters.toLowerCase());
+    currentFilteredWords = currentFilteredWords.filter(word => {
+        // Check if any of the letters are in the word
+        return !Array.from(letterSet).every(letter => word.toLowerCase().includes(letter));
+    });
+    displayResults(currentFilteredWords);
 }
