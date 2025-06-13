@@ -1553,8 +1553,17 @@ input:checked + .slider:before {
         gap: 10px;
     }
     
-    .available-features, .selected-features {
-        height: 300px;
+    .available-features {
+        height: 400px; /* Increased from 300px */
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        background-color: #fafafa;
+        border-radius: 8px;
+    }
+
+    .selected-features {
+        height: 300px; /* Kept at 300px */
         display: flex;
         flex-direction: column;
         overflow: hidden;
@@ -1583,14 +1592,6 @@ input:checked + .slider:before {
         gap: 10px;
         align-content: flex-start;
         height: calc(100% - 45px); /* Subtract header height */
-    }
-
-    .feature-group {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        margin: 2px;
-        flex-shrink: 0;
     }
 }
 
