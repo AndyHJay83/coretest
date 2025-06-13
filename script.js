@@ -242,43 +242,38 @@ function initializeDropdowns() {
 // Function to setup button listeners
 function setupButtonListeners() {
     // Create Workflow button
-    const createWorkflowButton = document.getElementById('createWorkflowButton');
     if (createWorkflowButton) {
         createWorkflowButton.replaceWith(createWorkflowButton.cloneNode(true));
         const newCreateWorkflowButton = document.getElementById('createWorkflowButton');
-        newCreateWorkflowButton.addEventListener('click', showWorkflowCreation);
+        newCreateWorkflowButton.addEventListener('click', () => {
+            document.getElementById('homepage').style.display = 'none';
+            document.getElementById('workflowCreation').style.display = 'block';
+        });
         newCreateWorkflowButton.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            showWorkflowCreation();
+            newCreateWorkflowButton.click();
         }, { passive: false });
     }
-    
-    // Toggle Saved Workflows button
-    const toggleSavedWorkflowsButton = document.getElementById('toggleSavedWorkflows');
-    if (toggleSavedWorkflowsButton) {
-        toggleSavedWorkflowsButton.replaceWith(toggleSavedWorkflowsButton.cloneNode(true));
-        const newToggleButton = document.getElementById('toggleSavedWorkflows');
-        newToggleButton.addEventListener('click', toggleSavedWorkflows);
-        newToggleButton.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            toggleSavedWorkflows();
-        }, { passive: false });
-    }
-    
+
     // Cancel Workflow button
-    const cancelWorkflowButton = document.getElementById('cancelWorkflowButton');
     if (cancelWorkflowButton) {
         cancelWorkflowButton.replaceWith(cancelWorkflowButton.cloneNode(true));
         const newCancelWorkflowButton = document.getElementById('cancelWorkflowButton');
-        newCancelWorkflowButton.addEventListener('click', hideWorkflowCreation);
+        newCancelWorkflowButton.addEventListener('click', () => {
+            document.getElementById('workflowCreation').style.display = 'none';
+            document.getElementById('homepage').style.display = 'block';
+            document.getElementById('workflowName').value = '';
+            document.querySelectorAll('.feature-checkbox').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+        });
         newCancelWorkflowButton.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            hideWorkflowCreation();
+            newCancelWorkflowButton.click();
         }, { passive: false });
     }
-    
+
     // Save Workflow button
-    const saveWorkflowButton = document.getElementById('saveWorkflowButton');
     if (saveWorkflowButton) {
         saveWorkflowButton.replaceWith(saveWorkflowButton.cloneNode(true));
         const newSaveWorkflowButton = document.getElementById('saveWorkflowButton');
@@ -288,9 +283,8 @@ function setupButtonListeners() {
             saveWorkflow();
         }, { passive: false });
     }
-    
+
     // Perform button
-    const performButton = document.getElementById('performButton');
     if (performButton) {
         performButton.replaceWith(performButton.cloneNode(true));
         const newPerformButton = document.getElementById('performButton');
@@ -2968,7 +2962,12 @@ function initializeFeatures() {
 const style = document.createElement('style');
 style.textContent = `
     .button-container button,
-    .feature-section button {
+    .feature-section button,
+    .perform-button,
+    .create-button,
+    .cancel-button,
+    .save-workflow-button,
+    .toggle-saved-workflows {
         -webkit-tap-highlight-color: transparent;
         touch-action: manipulation;
         cursor: pointer;
@@ -2987,13 +2986,23 @@ style.textContent = `
     }
 
     .button-container button:active,
-    .feature-section button:active {
+    .feature-section button:active,
+    .perform-button:active,
+    .create-button:active,
+    .cancel-button:active,
+    .save-workflow-button:active,
+    .toggle-saved-workflows:active {
         transform: scale(0.95);
         background-color: #45a049;
     }
 
     .button-container button:disabled,
-    .feature-section button:disabled {
+    .feature-section button:disabled,
+    .perform-button:disabled,
+    .create-button:disabled,
+    .cancel-button:disabled,
+    .save-workflow-button:disabled,
+    .toggle-saved-workflows:disabled {
         background-color: #cccccc;
         cursor: not-allowed;
         transform: none;
@@ -3011,6 +3020,30 @@ style.textContent = `
         background-color: #2196F3;
     }
 
+    .perform-button {
+        background-color: #4CAF50;
+        width: 100%;
+        margin: 20px 0;
+    }
+
+    .create-button {
+        background-color: #2196F3;
+        width: 100%;
+        margin: 10px 0;
+    }
+
+    .cancel-button {
+        background-color: #f44336;
+    }
+
+    .save-workflow-button {
+        background-color: #4CAF50;
+    }
+
+    .toggle-saved-workflows {
+        background-color: #2196F3;
+    }
+
     .input-group {
         display: flex;
         gap: 10px;
@@ -3025,5 +3058,25 @@ style.textContent = `
         border-radius: 4px;
         min-height: 44px;
     }
+
+    @media (max-width: 600px) {
+        .button-container button,
+        .feature-section button,
+        .perform-button,
+        .create-button,
+        .cancel-button,
+        .save-workflow-button,
+        .toggle-saved-workflows {
+            min-height: 48px;
+            min-width: 48px;
+            padding: 14px 24px;
+            font-size: 18px;
+        }
+    }
 `;
 document.head.appendChild(style);
+
+// Call setupButtonListeners when the DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    setupButtonListeners();
+});
