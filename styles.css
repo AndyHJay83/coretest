@@ -1554,7 +1554,7 @@ input:checked + .slider:before {
     }
     
     .available-features {
-        height: 60vh; /* Much taller to show all features */
+        height: 80vh; /* Increased by another 20% */
         display: flex;
         flex-direction: column;
         overflow: hidden;
@@ -1563,7 +1563,7 @@ input:checked + .slider:before {
     }
 
     .selected-features {
-        height: 140px; /* Shorter to compensate */
+        height: 60px; /* Shorter to match */
         display: flex;
         flex-direction: column;
         overflow: hidden;
@@ -1589,7 +1589,7 @@ input:checked + .slider:before {
         padding: 10px;
         display: flex;
         flex-wrap: wrap;
-        gap: 7.5px; /* Reduced gap by 25% from 10px */
+        gap: 7.5px;
         align-content: flex-start;
         height: calc(100% - 45px);
     }
@@ -1597,7 +1597,7 @@ input:checked + .slider:before {
     .feature-group {
         display: flex;
         align-items: center;
-        gap: 3.75px; /* Reduced gap by 25% from 5px */
+        gap: 3.75px;
         margin: 2px;
         flex-shrink: 0;
     }
