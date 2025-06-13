@@ -3123,21 +3123,22 @@ function initializeFeatureSelection() {
         const featureButtons = availableFeatures.querySelectorAll('.feature-button');
         
         featureButtons.forEach(button => {
-            // Remove drag events
-            button.draggable = false;
+            // Remove existing event listeners
+            const newButton = button.cloneNode(true);
+            button.parentNode.replaceChild(newButton, button);
             
             // Add click event
-            button.addEventListener('click', () => {
-                const featureType = button.dataset.feature;
+            newButton.addEventListener('click', () => {
+                const featureType = newButton.dataset.feature;
                 if (!isFeatureAlreadySelected(featureType)) {
                     addFeatureToSelected(featureType);
                 }
             });
             
             // Add touch event for mobile
-            button.addEventListener('touchstart', (e) => {
+            newButton.addEventListener('touchstart', (e) => {
                 e.preventDefault();
-                const featureType = button.dataset.feature;
+                const featureType = newButton.dataset.feature;
                 if (!isFeatureAlreadySelected(featureType)) {
                     addFeatureToSelected(featureType);
                 }
@@ -3160,6 +3161,8 @@ function addFeatureToSelected(featureType) {
     const selectedFeatures = document.getElementById('selectedFeaturesList');
     const featureButton = document.querySelector(`.feature-button[data-feature="${featureType}"]`);
     
+    if (!featureButton) return;
+    
     const selectedFeature = document.createElement('div');
     selectedFeature.className = 'selected-feature-item';
     selectedFeature.dataset.feature = featureType;
@@ -3172,7 +3175,7 @@ function addFeatureToSelected(featureType) {
     removeButton.className = 'remove-feature';
     removeButton.textContent = '×';
     removeButton.onclick = (e) => {
-        e.stopPropagation(); // Prevent the click from bubbling up
+        e.stopPropagation();
         selectedFeature.remove();
     };
     selectedFeature.appendChild(removeButton);
@@ -3195,12 +3198,8 @@ function addFeatureToSelected(featureType) {
     selectedFeatures.appendChild(selectedFeature);
 }
 
-function removeFeature(featureType) {
-    const selectedFeature = document.querySelector(`.selected-feature-item[data-feature="${featureType}"]`);
-    if (selectedFeature) {
-        selectedFeature.remove();
-    }
-}
+// Remove the duplicate addFeatureToList function since we're using addFeatureToSelected
+// ... existing code ...
 
 // Initialize feature selection when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
