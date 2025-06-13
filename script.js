@@ -3920,8 +3920,8 @@ function initializeNotInFeature() {
 function filterWordsByNotIn(letters) {
     const letterSet = new Set(letters.toLowerCase());
     currentFilteredWords = currentFilteredWords.filter(word => {
-        // Check if any of the letters are in the word
-        return !Array.from(letterSet).every(letter => word.toLowerCase().includes(letter));
+        // Check if ANY of the letters are in the word
+        return !Array.from(letterSet).some(letter => word.toLowerCase().includes(letter));
     });
     displayResults(currentFilteredWords);
 }
