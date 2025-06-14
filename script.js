@@ -900,6 +900,10 @@ async function loadWordList() {
 // Function to execute workflow
 async function executeWorkflow(steps) {
     try {
+        // Get the currently selected wordlist
+        const wordlistSelect = document.getElementById('wordlistSelect');
+        const selectedWordlist = wordlistSelect.value;
+        
         // Load the wordlist first
         await loadWordList();
         currentFilteredWords = [...wordList]; // Start with the full wordlist
@@ -921,6 +925,7 @@ async function executeWorkflow(steps) {
         usedLettersInWorkflow = [];
         
         console.log('Starting workflow with steps:', steps);
+        console.log('Using wordlist:', selectedWordlist);
         
         // Hide homepage and show workflow execution
         const homepage = document.getElementById('homepage');
