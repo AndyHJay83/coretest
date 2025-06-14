@@ -47,6 +47,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     const savedWorkflows = localStorage.getItem('workflows');
     if (savedWorkflows) {
         workflows = JSON.parse(savedWorkflows);
+        // Set the most recent workflow as default if there are any workflows
+        if (workflows.length > 0) {
+            const mostRecentWorkflow = workflows[workflows.length - 1];
+            workflowSelect.value = mostRecentWorkflow.name;
+            const workflowCustomSelect = document.getElementById('workflowCustomSelect');
+            if (workflowCustomSelect) {
+                const selectedText = workflowCustomSelect.querySelector('.selected-text');
+                if (selectedText) {
+                    selectedText.textContent = mostRecentWorkflow.name;
+                }
+            }
+        }
     }
     
     // Initialize dropdowns and button listeners
