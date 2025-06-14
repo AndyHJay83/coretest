@@ -134,6 +134,10 @@
                                 <button class="feature-button" data-feature="notIn" draggable="true">NOT IN</button>
                                 <button class="info-button" data-feature="notIn"><i class="fas fa-info-circle"></i></button>
                             </div>
+                            <div class="feature-group">
+                                <button class="feature-button" data-feature="abcde" draggable="true">ABCDE</button>
+                                <button class="info-button" data-feature="abcde"><i class="fas fa-info-circle"></i></button>
+                            </div>
                         </div>
                     </div>
 
@@ -331,6 +335,37 @@
                         <button id="notInSkipButton" class="skip-button">SKIP</button>
                     </div>
                 </div>
+
+                <!-- ABCDE feature -->
+                <div id="abcdeFeature" class="feature-section" style="display: none;">
+                    <h2 class="feature-title">ABCDE</h2>
+                    <div class="abcde-row" style="display: flex; justify-content: center; gap: 10px;">
+                        <div class="abcde-letter-group" data-letter="A">
+                            <div class="abcde-letter">A</div>
+                            <button class="abcde-yes-btn" data-letter="A">YES</button>
+                        </div>
+                        <div class="abcde-letter-group" data-letter="B">
+                            <div class="abcde-letter">B</div>
+                            <button class="abcde-yes-btn" data-letter="B">YES</button>
+                        </div>
+                        <div class="abcde-letter-group" data-letter="C">
+                            <div class="abcde-letter">C</div>
+                            <button class="abcde-yes-btn" data-letter="C">YES</button>
+                        </div>
+                        <div class="abcde-letter-group" data-letter="D">
+                            <div class="abcde-letter">D</div>
+                            <button class="abcde-yes-btn" data-letter="D">YES</button>
+                        </div>
+                        <div class="abcde-letter-group" data-letter="E">
+                            <div class="abcde-letter">E</div>
+                            <button class="abcde-yes-btn" data-letter="E">YES</button>
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center; margin-top: 20px; gap: 10px;">
+                        <button id="abcdeDoneButton">DONE</button>
+                        <button id="abcdeSkipButton" class="skip-button">SKIP</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -447,6 +482,13 @@
             <div class="feature-info-content">
                 <h3>NOT IN</h3>
                 <p><strong>Letters Not In Word</strong><br>Type in a string of letters. If all these letters are in the word, it will be removed from the wordlist.</p>
+                <button class="close-info-button">&times;</button>
+            </div>
+        </div>
+        <div id="abcdeInfo" class="feature-info-modal">
+            <div class="feature-info-content">
+                <h3>ABCDE</h3>
+                <p>Are there the letters A-E within the word? Answer YES for individual letters, then DONE to confirm.</p>
                 <button class="close-info-button">&times;</button>
             </div>
         </div>
