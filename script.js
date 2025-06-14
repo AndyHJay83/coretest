@@ -28,6 +28,205 @@ let letterFrequencyMap = new Map();  // Store frequency of all letters
 let workflows = JSON.parse(localStorage.getItem('workflows')) || [];
 let currentWorkflow = null;
 
+// Function to execute workflow
+async function executeWorkflow(steps) {
+    try {
+        // Get the currently selected wordlist
+        const wordlistSelect = document.getElementById('wordlistSelect');
+        const selectedWordlist = wordlistSelect.value;
+        console.log('Selected wordlist:', selectedWordlist);
+        
+        // Load the wordlist first and wait for it to complete
+        await loadWordList();
+        console.log('Wordlist loaded, word count:', wordList.length);
+        
+        // Reset all feature states
+        currentFilteredWords = [...wordList]; // Start with the full wordlist
+        lexiconCompleted = false;
+        originalLexCompleted = false;
+        eeeCompleted = false;
+        hasAdjacentConsonants = null;
+        hasO = null;
+        selectedCurvedLetter = null;
+        currentVowelIndex = 0;
+        uniqueVowels = [];
+        currentFilteredWordsForVowels = [];
+        currentPosition1Word = '';
+        leastFrequentLetter = null;  // Reset least frequent letter state
+        
+        // Reset used letters at the start of a new workflow
+        usedLettersInWorkflow = [];
+        
+        console.log('Starting workflow with steps:', steps);
+        console.log('Using wordlist:', selectedWordlist);
+        console.log('Current word count:', currentFilteredWords.length);
+        
+        // Hide homepage and show workflow execution
+        const homepage = document.getElementById('homepage');
+        const workflowExecution = document.getElementById('workflowExecution');
+        
+        if (homepage) {
+            homepage.style.display = 'none';
+        }
+        
+        if (workflowExecution) {
+            workflowExecution.style.display = 'flex';
+            workflowExecution.style.flexDirection = 'column';
+            workflowExecution.style.height = '100vh';
+        }
+
+        // Add home button if it doesn't exist
+        let homeButton = document.getElementById('homeButton');
+        if (!homeButton) {
+            homeButton = document.createElement('button');
+            homeButton.id = 'homeButton';
+            homeButton.className = 'home-button';
+            homeButton.innerHTML = '⌂';
+            homeButton.title = 'Return to Home';
+            
+            // Function to handle home button action
+            const handleHomeAction = () => {
+                // Hide workflow execution
+                if (workflowExecution) {
+                    workflowExecution.style.display = 'none';
+                }
+                // Show homepage
+                if (homepage) {
+                    homepage.style.display = 'block';
+                }
+                // Remove reset button if it exists
+                const resetButton = document.getElementById('resetWorkflowButton');
+                if (resetButton) {
+                    resetButton.remove();
+                }
+                // Remove home button
+                homeButton.remove();
+            };
+            
+            // Add both click and touch events
+            homeButton.addEventListener('click', handleHomeAction);
+            homeButton.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                handleHomeAction();
+            }, { passive: false });
+            
+            // Insert home button next to the header
+            const header = document.querySelector('.header');
+            if (header) {
+                header.insertBefore(homeButton, header.firstChild);
+            }
+        }
+
+        // Add reset button if it doesn't exist
+        let resetButton = document.getElementById('resetWorkflowButton');
+        if (!resetButton) {
+            resetButton = document.createElement('button');
+            resetButton.id = 'resetWorkflowButton';
+            resetButton.className = 'reset-workflow-button';
+            resetButton.innerHTML = '↺';
+            resetButton.title = 'Reset Workflow';
+            
+            // Function to handle reset action
+            const handleResetAction = () => {
+                if (currentWorkflow) {
+                    executeWorkflow(currentWorkflow.steps);
+                }
+            };
+            
+            // Add both click and touch events
+            resetButton.addEventListener('click', handleResetAction);
+            resetButton.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                handleResetAction();
+            }, { passive: false });
+            
+            document.body.appendChild(resetButton);
+        }
+        
+        // Store current workflow for reset functionality
+        currentWorkflow = { steps };
+        
+        // Create feature elements if they don't exist
+        const featureElements = {
+            position1Feature: createPosition1Feature(),
+            vowelFeature: createVowelFeature(),
+            oFeature: createOFeature(),
+            lexiconFeature: createLexiconFeature(),
+            eeeFeature: createEeeFeature(),
+            eeeFirstFeature: createEeeFirstFeature(),
+            originalLexFeature: createOriginalLexFeature(),
+            consonantQuestion: createConsonantQuestion(),
+            colour3Feature: createColour3Feature(),
+            shapeFeature: createShapeFeature(),
+            curvedFeature: createCurvedFeature(),
+            lengthFeature: createLengthFeature(),
+            mostFrequentFeature: createMostFrequentFeature(),
+            leastFrequentFeature: createLeastFrequentFeature(),
+            notInFeature: createNotInFeature(),
+            abcde: createAbcdeFeature(),
+        };
+        
+        // Add all feature elements to the document body
+        Object.values(featureElements).forEach(element => {
+            if (element) {
+                if (element.parentNode) {
+                    element.parentNode.removeChild(element);
+                }
+                document.body.appendChild(element);
+                element.style.display = 'none';
+                element.classList.remove('completed');
+            }
+        });
+        
+        // Get or create the feature area and results container
+        let featureArea = document.getElementById('featureArea');
+        let resultsContainer = document.getElementById('results');
+        
+        if (!featureArea) {
+            featureArea = document.createElement('div');
+            featureArea.id = 'featureArea';
+            featureArea.className = 'feature-area';
+            workflowExecution.insertBefore(featureArea, workflowExecution.firstChild);
+        }
+        
+        if (!resultsContainer) {
+            resultsContainer = document.createElement('div');
+            resultsContainer.id = 'results';
+            resultsContainer.className = 'results-container';
+            workflowExecution.appendChild(resultsContainer);
+        }
+        
+        // Clear previous results
+        resultsContainer.innerHTML = '';
+        
+        // Display initial word count
+        updateWordCount(currentFilteredWords.length);
+        
+        // Process each step in the workflow
+        for (const step of steps) {
+            const featureElement = featureElements[step.toLowerCase() + 'Feature'];
+            if (featureElement) {
+                featureElement.style.display = 'block';
+                await new Promise(resolve => {
+                    const handleFeatureComplete = () => {
+                        featureElement.style.display = 'none';
+                        featureElement.classList.add('completed');
+                        resolve();
+                    };
+                    setupFeatureListeners(featureElement, handleFeatureComplete);
+                });
+            }
+        }
+        
+        // Show final results
+        displayResults(currentFilteredWords);
+        
+    } catch (error) {
+        console.error('Error executing workflow:', error);
+        throw error;
+    }
+}
+
 // DOM Elements
 const createWorkflowButton = document.getElementById('createWorkflowButton');
 const cancelWorkflowButton = document.getElementById('cancelWorkflowButton');
