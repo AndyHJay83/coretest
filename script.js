@@ -2251,7 +2251,9 @@ function setupFeatureListeners(feature, callback) {
                 doneBtn.onclick = () => {
                     const filteredWords = filterWordsByAbcde(currentFilteredWords, yesLetters);
                     callback(filteredWords);
-                    document.getElementById('abcdeFeature').dispatchEvent(new Event('completed'));
+                    const featureDiv = document.getElementById('abcdeFeature');
+                    featureDiv.classList.add('completed');
+                    featureDiv.dispatchEvent(new Event('completed'));
                 };
                 doneBtn.addEventListener('touchstart', function(e) {
                     e.preventDefault();
@@ -2261,7 +2263,9 @@ function setupFeatureListeners(feature, callback) {
             if (skipBtn) {
                 skipBtn.onclick = () => {
                     callback(currentFilteredWords);
-                    document.getElementById('abcdeFeature').dispatchEvent(new Event('completed'));
+                    const featureDiv = document.getElementById('abcdeFeature');
+                    featureDiv.classList.add('completed');
+                    featureDiv.dispatchEvent(new Event('completed'));
                 };
                 skipBtn.addEventListener('touchstart', function(e) {
                     e.preventDefault();
