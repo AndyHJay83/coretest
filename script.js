@@ -28,205 +28,6 @@ let letterFrequencyMap = new Map();  // Store frequency of all letters
 let workflows = JSON.parse(localStorage.getItem('workflows')) || [];
 let currentWorkflow = null;
 
-// Function to execute workflow
-async function executeWorkflow(steps) {
-    try {
-        // Get the currently selected wordlist
-        const wordlistSelect = document.getElementById('wordlistSelect');
-        const selectedWordlist = wordlistSelect.value;
-        console.log('Selected wordlist:', selectedWordlist);
-        
-        // Load the wordlist first and wait for it to complete
-        await loadWordList();
-        console.log('Wordlist loaded, word count:', wordList.length);
-        
-        // Reset all feature states
-        currentFilteredWords = [...wordList]; // Start with the full wordlist
-        lexiconCompleted = false;
-        originalLexCompleted = false;
-        eeeCompleted = false;
-        hasAdjacentConsonants = null;
-        hasO = null;
-        selectedCurvedLetter = null;
-        currentVowelIndex = 0;
-        uniqueVowels = [];
-        currentFilteredWordsForVowels = [];
-        currentPosition1Word = '';
-        leastFrequentLetter = null;  // Reset least frequent letter state
-        
-        // Reset used letters at the start of a new workflow
-        usedLettersInWorkflow = [];
-        
-        console.log('Starting workflow with steps:', steps);
-        console.log('Using wordlist:', selectedWordlist);
-        console.log('Current word count:', currentFilteredWords.length);
-        
-        // Hide homepage and show workflow execution
-        const homepage = document.getElementById('homepage');
-        const workflowExecution = document.getElementById('workflowExecution');
-        
-        if (homepage) {
-            homepage.style.display = 'none';
-        }
-        
-        if (workflowExecution) {
-            workflowExecution.style.display = 'flex';
-            workflowExecution.style.flexDirection = 'column';
-            workflowExecution.style.height = '100vh';
-        }
-
-        // Add home button if it doesn't exist
-        let homeButton = document.getElementById('homeButton');
-        if (!homeButton) {
-            homeButton = document.createElement('button');
-            homeButton.id = 'homeButton';
-            homeButton.className = 'home-button';
-            homeButton.innerHTML = '⌂';
-            homeButton.title = 'Return to Home';
-            
-            // Function to handle home button action
-            const handleHomeAction = () => {
-                // Hide workflow execution
-                if (workflowExecution) {
-                    workflowExecution.style.display = 'none';
-                }
-                // Show homepage
-                if (homepage) {
-                    homepage.style.display = 'block';
-                }
-                // Remove reset button if it exists
-                const resetButton = document.getElementById('resetWorkflowButton');
-                if (resetButton) {
-                    resetButton.remove();
-                }
-                // Remove home button
-                homeButton.remove();
-            };
-            
-            // Add both click and touch events
-            homeButton.addEventListener('click', handleHomeAction);
-            homeButton.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                handleHomeAction();
-            }, { passive: false });
-            
-            // Insert home button next to the header
-            const header = document.querySelector('.header');
-            if (header) {
-                header.insertBefore(homeButton, header.firstChild);
-            }
-        }
-
-        // Add reset button if it doesn't exist
-        let resetButton = document.getElementById('resetWorkflowButton');
-        if (!resetButton) {
-            resetButton = document.createElement('button');
-            resetButton.id = 'resetWorkflowButton';
-            resetButton.className = 'reset-workflow-button';
-            resetButton.innerHTML = '↺';
-            resetButton.title = 'Reset Workflow';
-            
-            // Function to handle reset action
-            const handleResetAction = () => {
-                if (currentWorkflow) {
-                    executeWorkflow(currentWorkflow.steps);
-                }
-            };
-            
-            // Add both click and touch events
-            resetButton.addEventListener('click', handleResetAction);
-            resetButton.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                handleResetAction();
-            }, { passive: false });
-            
-            document.body.appendChild(resetButton);
-        }
-        
-        // Store current workflow for reset functionality
-        currentWorkflow = { steps };
-        
-        // Create feature elements if they don't exist
-        const featureElements = {
-            position1Feature: createPosition1Feature(),
-            vowelFeature: createVowelFeature(),
-            oFeature: createOFeature(),
-            lexiconFeature: createLexiconFeature(),
-            eeeFeature: createEeeFeature(),
-            eeeFirstFeature: createEeeFirstFeature(),
-            originalLexFeature: createOriginalLexFeature(),
-            consonantQuestion: createConsonantQuestion(),
-            colour3Feature: createColour3Feature(),
-            shapeFeature: createShapeFeature(),
-            curvedFeature: createCurvedFeature(),
-            lengthFeature: createLengthFeature(),
-            mostFrequentFeature: createMostFrequentFeature(),
-            leastFrequentFeature: createLeastFrequentFeature(),
-            notInFeature: createNotInFeature(),
-            abcde: createAbcdeFeature(),
-        };
-        
-        // Add all feature elements to the document body
-        Object.values(featureElements).forEach(element => {
-            if (element) {
-                if (element.parentNode) {
-                    element.parentNode.removeChild(element);
-                }
-                document.body.appendChild(element);
-                element.style.display = 'none';
-                element.classList.remove('completed');
-            }
-        });
-        
-        // Get or create the feature area and results container
-        let featureArea = document.getElementById('featureArea');
-        let resultsContainer = document.getElementById('results');
-        
-        if (!featureArea) {
-            featureArea = document.createElement('div');
-            featureArea.id = 'featureArea';
-            featureArea.className = 'feature-area';
-            workflowExecution.insertBefore(featureArea, workflowExecution.firstChild);
-        }
-        
-        if (!resultsContainer) {
-            resultsContainer = document.createElement('div');
-            resultsContainer.id = 'results';
-            resultsContainer.className = 'results-container';
-            workflowExecution.appendChild(resultsContainer);
-        }
-        
-        // Clear previous results
-        resultsContainer.innerHTML = '';
-        
-        // Display initial word count
-        updateWordCount(currentFilteredWords.length);
-        
-        // Process each step in the workflow
-        for (const step of steps) {
-            const featureElement = featureElements[step.toLowerCase() + 'Feature'];
-            if (featureElement) {
-                featureElement.style.display = 'block';
-                await new Promise(resolve => {
-                    const handleFeatureComplete = () => {
-                        featureElement.style.display = 'none';
-                        featureElement.classList.add('completed');
-                        resolve();
-                    };
-                    setupFeatureListeners(featureElement, handleFeatureComplete);
-                });
-            }
-        }
-        
-        // Show final results
-        displayResults(currentFilteredWords);
-        
-    } catch (error) {
-        console.error('Error executing workflow:', error);
-        throw error;
-    }
-}
-
 // DOM Elements
 const createWorkflowButton = document.getElementById('createWorkflowButton');
 const cancelWorkflowButton = document.getElementById('cancelWorkflowButton');
@@ -1083,26 +884,6 @@ async function loadWordList() {
         console.log('Selected wordlist value:', selectedWordlist);
         let wordlistPath;
         
-        // Show loading indicator
-        const resultsContainer = document.getElementById('results');
-        if (resultsContainer) {
-            resultsContainer.innerHTML = '<div class="loading">Loading wordlist...</div>';
-        }
-
-        // Check cache first
-        const cacheKey = `wordlist_${selectedWordlist}`;
-        const cachedData = localStorage.getItem(cacheKey);
-        if (cachedData) {
-            console.log('Loading from cache');
-            wordList = JSON.parse(cachedData);
-            currentFilteredWords = [...wordList];
-            currentWordlistForVowels = [...wordList];
-            if (resultsContainer) {
-                resultsContainer.innerHTML = '';
-            }
-            return wordList;
-        }
-        
         switch(selectedWordlist) {
             case '19127':
                 wordlistPath = 'words/19127.txt';
@@ -1111,7 +892,7 @@ async function loadWordList() {
                 wordlistPath = 'words/EmotionsJobsSpiritAnimals.txt';
                 break;
             case '134k':
-                wordlistPath = 'words/134K.txt.gz';  // Use compressed version
+                wordlistPath = 'words/134K.txt';
                 break;
             case 'enuk':
             default:
@@ -1125,74 +906,1513 @@ async function loadWordList() {
         if (!response.ok) {
             throw new Error('Failed to load wordlist');
         }
-
-        // Get the content type to determine if we need to decompress
-        const contentType = response.headers.get('content-type');
-        let text;
-        
-        if (contentType === 'application/gzip' || wordlistPath.endsWith('.gz')) {
-            // Handle compressed content
-            const compressedData = await response.arrayBuffer();
-            const decompressedData = await new Response(compressedData).text();
-            text = decompressedData;
-        } else {
-            // Handle uncompressed content
-            text = await response.text();
-        }
-        
+        const text = await response.text();
         console.log('Text loaded, length:', text.length);
-        
-        // Process the text in chunks to avoid blocking the UI
-        const words = text.split('\n');
-        const chunkSize = 1000; // Process 1000 words at a time
-        wordList = [];
-        
-        for (let i = 0; i < words.length; i += chunkSize) {
-            const chunk = words.slice(i, i + chunkSize);
-            const filteredChunk = chunk.filter(word => word.trim());
-            wordList.push(...filteredChunk);
-            
-            // Update progress every 10 chunks
-            if (i % (chunkSize * 10) === 0) {
-                const progress = Math.min(100, Math.round((i / words.length) * 100));
-                if (resultsContainer) {
-                    resultsContainer.innerHTML = `<div class="loading">Loading wordlist... ${progress}%</div>`;
-                }
-            }
-            
-            // Allow UI to update
-            await new Promise(resolve => setTimeout(resolve, 0));
-        }
-        
+        wordList = text.split('\n').filter(word => word.trim());
         console.log('Filtered words count:', wordList.length);
         currentFilteredWords = [...wordList];
         currentWordlistForVowels = [...wordList];
         console.log('Wordlist loaded successfully:', wordList.length, 'words');
-        
-        // Cache the result
-        try {
-            localStorage.setItem(cacheKey, JSON.stringify(wordList));
-            console.log('Wordlist cached successfully');
-        } catch (e) {
-            console.warn('Could not cache wordlist:', e);
-        }
-        
-        // Clear loading indicator
-        if (resultsContainer) {
-            resultsContainer.innerHTML = '';
-        }
-        
         return wordList;
     } catch (error) {
         console.error('Error loading wordlist:', error);
-        // Show error message
-        const resultsContainer = document.getElementById('results');
-        if (resultsContainer) {
-            resultsContainer.innerHTML = '<div class="error">Error loading wordlist. Please try again.</div>';
-        }
         throw error;
     }
 }
+
+// Function to execute workflow
+async function executeWorkflow(steps) {
+    try {
+        // Get the currently selected wordlist
+        const wordlistSelect = document.getElementById('wordlistSelect');
+        const selectedWordlist = wordlistSelect.value;
+        console.log('Selected wordlist:', selectedWordlist);
+        
+        // Load the wordlist first and wait for it to complete
+        await loadWordList();
+        console.log('Wordlist loaded, word count:', wordList.length);
+        
+        // Reset all feature states
+        currentFilteredWords = [...wordList]; // Start with the full wordlist
+        lexiconCompleted = false;
+        originalLexCompleted = false;
+        eeeCompleted = false;
+        hasAdjacentConsonants = null;
+        hasO = null;
+        selectedCurvedLetter = null;
+        currentVowelIndex = 0;
+        uniqueVowels = [];
+        currentFilteredWordsForVowels = [];
+        currentPosition1Word = '';
+        leastFrequentLetter = null;  // Reset least frequent letter state
+        
+        // Reset used letters at the start of a new workflow
+        usedLettersInWorkflow = [];
+        
+        console.log('Starting workflow with steps:', steps);
+        console.log('Using wordlist:', selectedWordlist);
+        console.log('Current word count:', currentFilteredWords.length);
+        
+        // Hide homepage and show workflow execution
+        const homepage = document.getElementById('homepage');
+        const workflowExecution = document.getElementById('workflowExecution');
+        
+        if (homepage) {
+            homepage.style.display = 'none';
+        }
+        
+        if (workflowExecution) {
+            workflowExecution.style.display = 'flex';
+            workflowExecution.style.flexDirection = 'column';
+            workflowExecution.style.height = '100vh';
+        }
+
+        // Add home button if it doesn't exist
+        let homeButton = document.getElementById('homeButton');
+        if (!homeButton) {
+            homeButton = document.createElement('button');
+            homeButton.id = 'homeButton';
+            homeButton.className = 'home-button';
+            homeButton.innerHTML = '⌂';
+            homeButton.title = 'Return to Home';
+            
+            // Function to handle home button action
+            const handleHomeAction = () => {
+                // Hide workflow execution
+                if (workflowExecution) {
+                    workflowExecution.style.display = 'none';
+                }
+                // Show homepage
+                if (homepage) {
+                    homepage.style.display = 'block';
+                }
+                // Remove reset button if it exists
+                const resetButton = document.getElementById('resetWorkflowButton');
+                if (resetButton) {
+                    resetButton.remove();
+                }
+                // Remove home button
+                homeButton.remove();
+            };
+            
+            // Add both click and touch events
+            homeButton.addEventListener('click', handleHomeAction);
+            homeButton.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                handleHomeAction();
+            }, { passive: false });
+            
+            // Insert home button next to the header
+            const header = document.querySelector('.header');
+            if (header) {
+                header.insertBefore(homeButton, header.firstChild);
+            }
+        }
+
+        // Add reset button if it doesn't exist
+        let resetButton = document.getElementById('resetWorkflowButton');
+        if (!resetButton) {
+            resetButton = document.createElement('button');
+            resetButton.id = 'resetWorkflowButton';
+            resetButton.className = 'reset-workflow-button';
+            resetButton.innerHTML = '↺';
+            resetButton.title = 'Reset Workflow';
+            
+            // Function to handle reset action
+            const handleResetAction = () => {
+                if (currentWorkflow) {
+                    executeWorkflow(currentWorkflow.steps);
+                }
+            };
+            
+            // Add both click and touch events
+            resetButton.addEventListener('click', handleResetAction);
+            resetButton.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                handleResetAction();
+            }, { passive: false });
+            
+            document.body.appendChild(resetButton);
+        }
+        
+        // Store current workflow for reset functionality
+        currentWorkflow = { steps };
+        
+        // Create feature elements if they don't exist
+        const featureElements = {
+            position1Feature: createPosition1Feature(),
+            vowelFeature: createVowelFeature(),
+            oFeature: createOFeature(),
+            lexiconFeature: createLexiconFeature(),
+            eeeFeature: createEeeFeature(),
+            eeeFirstFeature: createEeeFirstFeature(),
+            originalLexFeature: createOriginalLexFeature(),
+            consonantQuestion: createConsonantQuestion(),
+            colour3Feature: createColour3Feature(),
+            shapeFeature: createShapeFeature(),
+            curvedFeature: createCurvedFeature(),
+            lengthFeature: createLengthFeature(),
+            mostFrequentFeature: createMostFrequentFeature(),
+            leastFrequentFeature: createLeastFrequentFeature(),
+            notInFeature: createNotInFeature(),
+            abcde: createAbcdeFeature(),
+        };
+        
+        // Add all feature elements to the document body
+        Object.values(featureElements).forEach(element => {
+            if (element) {
+                if (element.parentNode) {
+                    element.parentNode.removeChild(element);
+                }
+                document.body.appendChild(element);
+                element.style.display = 'none';
+                element.classList.remove('completed');
+            }
+        });
+        
+        // Get or create the feature area and results container
+        let featureArea = document.getElementById('featureArea');
+        let resultsContainer = document.getElementById('results');
+        
+        if (!featureArea) {
+            featureArea = document.createElement('div');
+            featureArea.id = 'featureArea';
+            featureArea.className = 'feature-area';
+            workflowExecution.insertBefore(featureArea, workflowExecution.firstChild);
+        }
+        
+        if (!resultsContainer) {
+            resultsContainer = document.createElement('div');
+            resultsContainer.id = 'results';
+            resultsContainer.className = 'results-container';
+            workflowExecution.appendChild(resultsContainer);
+        }
+        
+        // Set up the layout
+        featureArea.style.flex = '0 0 33vh';
+        featureArea.style.minHeight = '200px';
+        featureArea.style.padding = '20px';
+        featureArea.style.backgroundColor = '#f5f5f5';
+        featureArea.style.borderBottom = '1px solid #ddd';
+        
+        resultsContainer.style.flex = '1';
+        resultsContainer.style.overflowY = 'auto';
+        resultsContainer.style.padding = '20px';
+        resultsContainer.style.backgroundColor = '#fff';
+        
+        // Clear any existing content
+        featureArea.innerHTML = '';
+        resultsContainer.innerHTML = '';
+        
+        // Display initial wordlist
+        displayResults(currentFilteredWords);
+        
+        // Track the rank of MOST FREQUENT features
+        let mostFrequentRank = 1;
+        
+        // Execute each step in sequence
+        for (const step of steps) {
+            console.log('Executing step:', step);
+            
+            let featureId = step.feature + 'Feature';
+            if (step.feature === 'consonant') {
+                featureId = 'consonantQuestion';
+            }
+            
+            // Always create a fresh feature element for each step
+            let featureElement;
+            switch (step.feature) {
+                case 'mostFrequent':
+                    featureElement = createMostFrequentFeature();
+                    break;
+                case 'leastFrequent':
+                    featureElement = createLeastFrequentFeature();
+                    break;
+                case 'length':
+                    featureElement = createLengthFeature();
+                    break;
+                case 'notIn':
+                    featureElement = createNotInFeature();
+                    break;
+                case 'position1':
+                    featureElement = createPosition1Feature();
+                    break;
+                case 'vowel':
+                    featureElement = createVowelFeature();
+                    break;
+                case 'o':
+                    featureElement = createOFeature();
+                    break;
+                case 'lexicon':
+                    featureElement = createLexiconFeature();
+                    break;
+                case 'eee':
+                    featureElement = createEeeFeature();
+                    break;
+                case 'eeeFirst':
+                    featureElement = createEeeFirstFeature();
+                    break;
+                case 'originalLex':
+                    featureElement = createOriginalLexFeature();
+                    break;
+                case 'consonant':
+                    featureElement = createConsonantQuestion();
+                    break;
+                case 'colour3':
+                    featureElement = createColour3Feature();
+                    break;
+                case 'shape':
+                    featureElement = createShapeFeature();
+                    break;
+                case 'curved':
+                    featureElement = createCurvedFeature();
+                    break;
+                case 'abcde':
+                    featureElement = createAbcdeFeature();
+                    break;
+                default:
+                    featureElement = null;
+            }
+            if (!featureElement) continue;
+            featureArea.innerHTML = '';
+            featureArea.appendChild(featureElement);
+            featureElement.style.display = 'block';
+            
+            // For MOST FREQUENT feature, use the current rank
+            if (step.feature === 'mostFrequent') {
+                mostFrequentLetter = findMostFrequentLetter(currentFilteredWords, mostFrequentRank);
+                if (mostFrequentLetter) {
+                    const letterDisplay = featureElement.querySelector('.letter');
+                    if (letterDisplay) {
+                        letterDisplay.textContent = mostFrequentLetter;
+                    }
+                }
+            }
+            // For LEAST FREQUENT feature
+            else if (step.feature === 'leastFrequent') {
+                leastFrequentLetter = findLeastFrequentLetter(currentFilteredWords);
+                if (leastFrequentLetter) {
+                    const letterDisplay = featureElement.querySelector('.letter');
+                    if (letterDisplay) {
+                        letterDisplay.textContent = leastFrequentLetter;
+                    }
+                }
+            }
+            
+            // Set up event listeners for this feature
+            setupFeatureListeners(step.feature, (filteredWords) => {
+                currentFilteredWords = filteredWords;
+                displayResults(currentFilteredWords);
+            });
+            
+            // Wait for user interaction
+            await new Promise((resolve) => {
+                const handleFeatureComplete = () => {
+                    console.log(`Feature ${featureId} completed`);
+                    featureElement.classList.add('completed');
+                    featureElement.style.display = 'none';
+                    
+                    // If this was the MOST FREQUENT feature and YES was selected, increment the rank
+                    if (step.feature === 'mostFrequent' && mostFrequentLetter) {
+                        usedLettersInWorkflow.push(mostFrequentLetter);
+                        mostFrequentRank++;
+                    }
+                    
+                    resolve();
+                };
+                
+                featureElement.addEventListener('completed', handleFeatureComplete, { once: true });
+            });
+        }
+        
+        // Show final results
+        displayResults(currentFilteredWords);
+    } catch (error) {
+        console.error('Error executing workflow:', error);
+        throw error;
+    }
+}
+
+// Helper functions to create feature elements
+function createPosition1Feature() {
+    const div = document.createElement('div');
+    div.id = 'position1Feature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">SHORT WORD</h2>
+        <div class="position-input">
+            <input type="text" id="position1Input" placeholder="Enter a word">
+            <button id="position1Button">SUBMIT</button>
+            <button id="position1DoneButton">DONE</button>
+        </div>
+    `;
+    return div;
+}
+
+function createVowelFeature() {
+    const div = document.createElement('div');
+    div.id = 'vowelFeature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">VOWEL</h2>
+        <div class="vowel-letter"></div>
+        <div class="button-container">
+            <button class="vowel-btn yes-btn">YES</button>
+            <button class="vowel-btn no-btn">NO</button>
+        </div>
+        <div class="position-buttons">
+            <button class="position-btn" data-position="1">1</button>
+            <button class="position-btn" data-position="2">2</button>
+            <button class="position-btn" data-position="3">3</button>
+            <button class="position-btn" data-position="4">4</button>
+            <button class="position-btn" data-position="5">5</button>
+            <button class="position-btn" data-position="6">6</button>
+            <button class="position-btn" data-position="7">7</button>
+            <button class="position-btn" data-position="8">8</button>
+        </div>
+    `;
+    return div;
+}
+
+function createOFeature() {
+    const div = document.createElement('div');
+    div.id = 'oFeature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">O?</h2>
+        <div class="button-container">
+            <button id="oYesBtn" class="yes-btn">YES</button>
+            <button id="oNoBtn" class="no-btn">NO</button>
+            <button id="oSkipBtn" class="skip-button">SKIP</button>
+        </div>
+    `;
+    return div;
+}
+
+function createLexiconFeature() {
+    const div = document.createElement('div');
+    div.id = 'lexiconFeature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">LEXICON</h2>
+        <div class="lexicon-input">
+            <input type="text" id="lexiconInput" placeholder="Enter positions (e.g., 123)">
+            <button id="lexiconButton">SUBMIT</button>
+            <button id="lexiconSkipButton" class="skip-button">SKIP</button>
+        </div>
+    `;
+    return div;
+}
+
+function createEeeFeature() {
+    const div = document.createElement('div');
+    div.id = 'eeeFeature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">EEE?</h2>
+        <div class="button-container">
+            <button id="eeeButton">E</button>
+            <button id="eeeYesBtn" class="yes-btn">YES</button>
+            <button id="eeeNoBtn" class="no-btn">NO</button>
+        </div>
+    `;
+    return div;
+}
+
+function createEeeFirstFeature() {
+    const div = document.createElement('div');
+    div.id = 'eeeFirstFeature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">EEEFIRST</h2>
+        <div class="button-container">
+            <button id="eeeFirstButton">E</button>
+            <button id="eeeFirstYesBtn" class="yes-btn">YES</button>
+            <button id="eeeFirstNoBtn" class="no-btn">NO</button>
+        </div>
+        <button id="eeeFirstSkipButton" class="skip-button">SKIP</button>
+    `;
+    return div;
+}
+
+function createOriginalLexFeature() {
+    const div = document.createElement('div');
+    div.id = 'originalLexFeature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">LEXICON</h2>
+        <div class="position-info">
+            <div class="position-display">Position: <span class="position-number">1</span></div>
+            <div class="possible-letters">Possible letters: <span class="letters-list"></span></div>
+        </div>
+        <div class="lexicon-input">
+            <input type="text" id="originalLexInput" placeholder="Enter a word">
+            <button id="originalLexButton">SUBMIT</button>
+            <button id="originalLexSkipButton" class="skip-button">SKIP</button>
+        </div>
+    `;
+    return div;
+}
+
+function createConsonantQuestion() {
+    const div = document.createElement('div');
+    div.id = 'consonantQuestion';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">CONSONANTS TOGETHER?</h2>
+        <div class="button-container">
+            <button id="consonantYesBtn" class="yes-btn">YES</button>
+            <button id="consonantNoBtn" class="no-btn">NO</button>
+        </div>
+    `;
+    return div;
+}
+
+function createColour3Feature() {
+    const div = document.createElement('div');
+    div.id = 'colour3Feature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">COLOUR3</h2>
+        <div class="button-container">
+            <button id="colour3YesBtn" class="yes-btn">YES</button>
+            <button id="colour3SkipButton" class="skip-button">SKIP</button>
+        </div>
+    `;
+    return div;
+}
+
+function createShapeFeature() {
+    const div = document.createElement('div');
+    div.id = 'shapeFeature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">SHAPE</h2>
+        <div class="shape-display">
+            <div class="position-display"></div>
+            <div class="category-buttons"></div>
+        </div>
+    `;
+    return div;
+}
+
+function createCurvedFeature() {
+    const div = document.createElement('div');
+    div.id = 'curvedFeature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">CURVED</h2>
+        <div class="curved-buttons">
+            <button class="curved-btn">B</button>
+            <button class="curved-btn">C</button>
+            <button class="curved-btn">D</button>
+            <button class="curved-btn">G</button>
+            <button class="curved-btn">J</button>
+            <button class="curved-btn">O</button>
+            <button class="curved-btn">P</button>
+            <button class="curved-btn">Q</button>
+            <button class="curved-btn">R</button>
+            <button class="curved-btn">S</button>
+            <button class="curved-btn">U</button>
+        </div>
+        <button id="curvedSkipBtn" class="skip-button">SKIP</button>
+    `;
+    return div;
+}
+
+function createLengthFeature() {
+    const div = document.createElement('div');
+    div.id = 'lengthFeature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">LENGTH</h2>
+        <div class="length-input">
+            <input type="number" id="lengthInput" placeholder="Enter length (3+)" min="3">
+            <button id="lengthButton">SUBMIT</button>
+            <button id="lengthSkipButton" class="skip-button">SKIP</button>
+        </div>
+    `;
+    return div;
+}
+
+function createMostFrequentFeature() {
+    const div = document.createElement('div');
+    div.id = 'mostFrequentFeature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">MOST FREQUENT</h2>
+        <div class="frequent-letter-display">
+            <div class="letter">-</div>
+        </div>
+        <div class="button-container">
+            <button id="frequentYesBtn" class="yes-btn">YES</button>
+            <button id="frequentNoBtn" class="no-btn">NO</button>
+            <button id="frequentSkipButton" class="skip-button">SKIP</button>
+        </div>
+    `;
+    return div;
+}
+
+function createLeastFrequentFeature() {
+    const div = document.createElement('div');
+    div.id = 'leastFrequentFeature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">LEAST FREQUENT</h2>
+        <div class="frequent-letter-display">
+            <div class="letter">-</div>
+        </div>
+        <div class="button-container">
+            <button id="leastFrequentYesBtn" class="yes-btn">YES</button>
+            <button id="leastFrequentNoBtn" class="no-btn">NO</button>
+            <button id="leastFrequentSkipButton" class="skip-button">SKIP</button>
+        </div>
+    `;
+    return div;
+}
+
+function createNotInFeature() {
+    const div = document.createElement('div');
+    div.id = 'notInFeature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">NOT IN</h2>
+        <div class="input-group">
+            <input type="text" id="notInInput" placeholder="Enter letters...">
+            <button id="notInButton">SUBMIT</button>
+            <button id="notInSkipButton" class="skip-button">SKIP</button>
+        </div>
+    `;
+    return div;
+}
+
+// --- ABCDE Feature Logic ---
+function createAbcdeFeature() {
+    const div = document.createElement('div');
+    div.id = 'abcdeFeature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">ABCDE</h2>
+        <div class="abcde-row" style="display: flex; justify-content: center; gap: 10px;">
+            <div class="abcde-letter-group" data-letter="A">
+                <div class="abcde-letter">A</div>
+                <button class="abcde-yes-btn" data-letter="A">YES</button>
+            </div>
+            <div class="abcde-letter-group" data-letter="B">
+                <div class="abcde-letter">B</div>
+                <button class="abcde-yes-btn" data-letter="B">YES</button>
+            </div>
+            <div class="abcde-letter-group" data-letter="C">
+                <div class="abcde-letter">C</div>
+                <button class="abcde-yes-btn" data-letter="C">YES</button>
+            </div>
+            <div class="abcde-letter-group" data-letter="D">
+                <div class="abcde-letter">D</div>
+                <button class="abcde-yes-btn" data-letter="D">YES</button>
+            </div>
+            <div class="abcde-letter-group" data-letter="E">
+                <div class="abcde-letter">E</div>
+                <button class="abcde-yes-btn" data-letter="E">YES</button>
+            </div>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; margin-top: 20px; gap: 10px;">
+            <button id="abcdeDoneButton">DONE</button>
+            <button id="abcdeSkipButton" class="skip-button">SKIP</button>
+        </div>
+    `;
+    return div;
+}
+
+// Filtering logic for ABCDE feature
+function filterWordsByAbcde(words, yesLetters) {
+    return words.filter(word => {
+        // Must include all YES letters
+        for (const letter of yesLetters) {
+            if (!word.includes(letter)) return false;
+        }
+        // Must NOT include any of the other letters (A-E not in yesLetters)
+        for (const letter of ['A','B','C','D','E']) {
+            if (!yesLetters.includes(letter) && word.includes(letter)) return false;
+        }
+        return true;
+    });
+}
+
+// Function to setup feature listeners
+function setupFeatureListeners(feature, callback) {
+    switch (feature) {
+        case 'position1': {
+            const position1Button = document.getElementById('position1Button');
+            const position1DoneButton = document.getElementById('position1DoneButton');
+            const position1Input = document.getElementById('position1Input');
+            
+            if (position1Button) {
+                position1Button.onclick = () => {
+                    const input = position1Input?.value.trim();
+                    if (input) {
+                        const consonants = getConsonantsInOrder(input);
+                        if (consonants.length >= 2) {
+                            const filteredWords = filterWordsByPosition1(currentFilteredWords, consonants);
+                            // Store the input word for vowel feature
+                            currentPosition1Word = input.toUpperCase(); // Ensure it's uppercase
+                            callback(filteredWords);
+                            document.getElementById('position1Feature').dispatchEvent(new Event('completed'));
+    } else {
+                            alert('Please enter a word with at least 2 consonants');
+                        }
+                    } else {
+                        alert('Please enter a word');
+                    }
+                };
+                
+                // Add touch event for mobile
+                position1Button.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    position1Button.click();
+                }, { passive: false });
+            }
+            
+            if (position1DoneButton) {
+                position1DoneButton.onclick = () => {
+                    callback(currentFilteredWords);
+                    document.getElementById('position1Feature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                position1DoneButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    position1DoneButton.click();
+                }, { passive: false });
+            }
+            break;
+        }
+            
+        case 'vowel': {
+            const vowelYesBtn = document.querySelector('#vowelFeature .yes-btn');
+            const vowelNoBtn = document.querySelector('#vowelFeature .no-btn');
+            const positionBtns = document.querySelectorAll('#vowelFeature .position-btn');
+            
+            // Initialize vowel processing with current words
+            currentFilteredWordsForVowels = [...currentFilteredWords];
+            originalFilteredWords = [...currentFilteredWords];
+            currentVowelIndex = 0;
+            
+            // Get vowels from Position 1 word in order
+            const vowels = new Set(['a', 'e', 'i', 'o', 'u']);
+            uniqueVowels = [];
+            if (currentPosition1Word) {
+                for (const char of currentPosition1Word.toLowerCase()) {
+                    if (vowels.has(char)) {
+                        uniqueVowels.push(char);
+                    }
+                }
+            }
+            
+            // Set up the vowel display
+            const vowelFeature = document.getElementById('vowelFeature');
+            const vowelLetter = vowelFeature.querySelector('.vowel-letter');
+            if (uniqueVowels.length > 0) {
+                vowelLetter.textContent = uniqueVowels[0].toUpperCase();
+                vowelLetter.style.display = 'inline-block';
+            }
+
+            // Function to filter words by vowel position
+            function filterWordsByVowelPosition(words, vowel, position) {
+                return words.filter(word => {
+                    // Convert position to 0-based index
+                    const pos = position - 1;
+                    // Check if word is long enough and has the vowel in the specified position
+                    return word.length > pos && word[pos].toLowerCase() === vowel.toLowerCase();
+                });
+            }
+
+            // Add click handlers for position buttons
+            positionBtns.forEach(btn => {
+                btn.onclick = () => {
+                    const position = parseInt(btn.dataset.position);
+                    const currentVowel = uniqueVowels[currentVowelIndex];
+                    if (currentVowel) {
+                        const filteredWords = filterWordsByVowelPosition(currentFilteredWords, currentVowel, position);
+                        callback(filteredWords);
+                        document.getElementById('vowelFeature').dispatchEvent(new Event('completed'));
+                    }
+                };
+                
+                // Add touch event for mobile
+                btn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    btn.click();
+                }, { passive: false });
+            });
+
+            // Existing YES/NO button handlers remain unchanged
+            if (vowelYesBtn) {
+                vowelYesBtn.onclick = () => {
+                    handleVowelSelection(true);
+                };
+                
+                // Add touch event for mobile
+                vowelYesBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    vowelYesBtn.click();
+                }, { passive: false });
+            }
+            
+            if (vowelNoBtn) {
+                vowelNoBtn.onclick = () => {
+                    handleVowelSelection(false);
+                };
+                
+                // Add touch event for mobile
+                vowelNoBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    vowelNoBtn.click();
+                }, { passive: false });
+            }
+            break;
+        }
+            
+        case 'o': {
+            const oYesBtn = document.getElementById('oYesBtn');
+            const oNoBtn = document.getElementById('oNoBtn');
+            const oSkipBtn = document.getElementById('oSkipBtn');
+            
+            if (oYesBtn) {
+                oYesBtn.onclick = () => {
+                    const filteredWords = filterWordsByO(currentFilteredWords, true);
+                    callback(filteredWords);
+                    document.getElementById('oFeature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                oYesBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    oYesBtn.click();
+                }, { passive: false });
+            }
+            
+            if (oNoBtn) {
+                oNoBtn.onclick = () => {
+                    const filteredWords = filterWordsByO(currentFilteredWords, false);
+                    callback(filteredWords);
+                    document.getElementById('oFeature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                oNoBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    oNoBtn.click();
+                }, { passive: false });
+            }
+            
+            if (oSkipBtn) {
+                oSkipBtn.onclick = () => {
+                    callback(currentFilteredWords);
+                    document.getElementById('oFeature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                oSkipBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    oSkipBtn.click();
+                }, { passive: false });
+            }
+            break;
+        }
+            
+        case 'curved': {
+            const curvedButtons = document.querySelectorAll('.curved-btn');
+            const curvedSkipBtn = document.getElementById('curvedSkipBtn');
+            
+            curvedButtons.forEach(button => {
+                button.onclick = () => {
+                    const letter = button.textContent;
+                    const filteredWords = filterWordsByCurvedPositions(currentFilteredWords, letter);
+                    callback(filteredWords);
+                    document.getElementById('curvedFeature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                button.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    button.click();
+                }, { passive: false });
+            });
+            
+            if (curvedSkipBtn) {
+                curvedSkipBtn.onclick = () => {
+                    callback(currentFilteredWords);
+                    document.getElementById('curvedFeature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                curvedSkipBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    curvedSkipBtn.click();
+                }, { passive: false });
+            }
+            break;
+        }
+            
+        case 'colour3': {
+            const colour3YesBtn = document.getElementById('colour3YesBtn');
+            const colour3SkipButton = document.getElementById('colour3SkipButton');
+            
+            if (colour3YesBtn) {
+                colour3YesBtn.onclick = () => {
+                    const filteredWords = filterWordsByColour3(currentFilteredWords);
+                    callback(filteredWords);
+                    document.getElementById('colour3Feature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                colour3YesBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    colour3YesBtn.click();
+                }, { passive: false });
+            }
+            
+            if (colour3SkipButton) {
+                colour3SkipButton.onclick = () => {
+                    callback(currentFilteredWords);
+                    document.getElementById('colour3Feature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                colour3SkipButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    colour3SkipButton.click();
+                }, { passive: false });
+            }
+            break;
+        }
+            
+        case 'lexicon': {
+            const lexiconButton = document.getElementById('lexiconButton');
+            const lexiconSkipButton = document.getElementById('lexiconSkipButton');
+            
+            if (lexiconButton) {
+                lexiconButton.onclick = () => {
+                    const input = document.getElementById('lexiconInput')?.value.trim();
+                    if (input) {
+                        const filteredWords = filterWordsByLexicon(currentFilteredWords, input);
+                        callback(filteredWords);
+                        document.getElementById('lexiconFeature').dispatchEvent(new Event('completed'));
+                    } else {
+                        alert('Please enter positions (e.g., 123)');
+                    }
+                };
+                
+                // Add touch event for mobile
+                lexiconButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    lexiconButton.click();
+                }, { passive: false });
+            }
+            
+            if (lexiconSkipButton) {
+                lexiconSkipButton.onclick = () => {
+                    callback(currentFilteredWords);
+                    document.getElementById('lexiconFeature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                lexiconSkipButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    lexiconSkipButton.click();
+                }, { passive: false });
+            }
+            break;
+        }
+            
+        case 'consonant': {
+            const consonantYesBtn = document.getElementById('consonantYesBtn');
+            const consonantNoBtn = document.getElementById('consonantNoBtn');
+            
+            if (consonantYesBtn) {
+                consonantYesBtn.onclick = () => {
+                    hasAdjacentConsonants = true;
+                    const filteredWords = currentFilteredWords.filter(word => hasWordAdjacentConsonants(word));
+                    callback(filteredWords);
+                    document.getElementById('consonantQuestion').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                consonantYesBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    consonantYesBtn.click();
+                }, { passive: false });
+            }
+            
+            if (consonantNoBtn) {
+                consonantNoBtn.onclick = () => {
+                    hasAdjacentConsonants = false;
+                    const filteredWords = currentFilteredWords.filter(word => !hasWordAdjacentConsonants(word));
+                    callback(filteredWords);
+                    document.getElementById('consonantQuestion').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                consonantNoBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    consonantNoBtn.click();
+                }, { passive: false });
+            }
+            break;
+        }
+            
+        case 'eee': {
+            const eeeButton = document.getElementById('eeeButton');
+            const eeeYesBtn = document.getElementById('eeeYesBtn');
+            const eeeNoBtn = document.getElementById('eeeNoBtn');
+            
+            if (eeeButton) {
+                eeeButton.onclick = () => {
+                    const filteredWords = filterWordsByEee(currentFilteredWords, 'E');
+                    callback(filteredWords);
+                    document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                eeeButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    eeeButton.click();
+                }, { passive: false });
+            }
+            
+            if (eeeYesBtn) {
+                eeeYesBtn.onclick = () => {
+                    const filteredWords = filterWordsByEee(currentFilteredWords, 'YES');
+                    callback(filteredWords);
+                    document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                eeeYesBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    eeeYesBtn.click();
+                }, { passive: false });
+            }
+            
+            if (eeeNoBtn) {
+                eeeNoBtn.onclick = () => {
+                    const filteredWords = filterWordsByEee(currentFilteredWords, 'NO');
+                    callback(filteredWords);
+                    document.getElementById('eeeFeature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                eeeNoBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    eeeNoBtn.click();
+                }, { passive: false });
+            }
+            break;
+        }
+
+        case 'eeeFirst': {
+            const eeeFirstButton = document.getElementById('eeeFirstButton');
+            const eeeFirstYesBtn = document.getElementById('eeeFirstYesBtn');
+            const eeeFirstNoBtn = document.getElementById('eeeFirstNoBtn');
+            const eeeFirstSkipButton = document.getElementById('eeeFirstSkipButton');
+            
+            if (eeeFirstButton) {
+                eeeFirstButton.onclick = () => {
+                    const filteredWords = filterWordsByEeeFirst(currentFilteredWords, 'E');
+                    callback(filteredWords);
+                    document.getElementById('eeeFirstFeature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                eeeFirstButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    eeeFirstButton.click();
+                }, { passive: false });
+            }
+            
+            if (eeeFirstYesBtn) {
+                eeeFirstYesBtn.onclick = () => {
+                    const filteredWords = filterWordsByEeeFirst(currentFilteredWords, 'YES');
+                    callback(filteredWords);
+                    document.getElementById('eeeFirstFeature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                eeeFirstYesBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    eeeFirstYesBtn.click();
+                }, { passive: false });
+            }
+            
+            if (eeeFirstNoBtn) {
+                eeeFirstNoBtn.onclick = () => {
+                    const filteredWords = filterWordsByEeeFirst(currentFilteredWords, 'NO');
+                    callback(filteredWords);
+                    document.getElementById('eeeFirstFeature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                eeeFirstNoBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    eeeFirstNoBtn.click();
+                }, { passive: false });
+            }
+
+            if (eeeFirstSkipButton) {
+                eeeFirstSkipButton.onclick = () => {
+                    callback(currentFilteredWords); // Keep the current word list unchanged
+                    document.getElementById('eeeFirstFeature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                eeeFirstSkipButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    eeeFirstSkipButton.click();
+                }, { passive: false });
+            }
+            break;
+        }
+        
+        case 'originalLex': {
+            const originalLexButton = document.getElementById('originalLexButton');
+            const originalLexSkipButton = document.getElementById('originalLexSkipButton');
+            const originalLexInput = document.getElementById('originalLexInput');
+            
+            // Find position with most variance and update display
+            const { position, letters } = findPositionWithMostVariance(currentFilteredWords);
+            originalLexPosition = position;
+            
+            // Update position display
+            const positionNumber = document.querySelector('#originalLexFeature .position-number');
+            if (positionNumber) {
+                positionNumber.textContent = position + 1; // Convert to 1-based position
+            }
+            
+            // Update possible letters display
+            const lettersList = document.querySelector('#originalLexFeature .letters-list');
+            if (lettersList) {
+                lettersList.textContent = letters.join(', ');
+            }
+            
+            if (originalLexButton) {
+                originalLexButton.onclick = () => {
+                    const input = originalLexInput?.value.trim();
+                    if (input) {
+                        const filteredWords = filterWordsByOriginalLex(currentFilteredWords, originalLexPosition, input);
+                        callback(filteredWords);
+                        document.getElementById('originalLexFeature').dispatchEvent(new Event('completed'));
+                    } else {
+                        alert('Please enter a word');
+                    }
+                };
+                
+                // Add touch event for mobile
+                originalLexButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    originalLexButton.click();
+                }, { passive: false });
+            }
+            
+            if (originalLexSkipButton) {
+                originalLexSkipButton.onclick = () => {
+                    callback(currentFilteredWords);
+                    document.getElementById('originalLexFeature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                originalLexSkipButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    originalLexSkipButton.click();
+                }, { passive: false });
+            }
+            break;
+        }
+
+        case 'length': {
+            const lengthButton = document.getElementById('lengthButton');
+            const lengthSkipButton = document.getElementById('lengthSkipButton');
+            const lengthInput = document.getElementById('lengthInput');
+            
+            if (lengthButton) {
+                lengthButton.onclick = () => {
+                    const input = lengthInput?.value.trim();
+                    if (input) {
+                        const length = parseInt(input);
+                        if (length >= 3) {
+                            const filteredWords = filterWordsByLength(currentFilteredWords, length);
+                            callback(filteredWords);
+                            document.getElementById('lengthFeature').dispatchEvent(new Event('completed'));
+                        } else {
+                            alert('Please enter a length of 3 or more');
+                        }
+                    } else {
+                        alert('Please enter a length');
+                    }
+                };
+                
+                // Add touch event for mobile
+                lengthButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    lengthButton.click();
+                }, { passive: false });
+            }
+            
+            if (lengthSkipButton) {
+                lengthSkipButton.onclick = () => {
+                    callback(currentFilteredWords);
+                    document.getElementById('lengthFeature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                lengthSkipButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    lengthSkipButton.click();
+                }, { passive: false });
+            }
+            break;
+        }
+
+        case 'mostFrequent': {
+            const frequentYesBtn = document.getElementById('frequentYesBtn');
+            const frequentNoBtn = document.getElementById('frequentNoBtn');
+            const frequentSkipButton = document.getElementById('frequentSkipButton');
+            const letterDisplay = document.querySelector('#mostFrequentFeature .letter');
+            
+            // Find and display most frequent letter
+            mostFrequentLetter = findMostFrequentLetter(currentFilteredWords);
+            if (letterDisplay) {
+                if (mostFrequentLetter) {
+                    letterDisplay.textContent = mostFrequentLetter;
+                    // Enable buttons if we have a letter
+                    if (frequentYesBtn) frequentYesBtn.disabled = false;
+                    if (frequentNoBtn) frequentNoBtn.disabled = false;
+                } else {
+                    letterDisplay.textContent = 'No more unique letters';
+                    // Disable buttons if no more letters
+                    if (frequentYesBtn) frequentYesBtn.disabled = true;
+                    if (frequentNoBtn) frequentNoBtn.disabled = true;
+                }
+            }
+            
+            if (frequentYesBtn) {
+                frequentYesBtn.onclick = () => {
+                    if (mostFrequentLetter) {
+                        const filteredWords = filterWordsByMostFrequent(currentFilteredWords, mostFrequentLetter, true);
+                        callback(filteredWords);
+                        document.getElementById('mostFrequentFeature').classList.add('completed');
+                        document.getElementById('mostFrequentFeature').dispatchEvent(new Event('completed'));
+                    }
+                };
+                
+                // Add touch event for mobile
+                frequentYesBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    if (!frequentYesBtn.disabled) {
+                        frequentYesBtn.click();
+                    }
+                }, { passive: false });
+            }
+            
+            if (frequentNoBtn) {
+                frequentNoBtn.onclick = () => {
+                    if (mostFrequentLetter) {
+                        const filteredWords = filterWordsByMostFrequent(currentFilteredWords, mostFrequentLetter, false);
+                        callback(filteredWords);
+                        document.getElementById('mostFrequentFeature').classList.add('completed');
+                        document.getElementById('mostFrequentFeature').dispatchEvent(new Event('completed'));
+                    }
+                };
+                
+                // Add touch event for mobile
+                frequentNoBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    if (!frequentNoBtn.disabled) {
+                        frequentNoBtn.click();
+                    }
+                }, { passive: false });
+            }
+            
+            if (frequentSkipButton) {
+                frequentSkipButton.onclick = () => {
+                    callback(currentFilteredWords);
+                    document.getElementById('mostFrequentFeature').classList.add('completed');
+                    document.getElementById('mostFrequentFeature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                frequentSkipButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    frequentSkipButton.click();
+                }, { passive: false });
+            }
+            break;
+        }
+
+        case 'leastFrequent': {
+            const leastFrequentYesBtn = document.getElementById('leastFrequentYesBtn');
+            const leastFrequentNoBtn = document.getElementById('leastFrequentNoBtn');
+            const leastFrequentSkipButton = document.getElementById('leastFrequentSkipButton');
+            const letterDisplay = document.querySelector('#leastFrequentFeature .letter');
+            
+            // Find and display least frequent letter
+            leastFrequentLetter = findLeastFrequentLetter(currentFilteredWords);
+            if (letterDisplay) {
+                if (leastFrequentLetter) {
+                    letterDisplay.textContent = leastFrequentLetter;
+                    // Enable buttons if we have a letter
+                    if (leastFrequentYesBtn) leastFrequentYesBtn.disabled = false;
+                    if (leastFrequentNoBtn) leastFrequentNoBtn.disabled = false;
+                } else {
+                    letterDisplay.textContent = 'No letters found';
+                    // Disable buttons if no letters
+                    if (leastFrequentYesBtn) leastFrequentYesBtn.disabled = true;
+                    if (leastFrequentNoBtn) leastFrequentNoBtn.disabled = true;
+                }
+            }
+            
+            if (leastFrequentYesBtn) {
+                leastFrequentYesBtn.onclick = () => {
+                    if (leastFrequentLetter) {
+                        const filteredWords = filterWordsByLeastFrequent(currentFilteredWords, leastFrequentLetter, true);
+                        callback(filteredWords);
+                        document.getElementById('leastFrequentFeature').classList.add('completed');
+                        document.getElementById('leastFrequentFeature').dispatchEvent(new Event('completed'));
+                    }
+                };
+                
+                // Add touch event for mobile
+                leastFrequentYesBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    if (!leastFrequentYesBtn.disabled) {
+                        leastFrequentYesBtn.click();
+                    }
+                }, { passive: false });
+            }
+            
+            if (leastFrequentNoBtn) {
+                leastFrequentNoBtn.onclick = () => {
+                    if (leastFrequentLetter) {
+                        const filteredWords = filterWordsByLeastFrequent(currentFilteredWords, leastFrequentLetter, false);
+                        callback(filteredWords);
+                        document.getElementById('leastFrequentFeature').classList.add('completed');
+                        document.getElementById('leastFrequentFeature').dispatchEvent(new Event('completed'));
+                    }
+                };
+                
+                // Add touch event for mobile
+                leastFrequentNoBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    if (!leastFrequentNoBtn.disabled) {
+                        leastFrequentNoBtn.click();
+                    }
+                }, { passive: false });
+            }
+            
+            if (leastFrequentSkipButton) {
+                leastFrequentSkipButton.onclick = () => {
+                    callback(currentFilteredWords);
+                    document.getElementById('leastFrequentFeature').classList.add('completed');
+                    document.getElementById('leastFrequentFeature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                leastFrequentSkipButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    leastFrequentSkipButton.click();
+                }, { passive: false });
+            }
+            break;
+        }
+
+        case 'notIn': {
+            const notInButton = document.getElementById('notInButton');
+            const notInSkipButton = document.getElementById('notInSkipButton');
+            const notInInput = document.getElementById('notInInput');
+
+            if (notInButton && notInInput && notInSkipButton) {
+                // Remove any existing event listeners
+                const newNotInButton = notInButton.cloneNode(true);
+                const newNotInSkipButton = notInSkipButton.cloneNode(true);
+                const newNotInInput = notInInput.cloneNode(true);
+                
+                notInButton.parentNode.replaceChild(newNotInButton, notInButton);
+                notInSkipButton.parentNode.replaceChild(newNotInSkipButton, notInSkipButton);
+                notInInput.parentNode.replaceChild(newNotInInput, notInInput);
+
+                newNotInButton.addEventListener('click', () => {
+                    const letters = newNotInInput.value.toLowerCase();
+                    if (letters) {
+                        filterWordsByNotIn(letters);
+                        callback(currentFilteredWords);
+                        document.getElementById('notInFeature').classList.add('completed');
+                        document.getElementById('notInFeature').dispatchEvent(new Event('completed'));
+                    }
+                });
+
+                newNotInSkipButton.addEventListener('click', () => {
+                    callback(currentFilteredWords);
+                    document.getElementById('notInFeature').classList.add('completed');
+                    document.getElementById('notInFeature').dispatchEvent(new Event('completed'));
+                });
+
+                // Add enter key support
+                newNotInInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        newNotInButton.click();
+                    }
+                });
+
+                // Add touch events for mobile
+                newNotInButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    newNotInButton.click();
+                }, { passive: false });
+
+                newNotInSkipButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    newNotInSkipButton.click();
+                }, { passive: false });
+            }
+            break;
+        }
+
+        case 'abcde': {
+            const yesBtns = Array.from(document.querySelectorAll('.abcde-yes-btn'));
+            const doneBtn = document.getElementById('abcdeDoneButton');
+            const skipBtn = document.getElementById('abcdeSkipButton');
+            let yesLetters = [];
+
+            yesBtns.forEach(btn => {
+                btn.classList.remove('active');
+                btn.onclick = () => {
+                    const letter = btn.dataset.letter;
+                    if (yesLetters.includes(letter)) {
+                        yesLetters = yesLetters.filter(l => l !== letter);
+                        btn.classList.remove('active');
+                    } else {
+                        yesLetters.push(letter);
+                        btn.classList.add('active');
+                    }
+                };
+                // Touch event for mobile
+                btn.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    btn.onclick();
+                }, { passive: false });
+            });
+
+            if (doneBtn) {
+                doneBtn.onclick = () => {
+                    const filteredWords = filterWordsByAbcde(currentFilteredWords, yesLetters);
+                    callback(filteredWords);
+                    const featureDiv = document.getElementById('abcdeFeature');
+                    featureDiv.classList.add('completed');
+                    featureDiv.dispatchEvent(new Event('completed'));
+                };
+                doneBtn.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    doneBtn.onclick();
+                }, { passive: false });
+            }
+            if (skipBtn) {
+                skipBtn.onclick = () => {
+                    callback(currentFilteredWords);
+                    const featureDiv = document.getElementById('abcdeFeature');
+                    featureDiv.classList.add('completed');
+                    featureDiv.dispatchEvent(new Event('completed'));
+                };
+                skipBtn.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    skipBtn.onclick();
+                }, { passive: false });
+            }
+            break;
+        }
+    }
+}
+
+// Function to display results
+function displayResults(words) {
+    const resultsContainer = document.getElementById('results');
+    if (!resultsContainer) {
+        console.error('Results container not found');
+        return;
+    }
+    
+    console.log('Displaying results in container:', resultsContainer);
+    
+    // Clear the results container
+    resultsContainer.innerHTML = '';
+    
+    if (words.length === 0) {
+        resultsContainer.innerHTML = '<p>No words match the current criteria.</p>';
+        updateWordCount(0);
+        return;
+    }
+    
+    // Create word list container
+    const wordList = document.createElement('ul');
+    wordList.className = 'word-list';
+    
+    // Add words to the list
+    words.forEach(word => {
+        const li = document.createElement('li');
+        li.textContent = word;
+        wordList.appendChild(li);
+    });
+    
+    // Add the word list to the results container
+    resultsContainer.appendChild(wordList);
+    
+    // Update word count
+    updateWordCount(words.length);
+    
+    // Ensure the feature area is empty and visible
+    const featureArea = document.getElementById('featureArea');
+    if (featureArea) {
+        featureArea.style.display = 'block';
+        // Clear any wordlist that might have been accidentally added to the feature area
+        if (featureArea.querySelector('.word-list')) {
+            featureArea.innerHTML = '';
+        }
+    }
+}
+
+// Function to update word count
+function updateWordCount(count) {
+    let wordCountDisplay = document.getElementById('wordCountDisplay');
+    
+    // Create the display if it doesn't exist
+    if (!wordCountDisplay) {
+        wordCountDisplay = document.createElement('div');
+        wordCountDisplay.id = 'wordCountDisplay';
+        wordCountDisplay.className = 'word-count-display';
+        document.body.appendChild(wordCountDisplay);
+    }
+    
+    wordCountDisplay.textContent = count;
+}
+
+// Add CSS for word count display
+const style = document.createElement('style');
+style.textContent = `
+    .word-count-display {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: rgba(0, 0, 0, 0.75);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 16px;
+        font-weight: bold;
+        z-index: 1000;
+        min-width: 40px;
+        text-align: center;
+    }
+`;
+document.head.appendChild(style);
 
 // Function to handle vowel selection
 function handleVowelSelection(includeVowel) {
