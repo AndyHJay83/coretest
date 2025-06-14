@@ -881,6 +881,7 @@ async function loadWordList() {
     try {
         const wordlistSelect = document.getElementById('wordlistSelect');
         const selectedWordlist = wordlistSelect.value;
+        console.log('Selected wordlist value:', selectedWordlist);
         let wordlistPath;
         
         switch(selectedWordlist) {
@@ -898,13 +899,17 @@ async function loadWordList() {
                 wordlistPath = 'words/ENUK-Long words Noun.txt';
                 break;
         }
+        console.log('Selected wordlist path:', wordlistPath);
         
         const response = await fetch(wordlistPath);
+        console.log('Fetch response status:', response.status);
         if (!response.ok) {
             throw new Error('Failed to load wordlist');
         }
         const text = await response.text();
+        console.log('Text loaded, length:', text.length);
         wordList = text.split('\n').filter(word => word.trim());
+        console.log('Filtered words count:', wordList.length);
         currentFilteredWords = [...wordList];
         currentWordlistForVowels = [...wordList];
         console.log('Wordlist loaded successfully:', wordList.length, 'words');
