@@ -2215,7 +2215,8 @@ input:checked + .slider:before {
 
 /* Length Feature */
 .length-input {
-    padding: 0;
+    position: relative;
+    padding: 15px;
     margin: 0;
     width: 100%;
     display: flex;
@@ -2224,23 +2225,28 @@ input:checked + .slider:before {
     box-sizing: border-box;
 }
 .length-input input[type="text"] {
-    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    padding: 24px 18px;
+    height: 100%;
+    padding: 0 18px;
     font-size: 22px !important;
     border: 3px solid #1B5E20;
     border-radius: 10px;
     background: #fff;
     color: #333;
-    min-height: 60px;
     box-sizing: border-box;
     margin: 0;
     z-index: 2;
     text-align: center;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 @media (max-width: 600px) {
     .length-input input[type="text"] {
-        padding: 24px 18px;
         font-size: 22px !important;
         border-width: 3px;
         min-height: 60px;
