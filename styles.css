@@ -2215,45 +2215,35 @@ input:checked + .slider:before {
 
 /* Length Feature */
 .length-input {
+    padding: 0;
+    margin: 0;
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 10px;
-    width: 100%;
-    padding: 15px;
+    box-sizing: border-box;
 }
-
-.length-input input[type="number"] {
-    padding: 10px;
-    font-size: 16px;
-    border: 2px solid #ddd;
-    border-radius: 8px;
+.length-input input[type="text"] {
+    display: block;
     width: 100%;
-    text-align: center;
-    -moz-appearance: textfield;
-}
-
-.length-input input[type="number"]::-webkit-outer-spin-button,
-.length-input input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
+    padding: 24px 18px;
+    font-size: 22px !important;
+    border: 3px solid #1B5E20;
+    border-radius: 10px;
+    background: #fff;
+    color: #333;
+    min-height: 60px;
+    box-sizing: border-box;
     margin: 0;
+    z-index: 2;
+    text-align: center;
 }
-
-/* Mobile Styles for Length Feature */
 @media (max-width: 600px) {
     .length-input input[type="text"] {
-        padding: 20px 16px;
-        font-size: 20px !important;
-        border-width: 2px;
-        -webkit-appearance: none;
-        appearance: none;
-        border-radius: 8px;
-        position: relative;
-        z-index: 2;
-        text-align: center;
-        min-height: 56px;
-        width: 100%;
-        box-sizing: border-box;
-        margin: 0;
+        padding: 24px 18px;
+        font-size: 22px !important;
+        border-width: 3px;
+        min-height: 60px;
     }
 }
 
