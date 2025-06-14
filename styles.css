@@ -2324,7 +2324,7 @@ input:checked + .slider:before {
     justify-content: center;
 }
 .abcde-yes-btn.active {
-    background: #b6f5c6;
+    background: #7CFC98; /* Very bright light green */
     color: #155d27;
     border-color: #155d27;
 }
