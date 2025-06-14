@@ -909,12 +909,14 @@ async function executeWorkflow(steps) {
         // Get the currently selected wordlist
         const wordlistSelect = document.getElementById('wordlistSelect');
         const selectedWordlist = wordlistSelect.value;
+        console.log('Selected wordlist:', selectedWordlist);
         
-        // Load the wordlist first
+        // Load the wordlist first and wait for it to complete
         await loadWordList();
-        currentFilteredWords = [...wordList]; // Start with the full wordlist
+        console.log('Wordlist loaded, word count:', wordList.length);
         
         // Reset all feature states
+        currentFilteredWords = [...wordList]; // Start with the full wordlist
         lexiconCompleted = false;
         originalLexCompleted = false;
         eeeCompleted = false;
@@ -932,6 +934,7 @@ async function executeWorkflow(steps) {
         
         console.log('Starting workflow with steps:', steps);
         console.log('Using wordlist:', selectedWordlist);
+        console.log('Current word count:', currentFilteredWords.length);
         
         // Hide homepage and show workflow execution
         const homepage = document.getElementById('homepage');
