@@ -875,7 +875,7 @@ async function loadWordList() {
             case '19127':
                 wordlistPath = 'words/19127.txt';
                 break;
-            case '3911':
+            case 'enuk':
             default:
                 wordlistPath = 'words/3911 Nouns.txt';
                 break;
