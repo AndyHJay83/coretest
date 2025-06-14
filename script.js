@@ -893,23 +893,65 @@ async function loadWordList() {
                 break;
             case '134k':
                 wordlistPath = 'words/134K.txt';
-                break;
+                // For 134K, we'll load in chunks
+                const response = await fetch(wordlistPath);
+                if (!response.ok) {
+                    throw new Error('Failed to load wordlist');
+                }
+                
+                // Get the total size of the file
+                const contentLength = response.headers.get('content-length');
+                const totalSize = parseInt(contentLength, 10);
+                
+                // Read the first chunk (first 100KB)
+                const chunkSize = 100 * 1024; // 100KB
+                const firstChunk = await response.text();
+                const firstChunkWords = firstChunk.split('\n')
+                    .filter(word => word.trim())
+                    .slice(0, 5000); // Take first 5000 words
+                
+                // Initialize with first chunk
+                wordList = firstChunkWords;
+                currentFilteredWords = [...wordList];
+                currentWordlistForVowels = [...wordList];
+                console.log('Initial chunk loaded:', wordList.length, 'words');
+                
+                // Load the rest in the background
+                setTimeout(async () => {
+                    try {
+                        const fullResponse = await fetch(wordlistPath);
+                        const fullText = await fullResponse.text();
+                        const allWords = fullText.split('\n').filter(word => word.trim());
+                        
+                        // Update the wordlist
+                        wordList = allWords;
+                        currentFilteredWords = [...wordList];
+                        currentWordlistForVowels = [...wordList];
+                        console.log('Full wordlist loaded:', wordList.length, 'words');
+                        
+                        // Update the display if we're showing results
+                        if (document.getElementById('results').style.display !== 'none') {
+                            displayResults(currentFilteredWords);
+                        }
+                    } catch (error) {
+                        console.error('Error loading full wordlist:', error);
+                    }
+                }, 1000); // Start loading full list after 1 second
+                
+                return wordList;
             case 'enuk':
             default:
                 wordlistPath = 'words/ENUK-Long words Noun.txt';
                 break;
         }
-        console.log('Selected wordlist path:', wordlistPath);
         
+        // For other wordlists, load normally
         const response = await fetch(wordlistPath);
-        console.log('Fetch response status:', response.status);
         if (!response.ok) {
             throw new Error('Failed to load wordlist');
         }
         const text = await response.text();
-        console.log('Text loaded, length:', text.length);
         wordList = text.split('\n').filter(word => word.trim());
-        console.log('Filtered words count:', wordList.length);
         currentFilteredWords = [...wordList];
         currentWordlistForVowels = [...wordList];
         console.log('Wordlist loaded successfully:', wordList.length, 'words');
