@@ -901,74 +901,21 @@ async function loadWordList() {
         }
         console.log('Selected wordlist path:', wordlistPath);
         
-        // Show loading indicator
-        const resultsContainer = document.getElementById('results');
-        if (resultsContainer) {
-            resultsContainer.innerHTML = '<div class="loading-indicator">Loading wordlist...</div>';
-        }
-        
         const response = await fetch(wordlistPath);
         console.log('Fetch response status:', response.status);
         if (!response.ok) {
             throw new Error('Failed to load wordlist');
         }
-
-        // Use a streaming approach for large files
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        let text = '';
-        let buffer = '';
-        
-        while (true) {
-            const {value, done} = await reader.read();
-            if (done) break;
-            
-            buffer += decoder.decode(value, {stream: true});
-            const lines = buffer.split('\n');
-            buffer = lines.pop() || ''; // Keep the last incomplete line in the buffer
-            
-            // Process complete lines
-            for (const line of lines) {
-                const trimmed = line.trim();
-                if (trimmed) {
-                    text += trimmed + '\n';
-                }
-            }
-            
-            // Update loading progress
-            if (resultsContainer) {
-                const progress = Math.min(100, Math.round((text.length / 1392657) * 100));
-                resultsContainer.innerHTML = `<div class="loading-indicator">Loading wordlist... ${progress}%</div>`;
-            }
-        }
-        
-        // Process any remaining text
-        if (buffer) {
-            const trimmed = buffer.trim();
-            if (trimmed) {
-                text += trimmed;
-            }
-        }
-        
+        const text = await response.text();
         console.log('Text loaded, length:', text.length);
         wordList = text.split('\n').filter(word => word.trim());
         console.log('Filtered words count:', wordList.length);
         currentFilteredWords = [...wordList];
         currentWordlistForVowels = [...wordList];
         console.log('Wordlist loaded successfully:', wordList.length, 'words');
-        
-        // Clear loading indicator and show results
-        if (resultsContainer) {
-            resultsContainer.innerHTML = '';
-            displayResults(currentFilteredWords);
-        }
-        
         return wordList;
     } catch (error) {
         console.error('Error loading wordlist:', error);
-        if (resultsContainer) {
-            resultsContainer.innerHTML = '<div class="error-message">Error loading wordlist. Please try again.</div>';
-        }
         throw error;
     }
 }
@@ -976,6 +923,316 @@ async function loadWordList() {
 // Function to execute workflow
 async function executeWorkflow(steps) {
     try {
+        // Get the currently selected wordlist
+        const wordlistSelect = document.getElementById('wordlistSelect');
+        const selectedWordlist = wordlistSelect.value;
+        console.log('Selected wordlist:', selectedWordlist);
+        
+        // Load the wordlist first and wait for it to complete
+        await loadWordList();
+        console.log('Wordlist loaded, word count:', wordList.length);
+        
+        // Reset all feature states
+        currentFilteredWords = [...wordList]; // Start with the full wordlist
+        lexiconCompleted = false;
+        originalLexCompleted = false;
+        eeeCompleted = false;
+        hasAdjacentConsonants = null;
+        hasO = null;
+        selectedCurvedLetter = null;
+        currentVowelIndex = 0;
+        uniqueVowels = [];
+        currentFilteredWordsForVowels = [];
+        currentPosition1Word = '';
+        leastFrequentLetter = null;  // Reset least frequent letter state
+        
+        // Reset used letters at the start of a new workflow
+        usedLettersInWorkflow = [];
+        
+        console.log('Starting workflow with steps:', steps);
+        console.log('Using wordlist:', selectedWordlist);
+        console.log('Current word count:', currentFilteredWords.length);
+        
+        // Hide homepage and show workflow execution
+        const homepage = document.getElementById('homepage');
+        const workflowExecution = document.getElementById('workflowExecution');
+        
+        if (homepage) {
+            homepage.style.display = 'none';
+        }
+        
+        if (workflowExecution) {
+            workflowExecution.style.display = 'flex';
+            workflowExecution.style.flexDirection = 'column';
+            workflowExecution.style.height = '100vh';
+        }
+
+        // Add home button if it doesn't exist
+        let homeButton = document.getElementById('homeButton');
+        if (!homeButton) {
+            homeButton = document.createElement('button');
+            homeButton.id = 'homeButton';
+            homeButton.className = 'home-button';
+            homeButton.innerHTML = '⌂';
+            homeButton.title = 'Return to Home';
+            
+            // Function to handle home button action
+            const handleHomeAction = () => {
+                // Hide workflow execution
+                if (workflowExecution) {
+                    workflowExecution.style.display = 'none';
+                }
+                // Show homepage
+                if (homepage) {
+                    homepage.style.display = 'block';
+                }
+                // Remove reset button if it exists
+                const resetButton = document.getElementById('resetWorkflowButton');
+                if (resetButton) {
+                    resetButton.remove();
+                }
+                // Remove home button
+                homeButton.remove();
+            };
+            
+            // Add both click and touch events
+            homeButton.addEventListener('click', handleHomeAction);
+            homeButton.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                handleHomeAction();
+            }, { passive: false });
+            
+            // Insert home button next to the header
+            const header = document.querySelector('.header');
+            if (header) {
+                header.insertBefore(homeButton, header.firstChild);
+            }
+        }
+
+        // Add reset button if it doesn't exist
+        let resetButton = document.getElementById('resetWorkflowButton');
+        if (!resetButton) {
+            resetButton = document.createElement('button');
+            resetButton.id = 'resetWorkflowButton';
+            resetButton.className = 'reset-workflow-button';
+            resetButton.innerHTML = '↺';
+            resetButton.title = 'Reset Workflow';
+            
+            // Function to handle reset action
+            const handleResetAction = () => {
+                if (currentWorkflow) {
+                    executeWorkflow(currentWorkflow.steps);
+                }
+            };
+            
+            // Add both click and touch events
+            resetButton.addEventListener('click', handleResetAction);
+            resetButton.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                handleResetAction();
+            }, { passive: false });
+            
+            document.body.appendChild(resetButton);
+        }
+        
+        // Store current workflow for reset functionality
+        currentWorkflow = { steps };
+        
+        // Create feature elements if they don't exist
+        const featureElements = {
+            position1Feature: createPosition1Feature(),
+            vowelFeature: createVowelFeature(),
+            oFeature: createOFeature(),
+            lexiconFeature: createLexiconFeature(),
+            eeeFeature: createEeeFeature(),
+            eeeFirstFeature: createEeeFirstFeature(),
+            originalLexFeature: createOriginalLexFeature(),
+            consonantQuestion: createConsonantQuestion(),
+            colour3Feature: createColour3Feature(),
+            shapeFeature: createShapeFeature(),
+            curvedFeature: createCurvedFeature(),
+            lengthFeature: createLengthFeature(),
+            mostFrequentFeature: createMostFrequentFeature(),
+            leastFrequentFeature: createLeastFrequentFeature(),
+            notInFeature: createNotInFeature(),
+            abcde: createAbcdeFeature(),
+        };
+        
+        // Add all feature elements to the document body
+        Object.values(featureElements).forEach(element => {
+            if (element) {
+                if (element.parentNode) {
+                    element.parentNode.removeChild(element);
+                }
+                document.body.appendChild(element);
+                element.style.display = 'none';
+                element.classList.remove('completed');
+            }
+        });
+        
+        // Get or create the feature area and results container
+        let featureArea = document.getElementById('featureArea');
+        let resultsContainer = document.getElementById('results');
+        
+        if (!featureArea) {
+            featureArea = document.createElement('div');
+            featureArea.id = 'featureArea';
+            featureArea.className = 'feature-area';
+            workflowExecution.insertBefore(featureArea, workflowExecution.firstChild);
+        }
+        
+        if (!resultsContainer) {
+            resultsContainer = document.createElement('div');
+            resultsContainer.id = 'results';
+            resultsContainer.className = 'results-container';
+            workflowExecution.appendChild(resultsContainer);
+        }
+        
+        // Set up the layout
+        featureArea.style.flex = '0 0 33vh';
+        featureArea.style.minHeight = '200px';
+        featureArea.style.padding = '20px';
+        featureArea.style.backgroundColor = '#f5f5f5';
+        featureArea.style.borderBottom = '1px solid #ddd';
+        
+        resultsContainer.style.flex = '1';
+        resultsContainer.style.overflowY = 'auto';
+        resultsContainer.style.padding = '20px';
+        resultsContainer.style.backgroundColor = '#fff';
+        
+        // Clear any existing content
+        featureArea.innerHTML = '';
+        resultsContainer.innerHTML = '';
+        
+        // Display initial wordlist
+        displayResults(currentFilteredWords);
+        
+        // Track the rank of MOST FREQUENT features
+        let mostFrequentRank = 1;
+        
+        // Execute each step in sequence
+        for (const step of steps) {
+            console.log('Executing step:', step);
+            
+            let featureId = step.feature + 'Feature';
+            if (step.feature === 'consonant') {
+                featureId = 'consonantQuestion';
+            }
+            
+            // Always create a fresh feature element for each step
+            let featureElement;
+            switch (step.feature) {
+                case 'mostFrequent':
+                    featureElement = createMostFrequentFeature();
+                    break;
+                case 'leastFrequent':
+                    featureElement = createLeastFrequentFeature();
+                    break;
+                case 'length':
+                    featureElement = createLengthFeature();
+                    break;
+                case 'notIn':
+                    featureElement = createNotInFeature();
+                    break;
+                case 'position1':
+                    featureElement = createPosition1Feature();
+                    break;
+                case 'vowel':
+                    featureElement = createVowelFeature();
+                    break;
+                case 'o':
+                    featureElement = createOFeature();
+                    break;
+                case 'lexicon':
+                    featureElement = createLexiconFeature();
+                    break;
+                case 'eee':
+                    featureElement = createEeeFeature();
+                    break;
+                case 'eeeFirst':
+                    featureElement = createEeeFirstFeature();
+                    break;
+                case 'originalLex':
+                    featureElement = createOriginalLexFeature();
+                    break;
+                case 'consonant':
+                    featureElement = createConsonantQuestion();
+                    break;
+                case 'colour3':
+                    featureElement = createColour3Feature();
+                    break;
+                case 'shape':
+                    featureElement = createShapeFeature();
+                    break;
+                case 'curved':
+                    featureElement = createCurvedFeature();
+                    break;
+                case 'abcde':
+                    featureElement = createAbcdeFeature();
+                    break;
+                default:
+                    featureElement = null;
+            }
+            if (!featureElement) continue;
+            featureArea.innerHTML = '';
+            featureArea.appendChild(featureElement);
+            featureElement.style.display = 'block';
+            
+            // For MOST FREQUENT feature, use the current rank
+            if (step.feature === 'mostFrequent') {
+                mostFrequentLetter = findMostFrequentLetter(currentFilteredWords, mostFrequentRank);
+                if (mostFrequentLetter) {
+                    const letterDisplay = featureElement.querySelector('.letter');
+                    if (letterDisplay) {
+                        letterDisplay.textContent = mostFrequentLetter;
+                    }
+                }
+            }
+            // For LEAST FREQUENT feature
+            else if (step.feature === 'leastFrequent') {
+                leastFrequentLetter = findLeastFrequentLetter(currentFilteredWords);
+                if (leastFrequentLetter) {
+                    const letterDisplay = featureElement.querySelector('.letter');
+                    if (letterDisplay) {
+                        letterDisplay.textContent = leastFrequentLetter;
+                    }
+                }
+            }
+            
+            // Set up event listeners for this feature
+            setupFeatureListeners(step.feature, (filteredWords) => {
+                currentFilteredWords = filteredWords;
+                displayResults(currentFilteredWords);
+            });
+            
+            // Wait for user interaction
+            await new Promise((resolve) => {
+                const handleFeatureComplete = () => {
+                    console.log(`Feature ${featureId} completed`);
+                    featureElement.classList.add('completed');
+                    featureElement.style.display = 'none';
+                    
+                    // If this was the MOST FREQUENT feature and YES was selected, increment the rank
+                    if (step.feature === 'mostFrequent' && mostFrequentLetter) {
+                        usedLettersInWorkflow.push(mostFrequentLetter);
+                        mostFrequentRank++;
+                    }
+                    
+                    resolve();
+                };
+                
+                featureElement.addEventListener('completed', handleFeatureComplete, { once: true });
+            });
+        }
+        
+        // Show final results
+        displayResults(currentFilteredWords);
+    } catch (error) {
+        console.error('Error executing workflow:', error);
+        throw error;
+    }
+}
+
 // Helper functions to create feature elements
 function createPosition1Feature() {
     const div = document.createElement('div');

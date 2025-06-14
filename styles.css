@@ -2343,18 +2343,4 @@ input:checked + .slider:before {
         max-height: 38px;
         font-size: 0.95em;
     }
-}
-
-.loading-indicator {
-    text-align: center;
-    padding: 20px;
-    font-size: 1.2em;
-    color: #666;
-}
-
-.error-message {
-    text-align: center;
-    padding: 20px;
-    font-size: 1.2em;
-    color: #ff0000;
 } 
