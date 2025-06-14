@@ -876,6 +876,8 @@ workflowSelect.addEventListener('touchend', function(e) {
     }
 }, { passive: false });
 
+let isFullWordlistLoaded = false;
+
 // Function to load word list
 async function loadWordList() {
     try {
@@ -893,6 +895,7 @@ async function loadWordList() {
                 break;
             case '134k':
                 wordlistPath = 'words/134K.txt';
+                isFullWordlistLoaded = false;
                 // For 134K, we'll load in chunks
                 const response = await fetch(wordlistPath);
                 if (!response.ok) {
@@ -902,6 +905,7 @@ async function loadWordList() {
                 // Get the total size of the file
                 const contentLength = response.headers.get('content-length');
                 const totalSize = parseInt(contentLength, 10);
+                console.log('Total file size:', totalSize, 'bytes');
                 
                 // Read the first chunk (first 100KB)
                 const chunkSize = 100 * 1024; // 100KB
@@ -919,6 +923,7 @@ async function loadWordList() {
                 // Load the rest in the background
                 setTimeout(async () => {
                     try {
+                        console.log('Starting to load full wordlist...');
                         const fullResponse = await fetch(wordlistPath);
                         const fullText = await fullResponse.text();
                         const allWords = fullText.split('\n').filter(word => word.trim());
@@ -927,6 +932,7 @@ async function loadWordList() {
                         wordList = allWords;
                         currentFilteredWords = [...wordList];
                         currentWordlistForVowels = [...wordList];
+                        isFullWordlistLoaded = true;
                         console.log('Full wordlist loaded:', wordList.length, 'words');
                         
                         // Update the display if we're showing results
@@ -954,6 +960,7 @@ async function loadWordList() {
         wordList = text.split('\n').filter(word => word.trim());
         currentFilteredWords = [...wordList];
         currentWordlistForVowels = [...wordList];
+        isFullWordlistLoaded = true;
         console.log('Wordlist loaded successfully:', wordList.length, 'words');
         return wordList;
     } catch (error) {
@@ -968,11 +975,21 @@ async function executeWorkflow(steps) {
         // Get the currently selected wordlist
         const wordlistSelect = document.getElementById('wordlistSelect');
         const selectedWordlist = wordlistSelect.value;
-        console.log('Selected wordlist:', selectedWordlist);
+        console.log('Starting workflow execution with wordlist:', selectedWordlist);
         
         // Load the wordlist first and wait for it to complete
         await loadWordList();
-        console.log('Wordlist loaded, word count:', wordList.length);
+        
+        // If using 134K wordlist, wait for full load
+        if (selectedWordlist === '134k' && !isFullWordlistLoaded) {
+            console.log('Waiting for full wordlist to load...');
+            while (!isFullWordlistLoaded) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            console.log('Full wordlist loaded, proceeding with workflow');
+        }
+        
+        console.log('Wordlist loaded for workflow, word count:', wordList.length);
         
         // Reset all feature states
         currentFilteredWords = [...wordList]; // Start with the full wordlist
