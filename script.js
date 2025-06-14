@@ -1001,6 +1001,7 @@ async function executeWorkflow(steps) {
             mostFrequentFeature: createMostFrequentFeature(),
             leastFrequentFeature: createLeastFrequentFeature(),
             notInFeature: createNotInFeature(),
+            abcde: createAbcdeFeature(),
         };
         
         // Add all feature elements to the document body
@@ -1111,6 +1112,9 @@ async function executeWorkflow(steps) {
                     break;
                 case 'curved':
                     featureElement = createCurvedFeature();
+                    break;
+                case 'abcde':
+                    featureElement = createAbcdeFeature();
                     break;
                 default:
                     featureElement = null;
@@ -1426,6 +1430,58 @@ function createNotInFeature() {
         </div>
     `;
     return div;
+}
+
+// --- ABCDE Feature Logic ---
+function createAbcdeFeature() {
+    const div = document.createElement('div');
+    div.id = 'abcdeFeature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">ABCDE</h2>
+        <div class="abcde-row" style="display: flex; justify-content: center; gap: 10px;">
+            <div class="abcde-letter-group" data-letter="A">
+                <div class="abcde-letter">A</div>
+                <button class="abcde-yes-btn" data-letter="A">YES</button>
+            </div>
+            <div class="abcde-letter-group" data-letter="B">
+                <div class="abcde-letter">B</div>
+                <button class="abcde-yes-btn" data-letter="B">YES</button>
+            </div>
+            <div class="abcde-letter-group" data-letter="C">
+                <div class="abcde-letter">C</div>
+                <button class="abcde-yes-btn" data-letter="C">YES</button>
+            </div>
+            <div class="abcde-letter-group" data-letter="D">
+                <div class="abcde-letter">D</div>
+                <button class="abcde-yes-btn" data-letter="D">YES</button>
+            </div>
+            <div class="abcde-letter-group" data-letter="E">
+                <div class="abcde-letter">E</div>
+                <button class="abcde-yes-btn" data-letter="E">YES</button>
+            </div>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; margin-top: 20px; gap: 10px;">
+            <button id="abcdeDoneButton">DONE</button>
+            <button id="abcdeSkipButton" class="skip-button">SKIP</button>
+        </div>
+    `;
+    return div;
+}
+
+// Filtering logic for ABCDE feature
+function filterWordsByAbcde(words, yesLetters) {
+    return words.filter(word => {
+        // Must include all YES letters
+        for (const letter of yesLetters) {
+            if (!word.includes(letter)) return false;
+        }
+        // Must NOT include any of the other letters (A-E not in yesLetters)
+        for (const letter of ['A','B','C','D','E']) {
+            if (!yesLetters.includes(letter) && word.includes(letter)) return false;
+        }
+        return true;
+    });
 }
 
 // Function to setup feature listeners
@@ -2165,6 +2221,55 @@ function setupFeatureListeners(feature, callback) {
             }
             break;
         }
+
+        case 'abcde': {
+            const yesBtns = Array.from(document.querySelectorAll('.abcde-yes-btn'));
+            const doneBtn = document.getElementById('abcdeDoneButton');
+            const skipBtn = document.getElementById('abcdeSkipButton');
+            let yesLetters = [];
+
+            yesBtns.forEach(btn => {
+                btn.classList.remove('active');
+                btn.onclick = () => {
+                    const letter = btn.dataset.letter;
+                    if (yesLetters.includes(letter)) {
+                        yesLetters = yesLetters.filter(l => l !== letter);
+                        btn.classList.remove('active');
+                    } else {
+                        yesLetters.push(letter);
+                        btn.classList.add('active');
+                    }
+                };
+                // Touch event for mobile
+                btn.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    btn.onclick();
+                }, { passive: false });
+            });
+
+            if (doneBtn) {
+                doneBtn.onclick = () => {
+                    const filteredWords = filterWordsByAbcde(currentFilteredWords, yesLetters);
+                    callback(filteredWords);
+                    document.getElementById('abcdeFeature').dispatchEvent(new Event('completed'));
+                };
+                doneBtn.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    doneBtn.onclick();
+                }, { passive: false });
+            }
+            if (skipBtn) {
+                skipBtn.onclick = () => {
+                    callback(currentFilteredWords);
+                    document.getElementById('abcdeFeature').dispatchEvent(new Event('completed'));
+                };
+                skipBtn.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    skipBtn.onclick();
+                }, { passive: false });
+            }
+            break;
+        }
     }
 }
 
@@ -2340,6 +2445,7 @@ function showNextFeature() {
         'mostFrequentFeature',
         'leastFrequentFeature',
         'notInFeature',
+        'abcdeFeature',
     ];
     
     // Hide all features first
@@ -2380,6 +2486,9 @@ function showNextFeature() {
     }
     else if (!document.getElementById('notInFeature').classList.contains('completed')) {
         document.getElementById('notInFeature').style.display = 'block';
+    }
+    else if (!document.getElementById('abcdeFeature').classList.contains('completed')) {
+        document.getElementById('abcdeFeature').style.display = 'block';
     }
     else {
         expandWordList();
@@ -2427,6 +2536,7 @@ function resetApp() {
         'mostFrequentFeature',
         'leastFrequentFeature',
         'notInFeature',
+        'abcdeFeature',
     ];
     
     features.forEach(featureId => {
