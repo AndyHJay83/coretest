@@ -2240,9 +2240,9 @@ input:checked + .slider:before {
 
 /* Mobile Styles for Length Feature */
 @media (max-width: 600px) {
-    .length-input input[type="number"] {
-        padding: 15px;
-        font-size: 16px !important;
+    .length-input input[type="text"] {
+        padding: 20px 16px;
+        font-size: 20px !important;
         border-width: 2px;
         -webkit-appearance: none;
         appearance: none;
@@ -2250,7 +2250,10 @@ input:checked + .slider:before {
         position: relative;
         z-index: 2;
         text-align: center;
-        min-height: 44px;
+        min-height: 56px;
+        width: 100%;
+        box-sizing: border-box;
+        margin: 0;
     }
 }
 

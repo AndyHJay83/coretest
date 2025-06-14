@@ -3218,9 +3218,9 @@ function initializeFeatureSelection() {
                 }
                 touchTimeout = setTimeout(() => {
                     const featureType = newButton.dataset.feature;
-                    if (!isFeatureAlreadySelected(featureType)) {
-                        addFeatureToSelected(featureType);
-                    }
+                if (!isFeatureAlreadySelected(featureType)) {
+                    addFeatureToSelected(featureType);
+                }
                 }, 100);
             }, { passive: false });
         });
