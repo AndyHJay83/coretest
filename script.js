@@ -1064,13 +1064,58 @@ async function executeWorkflow(steps) {
                 featureId = 'consonantQuestion';
             }
             
-            const featureElement = featureElements[featureId];
-            if (!featureElement) {
-                console.error(`Feature element not found for step: ${featureId}`);
-                continue;
+            // Always create a fresh feature element for each step
+            let featureElement;
+            switch (step.feature) {
+                case 'mostFrequent':
+                    featureElement = createMostFrequentFeature();
+                    break;
+                case 'leastFrequent':
+                    featureElement = createLeastFrequentFeature();
+                    break;
+                case 'length':
+                    featureElement = createLengthFeature();
+                    break;
+                case 'notIn':
+                    featureElement = createNotInFeature();
+                    break;
+                case 'position1':
+                    featureElement = createPosition1Feature();
+                    break;
+                case 'vowel':
+                    featureElement = createVowelFeature();
+                    break;
+                case 'o':
+                    featureElement = createOFeature();
+                    break;
+                case 'lexicon':
+                    featureElement = createLexiconFeature();
+                    break;
+                case 'eee':
+                    featureElement = createEeeFeature();
+                    break;
+                case 'eeeFirst':
+                    featureElement = createEeeFirstFeature();
+                    break;
+                case 'originalLex':
+                    featureElement = createOriginalLexFeature();
+                    break;
+                case 'consonant':
+                    featureElement = createConsonantQuestion();
+                    break;
+                case 'colour3':
+                    featureElement = createColour3Feature();
+                    break;
+                case 'shape':
+                    featureElement = createShapeFeature();
+                    break;
+                case 'curved':
+                    featureElement = createCurvedFeature();
+                    break;
+                default:
+                    featureElement = null;
             }
-            
-            // Move the feature to the feature area
+            if (!featureElement) continue;
             featureArea.innerHTML = '';
             featureArea.appendChild(featureElement);
             featureElement.style.display = 'block';
