@@ -3226,6 +3226,20 @@ function removeFeature(featureType) {
 // Initialize drag and drop when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     initializeDragAndDrop();
+    // ... existing code ...
+    // Improve LENGTH input touch sensitivity
+    const lengthInput = document.getElementById('lengthInput');
+    if (lengthInput) {
+        lengthInput.setAttribute('tabindex', '0');
+        lengthInput.addEventListener('touchstart', function(e) {
+            e.stopPropagation();
+            this.focus();
+        }, { passive: false });
+        lengthInput.addEventListener('click', function() {
+            this.focus();
+        });
+    }
+    // ... existing code ...
 });
 
 // Re-initialize drag and drop when new content is added
