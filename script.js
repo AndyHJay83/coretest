@@ -57,6 +57,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Initialize NOT IN feature
     initializeNotInFeature();
+
+    // Add wordlist change listener
+    const wordlistSelect = document.getElementById('wordlistSelect');
+    wordlistSelect.addEventListener('change', async () => {
+        await loadWordList();
+        // Reset any active features or filters
+        currentFilteredWords = [...wordList];
+        displayResults(currentFilteredWords);
+    });
 });
 
 // Function to initialize dropdowns
@@ -858,7 +867,21 @@ workflowSelect.addEventListener('touchend', function(e) {
 // Function to load word list
 async function loadWordList() {
     try {
-        const response = await fetch('words/ENUK-Long words Noun.txt');
+        const wordlistSelect = document.getElementById('wordlistSelect');
+        const selectedWordlist = wordlistSelect.value;
+        let wordlistPath;
+        
+        switch(selectedWordlist) {
+            case '19127':
+                wordlistPath = 'words/19127.txt';
+                break;
+            case 'enuk':
+            default:
+                wordlistPath = 'words/ENUK-Long words Noun.txt';
+                break;
+        }
+        
+        const response = await fetch(wordlistPath);
         if (!response.ok) {
             throw new Error('Failed to load wordlist');
         }
