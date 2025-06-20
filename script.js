@@ -879,43 +879,97 @@ workflowSelect.addEventListener('touchend', function(e) {
 // Function to load word list
 async function loadWordList() {
     try {
+        // Show loading indicator
+        const loadingIndicator = document.createElement('div');
+        loadingIndicator.id = 'loadingIndicator';
+        loadingIndicator.innerHTML = `
+            <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                        background: rgba(0,0,0,0.8); color: white; padding: 20px; border-radius: 10px; 
+                        z-index: 10000; text-align: center;">
+                <div>Loading wordlist...</div>
+                <div style="margin-top: 10px; font-size: 12px;">This may take a moment for large files</div>
+            </div>
+        `;
+        document.body.appendChild(loadingIndicator);
+        
         const wordlistSelect = document.getElementById('wordlistSelect');
         const selectedWordlist = wordlistSelect.value;
         console.log('Selected wordlist value:', selectedWordlist);
         let wordlistPath;
+        let gzippedPath;
         
         switch(selectedWordlist) {
             case '19127':
                 wordlistPath = 'words/19127.txt';
+                gzippedPath = 'words/19127.txt.gz';
                 break;
             case 'emotions':
                 wordlistPath = 'words/EmotionsJobsSpiritAnimals.txt';
+                gzippedPath = 'words/EmotionsJobsSpiritAnimals.txt.gz';
                 break;
             case '134k':
                 wordlistPath = 'words/134K.txt';
+                gzippedPath = 'words/134K.txt.gz';
                 break;
             case 'enuk':
             default:
                 wordlistPath = 'words/ENUK-Long words Noun.txt';
+                gzippedPath = 'words/ENUK-Long words Noun.txt.gz';
                 break;
         }
         console.log('Selected wordlist path:', wordlistPath);
+        console.log('Gzipped path:', gzippedPath);
         
-        const response = await fetch(wordlistPath);
-        console.log('Fetch response status:', response.status);
-        if (!response.ok) {
-            throw new Error('Failed to load wordlist');
+        let response;
+        let text;
+        
+        // Try gzipped file first for better performance
+        try {
+            console.log('Attempting to load gzipped file...');
+            response = await fetch(gzippedPath);
+            if (response.ok) {
+                const arrayBuffer = await response.arrayBuffer();
+                // Decompress using pako (if available) or fallback to text
+                if (typeof pako !== 'undefined') {
+                    const decompressed = pako.inflate(new Uint8Array(arrayBuffer), { to: 'string' });
+                    text = decompressed;
+                    console.log('Successfully loaded and decompressed gzipped file');
+                } else {
+                    // Fallback to uncompressed file
+                    throw new Error('Pako not available, falling back to uncompressed');
+                }
+            } else {
+                throw new Error('Gzipped file not found, falling back to uncompressed');
+            }
+        } catch (gzipError) {
+            console.log('Gzipped file failed, loading uncompressed file:', gzipError.message);
+            response = await fetch(wordlistPath);
+            if (!response.ok) {
+                throw new Error('Failed to load wordlist');
+            }
+            text = await response.text();
         }
-        const text = await response.text();
+        
         console.log('Text loaded, length:', text.length);
         wordList = text.split('\n').filter(word => word.trim());
         console.log('Filtered words count:', wordList.length);
         currentFilteredWords = [...wordList];
         currentWordlistForVowels = [...wordList];
         console.log('Wordlist loaded successfully:', wordList.length, 'words');
+        
+        // Remove loading indicator
+        if (loadingIndicator.parentNode) {
+            loadingIndicator.parentNode.removeChild(loadingIndicator);
+        }
+        
         return wordList;
     } catch (error) {
         console.error('Error loading wordlist:', error);
+        // Remove loading indicator on error
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        if (loadingIndicator && loadingIndicator.parentNode) {
+            loadingIndicator.parentNode.removeChild(loadingIndicator);
+        }
         throw error;
     }
 }
