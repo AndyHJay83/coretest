@@ -2351,15 +2351,6 @@ function setupFeatureListeners(feature, callback) {
                 }
             }
             
-            // If auto-answered, process immediately
-            if (autoAnswered) {
-                setTimeout(() => {
-                    const filteredWords = filterWordsByMostFrequent(currentFilteredWords, mostFrequentLetter, autoAnswer);
-                    callback(filteredWords);
-                    document.getElementById('mostFrequentFeature').classList.add('completed');
-                    document.getElementById('mostFrequentFeature').dispatchEvent(new Event('completed'));
-                }, 1000); // Show the auto-answer for 1 second
-                return;
             }
             
             if (frequentYesBtn) {
