@@ -931,6 +931,10 @@ async function loadWordList() {
                 wordlistPath = 'words/AllNames.txt';
                 gzippedPath = 'words/AllNames.txt.gz';
                 break;
+            case 'colouritems':
+                wordlistPath = 'words/ColourItems.txt';
+                gzippedPath = 'words/ColourItems.txt.gz';
+                break;
             case 'enuk':
             default:
                 wordlistPath = 'words/ENUK-Long words Noun.txt';
