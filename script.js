@@ -919,6 +919,14 @@ async function loadWordList() {
                 wordlistPath = 'words/134K.txt';
                 gzippedPath = 'words/134K.txt.gz';
                 break;
+            case 'boysnames':
+                wordlistPath = 'words/BoysNames.txt';
+                gzippedPath = 'words/BoysNames.txt.gz';
+                break;
+            case 'girlsnames':
+                wordlistPath = 'words/GirlsNames.txt';
+                gzippedPath = 'words/GirlsNames.txt.gz';
+                break;
             case 'enuk':
             default:
                 wordlistPath = 'words/ENUK-Long words Noun.txt';
