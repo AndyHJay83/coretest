@@ -2351,8 +2351,6 @@ function setupFeatureListeners(feature, callback) {
                 }
             }
             
-            }
-            
             if (frequentYesBtn) {
                 frequentYesBtn.onclick = () => {
                     if (mostFrequentLetter) {
