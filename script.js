@@ -4039,7 +4039,10 @@ function findMostFrequentLetter(words, rank = 1) {
     const frequencyMap = new Map();
     words.forEach(word => {
         [...word].forEach(letter => {
-            frequencyMap.set(letter, (frequencyMap.get(letter) || 0) + 1);
+            // Only count letters A-Z (same filter as findLeastFrequentLetter)
+            if (/^[A-Z]$/.test(letter)) {
+                frequencyMap.set(letter, (frequencyMap.get(letter) || 0) + 1);
+            }
         });
     });
     
