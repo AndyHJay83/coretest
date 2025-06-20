@@ -2333,33 +2333,13 @@ function setupFeatureListeners(feature, callback) {
             const frequentSkipButton = document.getElementById('frequentSkipButton');
             const letterDisplay = document.querySelector('#mostFrequentFeature .letter');
             
-            // Find and display most frequent letter
+            // Find and display most frequent letter (will skip already-answered letters)
             mostFrequentLetter = findMostFrequentLetter(currentFilteredWords);
-            
-            // Check if we already know about this letter from workflow state
-            const letterStatus = getLetterStatus(mostFrequentLetter);
-            let autoAnswered = false;
-            let autoAnswer = null;
-            
-            if (letterStatus === 'confirmed') {
-                autoAnswered = true;
-                autoAnswer = true; // YES
-                console.log(`Auto-answering MOST FREQUENT: ${mostFrequentLetter} = YES (already confirmed in workflow)`);
-            } else if (letterStatus === 'excluded') {
-                autoAnswered = true;
-                autoAnswer = false; // NO
-                console.log(`Auto-answering MOST FREQUENT: ${mostFrequentLetter} = NO (already excluded in workflow)`);
-            }
             
             if (letterDisplay) {
                 if (mostFrequentLetter) {
-                    if (autoAnswered) {
-                        letterDisplay.textContent = `${mostFrequentLetter} (Auto: ${autoAnswer ? 'YES' : 'NO'})`;
-                        letterDisplay.style.color = '#28a745'; // Green for auto-answered
-                    } else {
-                        letterDisplay.textContent = mostFrequentLetter;
-                        letterDisplay.style.color = '#000'; // Normal color
-                    }
+                    letterDisplay.textContent = mostFrequentLetter;
+                    letterDisplay.style.color = '#000'; // Normal color
                     // Enable buttons if we have a letter
                     if (frequentYesBtn) frequentYesBtn.disabled = false;
                     if (frequentNoBtn) frequentNoBtn.disabled = false;
@@ -2452,53 +2432,22 @@ function setupFeatureListeners(feature, callback) {
             const leastFrequentSkipButton = document.getElementById('leastFrequentSkipButton');
             const letterDisplay = document.querySelector('#leastFrequentFeature .letter');
             
-            // Find and display least frequent letter
+            // Find and display least frequent letter (will skip already-answered letters)
             leastFrequentLetter = findLeastFrequentLetter(currentFilteredWords);
-            
-            // Check if we already know about this letter from workflow state
-            const letterStatus = getLetterStatus(leastFrequentLetter);
-            let autoAnswered = false;
-            let autoAnswer = null;
-            
-            if (letterStatus === 'confirmed') {
-                autoAnswered = true;
-                autoAnswer = true; // YES
-                console.log(`Auto-answering LEAST FREQUENT: ${leastFrequentLetter} = YES (already confirmed in workflow)`);
-            } else if (letterStatus === 'excluded') {
-                autoAnswered = true;
-                autoAnswer = false; // NO
-                console.log(`Auto-answering LEAST FREQUENT: ${leastFrequentLetter} = NO (already excluded in workflow)`);
-            }
             
             if (letterDisplay) {
                 if (leastFrequentLetter) {
-                    if (autoAnswered) {
-                        letterDisplay.textContent = `${leastFrequentLetter} (Auto: ${autoAnswer ? 'YES' : 'NO'})`;
-                        letterDisplay.style.color = '#28a745'; // Green for auto-answered
-                    } else {
-                        letterDisplay.textContent = leastFrequentLetter;
-                        letterDisplay.style.color = '#000'; // Normal color
-                    }
+                    letterDisplay.textContent = leastFrequentLetter;
+                    letterDisplay.style.color = '#000'; // Normal color
                     // Enable buttons if we have a letter
                     if (leastFrequentYesBtn) leastFrequentYesBtn.disabled = false;
                     if (leastFrequentNoBtn) leastFrequentNoBtn.disabled = false;
                 } else {
-                    letterDisplay.textContent = 'No letters found';
-                    // Disable buttons if no letters
+                    letterDisplay.textContent = 'No more unique letters';
+                    // Disable buttons if no more letters
                     if (leastFrequentYesBtn) leastFrequentYesBtn.disabled = true;
                     if (leastFrequentNoBtn) leastFrequentNoBtn.disabled = true;
                 }
-            }
-            
-            // If auto-answered, process immediately
-            if (autoAnswered) {
-                setTimeout(() => {
-                    const filteredWords = filterWordsByLeastFrequent(currentFilteredWords, leastFrequentLetter, autoAnswer);
-                    callback(filteredWords);
-                    document.getElementById('leastFrequentFeature').classList.add('completed');
-                    document.getElementById('leastFrequentFeature').dispatchEvent(new Event('completed'));
-                }, 1000); // Show the auto-answer for 1 second
-                return;
             }
             
             if (leastFrequentYesBtn) {
@@ -4409,17 +4358,18 @@ function findMostFrequentLetter(words, rank = 1) {
         .sort((a, b) => b[1] - a[1])
         .map(entry => entry[0]);
     
-    // Find the nth most frequent letter that hasn't been used
+    // Find the nth most frequent letter that hasn't been answered in this workflow
     let count = 0;
     for (const letter of sortedLetters) {
-        if (!usedLettersInWorkflow.includes(letter)) {
+        // Skip letters that have already been confirmed or excluded in this workflow
+        if (!workflowState.confirmedLetters.has(letter) && !workflowState.excludedLetters.has(letter)) {
             count++;
             if (count === rank) {
                 return letter;
             }
         }
     }
-    return null;  // No more unique frequent letters
+    return null;  // No more unique frequent letters that haven't been answered
 }
 
 // Add filtering function
@@ -4448,8 +4398,14 @@ function findLeastFrequentLetter(words) {
         .sort((a, b) => a[1] - b[1])
         .map(entry => entry[0]);
     
-    // Return the least frequent letter
-    return sortedLetters[0] || null;
+    // Return the least frequent letter that hasn't been answered in this workflow
+    for (const letter of sortedLetters) {
+        // Skip letters that have already been confirmed or excluded in this workflow
+        if (!workflowState.confirmedLetters.has(letter) && !workflowState.excludedLetters.has(letter)) {
+            return letter;
+        }
+    }
+    return null;  // No more unique letters that haven't been answered
 }
 
 // Function to filter words based on least frequent letter
