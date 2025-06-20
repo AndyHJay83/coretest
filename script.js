@@ -1056,6 +1056,7 @@ async function executeWorkflow(steps) {
             leastFrequentFeature: createLeastFrequentFeature(),
             notInFeature: createNotInFeature(),
             abcde: createAbcdeFeature(),
+            abc: createAbcFeature(),
         };
         
         // Add all feature elements to the document body
@@ -1169,6 +1170,9 @@ async function executeWorkflow(steps) {
                     break;
                 case 'abcde':
                     featureElement = createAbcdeFeature();
+                    break;
+                case 'abc':
+                    featureElement = createAbcFeature();
                     break;
                 default:
                     featureElement = null;
@@ -1523,6 +1527,35 @@ function createAbcdeFeature() {
     return div;
 }
 
+// --- ABC Feature Logic ---
+function createAbcFeature() {
+    const div = document.createElement('div');
+    div.id = 'abcFeature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">ABC</h2>
+        <div class="abc-row" style="display: flex; justify-content: center; gap: 10px;">
+            <div class="abc-letter-group" data-letter="A">
+                <div class="abc-letter">A</div>
+                <button class="abc-yes-btn" data-letter="A">YES</button>
+            </div>
+            <div class="abc-letter-group" data-letter="B">
+                <div class="abc-letter">B</div>
+                <button class="abc-yes-btn" data-letter="B">YES</button>
+            </div>
+            <div class="abc-letter-group" data-letter="C">
+                <div class="abc-letter">C</div>
+                <button class="abc-yes-btn" data-letter="C">YES</button>
+            </div>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; margin-top: 20px; gap: 10px;">
+            <button id="abcDoneButton">DONE</button>
+            <button id="abcSkipButton" class="skip-button">SKIP</button>
+        </div>
+    `;
+    return div;
+}
+
 // Filtering logic for ABCDE feature
 function filterWordsByAbcde(words, yesLetters) {
     return words.filter(word => {
@@ -1532,6 +1565,21 @@ function filterWordsByAbcde(words, yesLetters) {
         }
         // Must NOT include any of the other letters (A-E not in yesLetters)
         for (const letter of ['A','B','C','D','E']) {
+            if (!yesLetters.includes(letter) && word.includes(letter)) return false;
+        }
+        return true;
+    });
+}
+
+// Filtering logic for ABC feature
+function filterWordsByAbc(words, yesLetters) {
+    return words.filter(word => {
+        // Must include all YES letters
+        for (const letter of yesLetters) {
+            if (!word.includes(letter)) return false;
+        }
+        // Must NOT include any of the other letters (A-C not in yesLetters)
+        for (const letter of ['A','B','C']) {
             if (!yesLetters.includes(letter) && word.includes(letter)) return false;
         }
         return true;
@@ -2328,6 +2376,58 @@ function setupFeatureListeners(feature, callback) {
             }
             break;
         }
+        case 'abc': {
+            const yesBtns = Array.from(document.querySelectorAll('.abc-yes-btn'));
+            const doneBtn = document.getElementById('abcDoneButton');
+            const skipBtn = document.getElementById('abcSkipButton');
+            let yesLetters = [];
+
+            yesBtns.forEach(btn => {
+                btn.classList.remove('active');
+                btn.onclick = () => {
+                    const letter = btn.dataset.letter;
+                    if (yesLetters.includes(letter)) {
+                        yesLetters = yesLetters.filter(l => l !== letter);
+                        btn.classList.remove('active');
+                    } else {
+                        yesLetters.push(letter);
+                        btn.classList.add('active');
+                    }
+                };
+                // Touch event for mobile
+                btn.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    btn.onclick();
+                }, { passive: false });
+            });
+
+            if (doneBtn) {
+                doneBtn.onclick = () => {
+                    const filteredWords = filterWordsByAbc(currentFilteredWords, yesLetters);
+                    callback(filteredWords);
+                    const featureDiv = document.getElementById('abcFeature');
+                    featureDiv.classList.add('completed');
+                    featureDiv.dispatchEvent(new Event('completed'));
+                };
+                doneBtn.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    doneBtn.onclick();
+                }, { passive: false });
+            }
+            if (skipBtn) {
+                skipBtn.onclick = () => {
+                    callback(currentFilteredWords);
+                    const featureDiv = document.getElementById('abcFeature');
+                    featureDiv.classList.add('completed');
+                    featureDiv.dispatchEvent(new Event('completed'));
+                };
+                skipBtn.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    skipBtn.onclick();
+                }, { passive: false });
+            }
+            break;
+        }
     }
 }
 
@@ -2504,6 +2604,7 @@ function showNextFeature() {
         'leastFrequentFeature',
         'notInFeature',
         'abcdeFeature',
+        'abcFeature',
     ];
     
     // Hide all features first
@@ -2547,6 +2648,9 @@ function showNextFeature() {
     }
     else if (!document.getElementById('abcdeFeature').classList.contains('completed')) {
         document.getElementById('abcdeFeature').style.display = 'block';
+    }
+    else if (!document.getElementById('abcFeature').classList.contains('completed')) {
+        document.getElementById('abcFeature').style.display = 'block';
     }
     else {
         expandWordList();
@@ -2595,6 +2699,7 @@ function resetApp() {
         'leastFrequentFeature',
         'notInFeature',
         'abcdeFeature',
+        'abcFeature',
     ];
     
     features.forEach(featureId => {

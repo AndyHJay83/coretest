@@ -1817,35 +1817,35 @@ input:checked + .slider:before {
 
 /* Mobile styles */
 @media (max-width: 768px) {
-    .dropdown {
-        max-width: 100%;
-    }
-    
-    .options-list,
-    .options-list.show {
-        position: absolute;
-        width: 100%;
-        height: auto;
-        max-height: none;
-        overflow: visible;
-    }
-    
-    .option {
-        padding: 12px;
-        font-size: 16px;
-        min-height: 44px;
-    }
-}
-
-/* Ensure dropdown is above other elements */
-.dropdown.workflow-dropdown .options-list,
-.dropdown.workflow-dropdown .options-list.show {
-    z-index: 9999;
+  .dropdown {
+    max-width: 100%;
+  }
+  
+  .options-list,
+  .options-list.show {
     position: absolute;
     width: 100%;
     height: auto;
     max-height: none;
     overflow: visible;
+  }
+  
+  .option {
+    padding: 12px;
+    font-size: 16px;
+    min-height: 44px;
+  }
+}
+
+/* Ensure dropdown is above other elements */
+.dropdown.workflow-dropdown .options-list,
+.dropdown.workflow-dropdown .options-list.show {
+  z-index: 9999;
+  position: absolute;
+  width: 100%;
+  height: auto;
+  max-height: none;
+  overflow: visible;
 }
 
 /* Feature Info Button Styles */
@@ -2335,6 +2335,65 @@ input:checked + .slider:before {
         gap: 6px;
     }
     .abcde-yes-btn {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        min-height: 38px;
+        max-width: 38px;
+        max-height: 38px;
+        font-size: 0.95em;
+    }
+}
+
+/* ABC Feature Styles */
+.abc-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+.abc-letter-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.abc-letter {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+.abc-yes-btn {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    max-width: 44px;
+    max-height: 44px;
+    border-radius: 8px;
+    background: #f0f0f0;
+    border: 1px solid #1B5E20;
+    color: #1B5E20;
+    font-weight: bold;
+    font-size: 1em;
+    margin-bottom: 2px;
+    transition: background 0.2s, color 0.2s;
+    box-sizing: border-box;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.abc-yes-btn.active {
+    background: #2196F3 !important; /* Bright blue */
+    color: #fff !important;
+    border-color: #1976D2 !important;
+    box-shadow: 0 0 0 2px #1976D233;
+}
+
+@media (max-width: 600px) {
+    .abc-row {
+        gap: 6px;
+    }
+    .abc-yes-btn {
         width: 38px;
         height: 38px;
         min-width: 38px;
