@@ -2559,7 +2559,6 @@ function setupFeatureListeners(feature, callback) {
             const yesBtns = Array.from(document.querySelectorAll('.abcde-yes-btn'));
             const doneBtn = document.getElementById('abcdeDoneButton');
             const skipBtn = document.getElementById('abcdeSkipButton');
-            const noneBtn = document.getElementById('abcdeNoneButton');
             let yesLetters = [];
 
             yesBtns.forEach(btn => {
@@ -2612,38 +2611,6 @@ function setupFeatureListeners(feature, callback) {
                     doneBtn.onclick();
                 }, { passive: false });
             }
-            
-            if (noneBtn) {
-                noneBtn.onclick = () => {
-                    // Update workflow state - exclude all ABCDE letters
-                    workflowState.abcdeSelection = new Set([]);
-                    
-                    // Add all ABCDE letters to excluded letters
-                    ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
-                        workflowState.excludedLetters.add(letter);
-                    });
-                    
-                    console.log(`ABCDE feature completed. NONE selected - all letters excluded`);
-                    logWorkflowState();
-                    
-                    // Filter out words containing any of A, B, C, D, E
-                    const filteredWords = currentFilteredWords.filter(word => {
-                        return !['A', 'B', 'C', 'D', 'E'].some(letter => 
-                            word.toUpperCase().includes(letter)
-                        );
-                    });
-                    
-                    callback(filteredWords);
-                    const featureDiv = document.getElementById('abcdeFeature');
-                    featureDiv.classList.add('completed');
-                    featureDiv.dispatchEvent(new Event('completed'));
-                };
-                noneBtn.addEventListener('touchstart', function(e) {
-                    e.preventDefault();
-                    noneBtn.onclick();
-                }, { passive: false });
-            }
-            
             if (skipBtn) {
                 skipBtn.onclick = () => {
                     callback(currentFilteredWords);
@@ -2662,7 +2629,6 @@ function setupFeatureListeners(feature, callback) {
             const yesBtns = Array.from(document.querySelectorAll('.abc-yes-btn'));
             const doneBtn = document.getElementById('abcDoneButton');
             const skipBtn = document.getElementById('abcSkipButton');
-            const noneBtn = document.getElementById('abcNoneButton');
             let yesLetters = [];
 
             yesBtns.forEach(btn => {
@@ -2715,38 +2681,6 @@ function setupFeatureListeners(feature, callback) {
                     doneBtn.onclick();
                 }, { passive: false });
             }
-            
-            if (noneBtn) {
-                noneBtn.onclick = () => {
-                    // Update workflow state - exclude all ABC letters
-                    workflowState.abcSelection = new Set([]);
-                    
-                    // Add all ABC letters to excluded letters
-                    ['A', 'B', 'C'].forEach(letter => {
-                        workflowState.excludedLetters.add(letter);
-                    });
-                    
-                    console.log(`ABC feature completed. NONE selected - all letters excluded`);
-                    logWorkflowState();
-                    
-                    // Filter out words containing any of A, B, C
-                    const filteredWords = currentFilteredWords.filter(word => {
-                        return !['A', 'B', 'C'].some(letter => 
-                            word.toUpperCase().includes(letter)
-                        );
-                    });
-                    
-                    callback(filteredWords);
-                    const featureDiv = document.getElementById('abcFeature');
-                    featureDiv.classList.add('completed');
-                    featureDiv.dispatchEvent(new Event('completed'));
-                };
-                noneBtn.addEventListener('touchstart', function(e) {
-                    e.preventDefault();
-                    noneBtn.onclick();
-                }, { passive: false });
-            }
-            
             if (skipBtn) {
                 skipBtn.onclick = () => {
                     callback(currentFilteredWords);
