@@ -28,6 +28,70 @@ let letterFrequencyMap = new Map();  // Store frequency of all letters
 let workflows = JSON.parse(localStorage.getItem('workflows')) || [];
 let currentWorkflow = null;
 
+// Global workflow state management
+let workflowState = {
+    confirmedLetters: new Set(), // Letters we KNOW are in the word
+    excludedLetters: new Set(),  // Letters we KNOW are NOT in the word
+    confirmedPositions: {},      // Letters we know are at specific positions
+    wordLength: null,           // If we know the word length
+    hasVowels: new Set(),       // Vowels we've confirmed are in the word
+    excludedVowels: new Set(),  // Vowels we've confirmed are NOT in the word
+    hasO: null,                 // Whether word contains 'O' (from O? feature)
+    hasE: null,                 // Whether word contains 'E' (from EEE features)
+    abcdeSelection: new Set(),  // Letters selected in ABCDE feature
+    abcSelection: new Set(),    // Letters selected in ABC feature
+    mostFrequentRank: 1,        // Current rank for most frequent letter
+    leastFrequentRank: 1,       // Current rank for least frequent letter
+    usedLettersInWorkflow: []   // Track letters used in workflow (existing)
+};
+
+// Function to reset workflow state
+function resetWorkflowState() {
+    workflowState = {
+        confirmedLetters: new Set(),
+        excludedLetters: new Set(),
+        confirmedPositions: {},
+        wordLength: null,
+        hasVowels: new Set(),
+        excludedVowels: new Set(),
+        hasO: null,
+        hasE: null,
+        abcdeSelection: new Set(),
+        abcSelection: new Set(),
+        mostFrequentRank: 1,
+        leastFrequentRank: 1,
+        usedLettersInWorkflow: []
+    };
+}
+
+// Function to check if a letter is already known
+function isLetterKnown(letter) {
+    return workflowState.confirmedLetters.has(letter) || workflowState.excludedLetters.has(letter);
+}
+
+// Function to get known status of a letter
+function getLetterStatus(letter) {
+    if (workflowState.confirmedLetters.has(letter)) return 'confirmed';
+    if (workflowState.excludedLetters.has(letter)) return 'excluded';
+    return 'unknown';
+}
+
+// Function to log workflow state for debugging
+function logWorkflowState() {
+    console.log('=== WORKFLOW STATE ===');
+    console.log('Confirmed letters:', Array.from(workflowState.confirmedLetters));
+    console.log('Excluded letters:', Array.from(workflowState.excludedLetters));
+    console.log('Confirmed positions:', workflowState.confirmedPositions);
+    console.log('Word length:', workflowState.wordLength);
+    console.log('Has vowels:', Array.from(workflowState.hasVowels));
+    console.log('Excluded vowels:', Array.from(workflowState.excludedVowels));
+    console.log('Has O:', workflowState.hasO);
+    console.log('Has E:', workflowState.hasE);
+    console.log('ABCDE selection:', Array.from(workflowState.abcdeSelection));
+    console.log('ABC selection:', Array.from(workflowState.abcSelection));
+    console.log('=====================');
+}
+
 // DOM Elements
 const createWorkflowButton = document.getElementById('createWorkflowButton');
 const cancelWorkflowButton = document.getElementById('cancelWorkflowButton');
@@ -1070,6 +1134,10 @@ async function executeWorkflow(steps) {
             lastLoadedWordlist = selectedWordlist;
         }
         console.log('Wordlist loaded, word count:', wordList.length);
+        
+        // Reset workflow state at the beginning of each workflow
+        resetWorkflowState();
+        console.log('Workflow state reset');
         
         // Reset all feature states
         currentFilteredWords = [...wordList]; // Start with the full wordlist
@@ -2267,9 +2335,31 @@ function setupFeatureListeners(feature, callback) {
             
             // Find and display most frequent letter
             mostFrequentLetter = findMostFrequentLetter(currentFilteredWords);
+            
+            // Check if we already know about this letter from workflow state
+            const letterStatus = getLetterStatus(mostFrequentLetter);
+            let autoAnswered = false;
+            let autoAnswer = null;
+            
+            if (letterStatus === 'confirmed') {
+                autoAnswered = true;
+                autoAnswer = true; // YES
+                console.log(`Auto-answering MOST FREQUENT: ${mostFrequentLetter} = YES (already confirmed in workflow)`);
+            } else if (letterStatus === 'excluded') {
+                autoAnswered = true;
+                autoAnswer = false; // NO
+                console.log(`Auto-answering MOST FREQUENT: ${mostFrequentLetter} = NO (already excluded in workflow)`);
+            }
+            
             if (letterDisplay) {
                 if (mostFrequentLetter) {
-                    letterDisplay.textContent = mostFrequentLetter;
+                    if (autoAnswered) {
+                        letterDisplay.textContent = `${mostFrequentLetter} (Auto: ${autoAnswer ? 'YES' : 'NO'})`;
+                        letterDisplay.style.color = '#28a745'; // Green for auto-answered
+                    } else {
+                        letterDisplay.textContent = mostFrequentLetter;
+                        letterDisplay.style.color = '#000'; // Normal color
+                    }
                     // Enable buttons if we have a letter
                     if (frequentYesBtn) frequentYesBtn.disabled = false;
                     if (frequentNoBtn) frequentNoBtn.disabled = false;
@@ -2281,9 +2371,25 @@ function setupFeatureListeners(feature, callback) {
                 }
             }
             
+            // If auto-answered, process immediately
+            if (autoAnswered) {
+                setTimeout(() => {
+                    const filteredWords = filterWordsByMostFrequent(currentFilteredWords, mostFrequentLetter, autoAnswer);
+                    callback(filteredWords);
+                    document.getElementById('mostFrequentFeature').classList.add('completed');
+                    document.getElementById('mostFrequentFeature').dispatchEvent(new Event('completed'));
+                }, 1000); // Show the auto-answer for 1 second
+                return;
+            }
+            
             if (frequentYesBtn) {
                 frequentYesBtn.onclick = () => {
                     if (mostFrequentLetter) {
+                        // Update workflow state
+                        workflowState.confirmedLetters.add(mostFrequentLetter);
+                        console.log(`MOST FREQUENT: ${mostFrequentLetter} confirmed`);
+                        logWorkflowState();
+                        
                         const filteredWords = filterWordsByMostFrequent(currentFilteredWords, mostFrequentLetter, true);
                         callback(filteredWords);
                         document.getElementById('mostFrequentFeature').classList.add('completed');
@@ -2303,6 +2409,11 @@ function setupFeatureListeners(feature, callback) {
             if (frequentNoBtn) {
                 frequentNoBtn.onclick = () => {
                     if (mostFrequentLetter) {
+                        // Update workflow state
+                        workflowState.excludedLetters.add(mostFrequentLetter);
+                        console.log(`MOST FREQUENT: ${mostFrequentLetter} excluded`);
+                        logWorkflowState();
+                        
                         const filteredWords = filterWordsByMostFrequent(currentFilteredWords, mostFrequentLetter, false);
                         callback(filteredWords);
                         document.getElementById('mostFrequentFeature').classList.add('completed');
@@ -2343,9 +2454,31 @@ function setupFeatureListeners(feature, callback) {
             
             // Find and display least frequent letter
             leastFrequentLetter = findLeastFrequentLetter(currentFilteredWords);
+            
+            // Check if we already know about this letter from workflow state
+            const letterStatus = getLetterStatus(leastFrequentLetter);
+            let autoAnswered = false;
+            let autoAnswer = null;
+            
+            if (letterStatus === 'confirmed') {
+                autoAnswered = true;
+                autoAnswer = true; // YES
+                console.log(`Auto-answering LEAST FREQUENT: ${leastFrequentLetter} = YES (already confirmed in workflow)`);
+            } else if (letterStatus === 'excluded') {
+                autoAnswered = true;
+                autoAnswer = false; // NO
+                console.log(`Auto-answering LEAST FREQUENT: ${leastFrequentLetter} = NO (already excluded in workflow)`);
+            }
+            
             if (letterDisplay) {
                 if (leastFrequentLetter) {
-                    letterDisplay.textContent = leastFrequentLetter;
+                    if (autoAnswered) {
+                        letterDisplay.textContent = `${leastFrequentLetter} (Auto: ${autoAnswer ? 'YES' : 'NO'})`;
+                        letterDisplay.style.color = '#28a745'; // Green for auto-answered
+                    } else {
+                        letterDisplay.textContent = leastFrequentLetter;
+                        letterDisplay.style.color = '#000'; // Normal color
+                    }
                     // Enable buttons if we have a letter
                     if (leastFrequentYesBtn) leastFrequentYesBtn.disabled = false;
                     if (leastFrequentNoBtn) leastFrequentNoBtn.disabled = false;
@@ -2357,9 +2490,25 @@ function setupFeatureListeners(feature, callback) {
                 }
             }
             
+            // If auto-answered, process immediately
+            if (autoAnswered) {
+                setTimeout(() => {
+                    const filteredWords = filterWordsByLeastFrequent(currentFilteredWords, leastFrequentLetter, autoAnswer);
+                    callback(filteredWords);
+                    document.getElementById('leastFrequentFeature').classList.add('completed');
+                    document.getElementById('leastFrequentFeature').dispatchEvent(new Event('completed'));
+                }, 1000); // Show the auto-answer for 1 second
+                return;
+            }
+            
             if (leastFrequentYesBtn) {
                 leastFrequentYesBtn.onclick = () => {
                     if (leastFrequentLetter) {
+                        // Update workflow state
+                        workflowState.confirmedLetters.add(leastFrequentLetter);
+                        console.log(`LEAST FREQUENT: ${leastFrequentLetter} confirmed`);
+                        logWorkflowState();
+                        
                         const filteredWords = filterWordsByLeastFrequent(currentFilteredWords, leastFrequentLetter, true);
                         callback(filteredWords);
                         document.getElementById('leastFrequentFeature').classList.add('completed');
@@ -2379,6 +2528,11 @@ function setupFeatureListeners(feature, callback) {
             if (leastFrequentNoBtn) {
                 leastFrequentNoBtn.onclick = () => {
                     if (leastFrequentLetter) {
+                        // Update workflow state
+                        workflowState.excludedLetters.add(leastFrequentLetter);
+                        console.log(`LEAST FREQUENT: ${leastFrequentLetter} excluded`);
+                        logWorkflowState();
+                        
                         const filteredWords = filterWordsByLeastFrequent(currentFilteredWords, leastFrequentLetter, false);
                         callback(filteredWords);
                         document.getElementById('leastFrequentFeature').classList.add('completed');
@@ -2490,6 +2644,24 @@ function setupFeatureListeners(feature, callback) {
 
             if (doneBtn) {
                 doneBtn.onclick = () => {
+                    // Update workflow state with ABCDE selections
+                    workflowState.abcdeSelection = new Set(yesLetters);
+                    
+                    // Add selected letters to confirmed letters
+                    yesLetters.forEach(letter => {
+                        workflowState.confirmedLetters.add(letter);
+                    });
+                    
+                    // Add unselected letters to excluded letters
+                    ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
+                        if (!yesLetters.includes(letter)) {
+                            workflowState.excludedLetters.add(letter);
+                        }
+                    });
+                    
+                    console.log(`ABCDE feature completed. Selected: ${yesLetters.join(', ')}`);
+                    logWorkflowState();
+                    
                     const filteredWords = filterWordsByAbcde(currentFilteredWords, yesLetters);
                     callback(filteredWords);
                     const featureDiv = document.getElementById('abcdeFeature');
@@ -2542,6 +2714,24 @@ function setupFeatureListeners(feature, callback) {
 
             if (doneBtn) {
                 doneBtn.onclick = () => {
+                    // Update workflow state with ABC selections
+                    workflowState.abcSelection = new Set(yesLetters);
+                    
+                    // Add selected letters to confirmed letters
+                    yesLetters.forEach(letter => {
+                        workflowState.confirmedLetters.add(letter);
+                    });
+                    
+                    // Add unselected letters to excluded letters
+                    ['A', 'B', 'C'].forEach(letter => {
+                        if (!yesLetters.includes(letter)) {
+                            workflowState.excludedLetters.add(letter);
+                        }
+                    });
+                    
+                    console.log(`ABC feature completed. Selected: ${yesLetters.join(', ')}`);
+                    logWorkflowState();
+                    
                     const filteredWords = filterWordsByAbc(currentFilteredWords, yesLetters);
                     callback(filteredWords);
                     const featureDiv = document.getElementById('abcFeature');
