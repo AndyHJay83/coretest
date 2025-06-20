@@ -638,6 +638,15 @@
 
         // Settings button click handler
         document.getElementById('settingsButton').addEventListener('click', showSettings);
+
+        // Test if pako is loaded
+        window.addEventListener('load', function() {
+            if (typeof pako !== 'undefined') {
+                console.log('✅ Pako library loaded successfully');
+            } else {
+                console.log('❌ Pako library failed to load');
+            }
+        });
     </script>
 </body>
 </html> 

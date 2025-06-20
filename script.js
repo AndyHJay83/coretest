@@ -877,6 +877,7 @@ workflowSelect.addEventListener('touchend', function(e) {
 async function loadWordList() {
     try {
         const startTime = performance.now();
+        console.log('=== WORDLIST LOADING START ===');
         
         // Show loading indicator
         const loadingIndicator = document.createElement('div');
@@ -896,6 +897,7 @@ async function loadWordList() {
             if (progressElement) {
                 progressElement.textContent = message;
             }
+            console.log('Progress:', message);
         };
         
         const wordlistSelect = document.getElementById('wordlistSelect');
@@ -928,6 +930,7 @@ async function loadWordList() {
         
         let response;
         let text;
+        let usedGzip = false;
         
         // Try gzipped file first for better performance
         try {
@@ -937,6 +940,8 @@ async function loadWordList() {
             response = await fetch(gzippedPath);
             const fetchTime = performance.now() - fetchStart;
             console.log(`Fetch time: ${fetchTime.toFixed(2)}ms`);
+            console.log('Response status:', response.status);
+            console.log('Response headers:', Object.fromEntries(response.headers.entries()));
             
             if (response.ok) {
                 updateProgress('Decompressing file...');
@@ -944,33 +949,40 @@ async function loadWordList() {
                 const arrayBuffer = await response.arrayBuffer();
                 const bufferTime = performance.now() - decompressStart;
                 console.log(`ArrayBuffer time: ${bufferTime.toFixed(2)}ms`);
+                console.log('ArrayBuffer size:', arrayBuffer.byteLength, 'bytes');
                 
                 // Decompress using pako (if available) or fallback to text
                 if (typeof pako !== 'undefined') {
+                    console.log('Pako library available, decompressing...');
                     const pakoStart = performance.now();
                     const decompressed = pako.inflate(new Uint8Array(arrayBuffer), { to: 'string' });
                     const pakoTime = performance.now() - pakoStart;
                     console.log(`Pako decompression time: ${pakoTime.toFixed(2)}ms`);
+                    console.log('Decompressed size:', decompressed.length, 'characters');
                     text = decompressed;
-                    console.log('Successfully loaded and decompressed gzipped file');
+                    usedGzip = true;
+                    console.log('✅ Successfully loaded and decompressed gzipped file');
                 } else {
-                    // Fallback to uncompressed file
+                    console.log('❌ Pako not available, falling back to uncompressed');
                     throw new Error('Pako not available, falling back to uncompressed');
                 }
             } else {
+                console.log('❌ Gzipped file not found, falling back to uncompressed');
                 throw new Error('Gzipped file not found, falling back to uncompressed');
             }
         } catch (gzipError) {
-            console.log('Gzipped file failed, loading uncompressed file:', gzipError.message);
+            console.log('❌ Gzipped file failed, loading uncompressed file:', gzipError.message);
             updateProgress('Loading uncompressed file...');
             response = await fetch(wordlistPath);
             if (!response.ok) {
                 throw new Error('Failed to load wordlist');
             }
             text = await response.text();
+            usedGzip = false;
         }
         
         console.log('Text loaded, length:', text.length);
+        console.log('Used gzip:', usedGzip);
         updateProgress('Processing wordlist...');
         
         // Optimize the word processing
@@ -1000,6 +1012,7 @@ async function loadWordList() {
         const totalTime = performance.now() - startTime;
         console.log(`Total loading time: ${totalTime.toFixed(2)}ms`);
         console.log('Wordlist loaded successfully:', wordList.length, 'words');
+        console.log('=== WORDLIST LOADING END ===');
         
         // Remove loading indicator
         if (loadingIndicator.parentNode) {
