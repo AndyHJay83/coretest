@@ -40,9 +40,6 @@ const performButton = document.getElementById('performButton');
 
 // Initialize the app when the DOM is loaded
 document.addEventListener('DOMContentLoaded', async () => {
-    // Load word list
-    await loadWordList();
-    
     // Load saved workflows from localStorage
     const savedWorkflows = localStorage.getItem('workflows');
     if (savedWorkflows) {
@@ -70,13 +67,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initialize NOT IN feature
     initializeNotInFeature();
 
-    // Add wordlist change listener
+    // Add wordlist change listener - reset loaded flag when wordlist changes
     const wordlistSelect = document.getElementById('wordlistSelect');
-    wordlistSelect.addEventListener('change', async () => {
-        await loadWordList();
-        // Reset any active features or filters
-        currentFilteredWords = [...wordList];
-        displayResults(currentFilteredWords);
+    wordlistSelect.addEventListener('change', () => {
+        // Reset the loaded flag so new wordlist will be loaded when workflow executes
+        wordListLoaded = false;
+        wordList = [];
+        currentFilteredWords = [];
     });
 });
 
@@ -879,6 +876,8 @@ workflowSelect.addEventListener('touchend', function(e) {
 // Function to load word list
 async function loadWordList() {
     try {
+        const startTime = performance.now();
+        
         // Show loading indicator
         const loadingIndicator = document.createElement('div');
         loadingIndicator.id = 'loadingIndicator';
@@ -887,10 +886,17 @@ async function loadWordList() {
                         background: rgba(0,0,0,0.8); color: white; padding: 20px; border-radius: 10px; 
                         z-index: 10000; text-align: center;">
                 <div>Loading wordlist...</div>
-                <div style="margin-top: 10px; font-size: 12px;">This may take a moment for large files</div>
+                <div id="loadingProgress" style="margin-top: 10px; font-size: 12px;">Initializing...</div>
             </div>
         `;
         document.body.appendChild(loadingIndicator);
+        
+        const updateProgress = (message) => {
+            const progressElement = document.getElementById('loadingProgress');
+            if (progressElement) {
+                progressElement.textContent = message;
+            }
+        };
         
         const wordlistSelect = document.getElementById('wordlistSelect');
         const selectedWordlist = wordlistSelect.value;
@@ -925,13 +931,26 @@ async function loadWordList() {
         
         // Try gzipped file first for better performance
         try {
+            updateProgress('Loading compressed file...');
             console.log('Attempting to load gzipped file...');
+            const fetchStart = performance.now();
             response = await fetch(gzippedPath);
+            const fetchTime = performance.now() - fetchStart;
+            console.log(`Fetch time: ${fetchTime.toFixed(2)}ms`);
+            
             if (response.ok) {
+                updateProgress('Decompressing file...');
+                const decompressStart = performance.now();
                 const arrayBuffer = await response.arrayBuffer();
+                const bufferTime = performance.now() - decompressStart;
+                console.log(`ArrayBuffer time: ${bufferTime.toFixed(2)}ms`);
+                
                 // Decompress using pako (if available) or fallback to text
                 if (typeof pako !== 'undefined') {
+                    const pakoStart = performance.now();
                     const decompressed = pako.inflate(new Uint8Array(arrayBuffer), { to: 'string' });
+                    const pakoTime = performance.now() - pakoStart;
+                    console.log(`Pako decompression time: ${pakoTime.toFixed(2)}ms`);
                     text = decompressed;
                     console.log('Successfully loaded and decompressed gzipped file');
                 } else {
@@ -943,6 +962,7 @@ async function loadWordList() {
             }
         } catch (gzipError) {
             console.log('Gzipped file failed, loading uncompressed file:', gzipError.message);
+            updateProgress('Loading uncompressed file...');
             response = await fetch(wordlistPath);
             if (!response.ok) {
                 throw new Error('Failed to load wordlist');
@@ -951,10 +971,34 @@ async function loadWordList() {
         }
         
         console.log('Text loaded, length:', text.length);
-        wordList = text.split('\n').filter(word => word.trim());
+        updateProgress('Processing wordlist...');
+        
+        // Optimize the word processing
+        const processStart = performance.now();
+        
+        // Use more efficient string processing
+        const lines = text.split('\n');
+        console.log(`Split into ${lines.length} lines`);
+        
+        // Use Set for faster filtering and deduplication
+        const wordSet = new Set();
+        for (let i = 0; i < lines.length; i++) {
+            const trimmed = lines[i].trim();
+            if (trimmed) {
+                wordSet.add(trimmed);
+            }
+        }
+        
+        wordList = Array.from(wordSet);
+        const processTime = performance.now() - processStart;
+        console.log(`Processing time: ${processTime.toFixed(2)}ms`);
         console.log('Filtered words count:', wordList.length);
+        
         currentFilteredWords = [...wordList];
         currentWordlistForVowels = [...wordList];
+        
+        const totalTime = performance.now() - startTime;
+        console.log(`Total loading time: ${totalTime.toFixed(2)}ms`);
         console.log('Wordlist loaded successfully:', wordList.length, 'words');
         
         // Remove loading indicator
@@ -974,6 +1018,10 @@ async function loadWordList() {
     }
 }
 
+// Add lazy loading flag
+let wordListLoaded = false;
+let lastLoadedWordlist = '';
+
 // Function to execute workflow
 async function executeWorkflow(steps) {
     try {
@@ -982,8 +1030,16 @@ async function executeWorkflow(steps) {
         const selectedWordlist = wordlistSelect.value;
         console.log('Selected wordlist:', selectedWordlist);
         
-        // Load the wordlist first and wait for it to complete
-        await loadWordList();
+        // Check if we need to load a new wordlist
+        const needsReload = !wordListLoaded || 
+                           wordList.length === 0 || 
+                           lastLoadedWordlist !== selectedWordlist;
+        
+        if (needsReload) {
+            await loadWordList();
+            wordListLoaded = true;
+            lastLoadedWordlist = selectedWordlist;
+        }
         console.log('Wordlist loaded, word count:', wordList.length);
         
         // Reset all feature states
