@@ -2573,22 +2573,51 @@ function displayResults(words) {
         return;
     }
     
-    // Create word list container
-    const wordList = document.createElement('ul');
-    wordList.className = 'word-list';
-    
-    // Add words to the list
-    words.forEach(word => {
-        const li = document.createElement('li');
-        li.textContent = word;
-        wordList.appendChild(li);
-    });
-    
-    // Add the word list to the results container
-    resultsContainer.appendChild(wordList);
-    
-    // Update word count
+    // Update word count first
     updateWordCount(words.length);
+    
+    // For large lists, use virtual scrolling approach
+    if (words.length > 1000) {
+        // Show first 1000 words with a "show more" option
+        const initialWords = words.slice(0, 1000);
+        const remainingCount = words.length - 1000;
+        
+        // Create HTML string for initial words (much faster than individual DOM elements)
+        const wordListHTML = initialWords.map(word => `<li>${word}</li>`).join('');
+        
+        resultsContainer.innerHTML = `
+            <ul class="word-list">
+                ${wordListHTML}
+            </ul>
+            <div class="load-more-container" style="text-align: center; margin: 20px 0;">
+                <button id="loadMoreBtn" class="load-more-btn" style="padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    Show ${remainingCount.toLocaleString()} more words
+                </button>
+            </div>
+        `;
+        
+        // Add event listener for load more button
+        const loadMoreBtn = document.getElementById('loadMoreBtn');
+        if (loadMoreBtn) {
+            loadMoreBtn.addEventListener('click', () => {
+                // Show all words
+                const allWordsHTML = words.map(word => `<li>${word}</li>`).join('');
+                resultsContainer.innerHTML = `
+                    <ul class="word-list">
+                        ${allWordsHTML}
+                    </ul>
+                `;
+            });
+        }
+    } else {
+        // For smaller lists, show all words at once using innerHTML
+        const wordListHTML = words.map(word => `<li>${word}</li>`).join('');
+        resultsContainer.innerHTML = `
+            <ul class="word-list">
+                ${wordListHTML}
+            </ul>
+        `;
+    }
     
     // Ensure the feature area is empty and visible
     const featureArea = document.getElementById('featureArea');
