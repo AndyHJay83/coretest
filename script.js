@@ -932,6 +932,10 @@ async function loadWordList() {
                 wordlistPath = 'words/ENUK-Long words Noun.txt';
                 gzippedPath = 'words/ENUK-Long words Noun.txt.gz';
                 break;
+            case 'allnames':
+                wordlistPath = 'words/AllNames.txt';
+                gzippedPath = 'words/AllNames.txt.gz';
+                break;
         }
         console.log('Selected wordlist path:', wordlistPath);
         console.log('Gzipped path:', gzippedPath);
