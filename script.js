@@ -1206,6 +1206,11 @@ async function executeWorkflow(steps) {
                 if (resetButton) {
                     resetButton.remove();
                 }
+                // Remove export button if it exists
+                const exportButton = document.getElementById('exportButton');
+                if (exportButton) {
+                    exportButton.remove();
+                }
                 // Remove home button
                 homeButton.remove();
             };
@@ -1450,10 +1455,71 @@ async function executeWorkflow(steps) {
         
         // Show final results
         displayResults(currentFilteredWords);
+        
+        // Add export button after workflow completion
+        addExportButton(currentFilteredWords);
     } catch (error) {
         console.error('Error executing workflow:', error);
         throw error;
     }
+}
+
+// Function to add export button
+function addExportButton(words) {
+    // Remove any existing export button
+    const existingExportButton = document.getElementById('exportButton');
+    if (existingExportButton) {
+        existingExportButton.remove();
+    }
+    
+    // Create export button
+    const exportButton = document.createElement('button');
+    exportButton.id = 'exportButton';
+    exportButton.className = 'export-button';
+    exportButton.innerHTML = '📄 Export';
+    exportButton.title = 'Export filtered wordlist as .txt file';
+    
+    // Add click event
+    exportButton.addEventListener('click', () => {
+        exportWordlist(words);
+    });
+    
+    // Add touch event for mobile
+    exportButton.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        exportWordlist(words);
+    }, { passive: false });
+    
+    // Add to the page
+    document.body.appendChild(exportButton);
+}
+
+// Function to export wordlist as .txt file
+function exportWordlist(words) {
+    if (!words || words.length === 0) {
+        alert('No words to export!');
+        return;
+    }
+    
+    // Create the content for the .txt file
+    const content = words.join('\n');
+    
+    // Create a blob with the content
+    const blob = new Blob([content], { type: 'text/plain' });
+    
+    // Create a download link
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `filtered_wordlist_${new Date().toISOString().slice(0, 10)}.txt`;
+    
+    // Trigger the download
+    document.body.appendChild(a);
+    a.click();
+    
+    // Clean up
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }
 
 // Helper functions to create feature elements
@@ -3202,6 +3268,12 @@ function resetApp() {
     
     // Show the first feature (consonant question)
     document.getElementById('consonantQuestion').style.display = 'block';
+    
+    // Remove export button if it exists
+    const exportButton = document.getElementById('exportButton');
+    if (exportButton) {
+        exportButton.remove();
+    }
 }
 
 // Function to check if a word has any adjacent consonants
