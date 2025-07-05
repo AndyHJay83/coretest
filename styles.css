@@ -1664,7 +1664,8 @@ input:checked + .slider:before {
 @media (max-width: 768px) {
     .available-features, .selected-features {
         min-height: 600px !important;
-        max-height: calc(100vh - 200px);
+        max-height: 600px !important;
+        height: 600px !important;
         position: relative !important;
     }
     .workflow-content {
