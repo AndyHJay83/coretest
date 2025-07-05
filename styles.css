@@ -1667,6 +1667,9 @@ input:checked + .slider:before {
         max-height: calc(100vh - 200px);
         position: relative !important;
     }
+    .workflow-content {
+        height: 100% !important;
+    }
     .scroll-indicator {
         display: flex !important;
         opacity: 1 !important;
