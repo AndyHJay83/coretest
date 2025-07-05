@@ -1513,34 +1513,20 @@ input:checked + .slider:before {
     position: relative;
 }
 
-.selected-features {
-    background-color: #fafafa;
-    border-radius: 8px;
-    overflow: hidden;
-    min-height: 400px;
-    max-height: calc(100vh - 200px);
-    display: flex;
-    flex-direction: column;
-}
-
-#selectedFeaturesList {
-    flex: 1;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    padding: 5px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4px;
+.scroll-indicator-container {
+    position: absolute;
+    left: 0;
+    bottom: 0;
     width: 100%;
-    box-sizing: border-box;
-    overflow-x: hidden;
+    z-index: 20;
+    background: transparent;
+    display: block;
+    height: 48px;
 }
 
 .scroll-indicator {
-    position: absolute;
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
+    display: block;
+    margin: 0 auto;
     background: rgba(0, 0, 0, 0.6);
     color: white;
     border: none;
@@ -1549,12 +1535,11 @@ input:checked + .slider:before {
     border-radius: 50%;
     width: 30px;
     height: 30px;
-    display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     font-size: 12px;
-    z-index: 10;
+    z-index: 21;
     opacity: 1;
     pointer-events: auto;
     transition: none;
