@@ -1941,7 +1941,7 @@ input:checked + .slider:before {
     .workflow-content {
         flex: 1;
         min-height: 0;
-        height: calc(100vh + 400px);
+        height: calc(100vh + 800px);
     }
     
     .available-features, .selected-features {
@@ -1952,7 +1952,7 @@ input:checked + .slider:before {
     
     .workflow-content {
         grid-template-columns: 30% 70%;
-        height: calc(100vh + 400px);
+        height: calc(100vh + 800px);
         min-height: 600px;
     }
     
@@ -2004,6 +2004,8 @@ input:checked + .slider:before {
 /* Ensure the workflow builder is scrollable */
 #workflowCreation {
     height: 100vh;
+    min-height: 100vh;
+    max-height: none;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     position: fixed;
