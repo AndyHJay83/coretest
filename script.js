@@ -3975,7 +3975,39 @@ function removeFeature(featureType) {
 // Initialize drag and drop when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     initializeDragAndDrop();
-    // ... existing code ...
+    
+    // Initialize scroll indicator
+    const scrollIndicator = document.getElementById('scrollIndicator');
+    const availableFeatures = document.getElementById('availableFeatures');
+    
+    if (scrollIndicator && availableFeatures) {
+        // Check if scrolling is needed
+        const checkScrollNeeded = () => {
+            const isScrollable = availableFeatures.scrollHeight > availableFeatures.clientHeight;
+            scrollIndicator.classList.toggle('hidden', !isScrollable);
+        };
+        
+        // Check on load
+        checkScrollNeeded();
+        
+        // Check on resize
+        window.addEventListener('resize', checkScrollNeeded);
+        
+        // Handle scroll indicator click
+        scrollIndicator.addEventListener('click', () => {
+            availableFeatures.scrollTo({
+                top: availableFeatures.scrollHeight,
+                behavior: 'smooth'
+            });
+        });
+        
+        // Hide indicator when scrolled to bottom
+        availableFeatures.addEventListener('scroll', () => {
+            const isAtBottom = availableFeatures.scrollTop + availableFeatures.clientHeight >= availableFeatures.scrollHeight - 10;
+            scrollIndicator.classList.toggle('hidden', isAtBottom);
+        });
+    }
+    
     // Improve LENGTH input touch sensitivity
     const lengthInput = document.getElementById('lengthInput');
     if (lengthInput) {
