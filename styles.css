@@ -1488,6 +1488,11 @@ input:checked + .slider:before {
     .toggle-saved-workflows {
         width: 100%;
     }
+    
+    .save-workflow-button,
+    .toggle-saved-workflows {
+        text-align: center;
+    }
 }
 
 /* Features section */
