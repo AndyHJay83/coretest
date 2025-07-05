@@ -1414,8 +1414,8 @@ input:checked + .slider:before {
     padding-top: 60px; /* Increased padding to avoid status bar */
     max-width: 1200px;
     margin: 0 auto;
-    height: 100vh;
-    min-height: 100vh;
+    height: 200vh;
+    min-height: 200vh;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     display: flex;
@@ -1930,8 +1930,8 @@ input:checked + .slider:before {
 /* Mobile styles */
 @media (max-width: 768px) {
     .workflow-creation {
-        height: 100vh;
-        min-height: 100vh;
+        height: 200vh;
+        min-height: 200vh;
         max-height: none;
         padding: 15px;
         padding-top: 60px;
