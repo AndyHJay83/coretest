@@ -20,7 +20,7 @@ body {
 }
 
 .container {
-    height: 100vh;
+    height: 100dvh; /* Use 100dvh for iOS Safari PWA compatibility */
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -77,8 +77,8 @@ body {
 
 /* Main container layout */
 #homepage, #workflowExecution {
-    height: 33vh;
-    min-height: 200px;
+    flex: 1 1 0;
+    min-height: 0; /* Important for flex children to allow shrinking */
     background: #fff;
     border-bottom: 1px solid #eee;
     overflow-y: auto;
@@ -93,7 +93,8 @@ body {
 
 /* Results Area (Bottom Two Thirds) */
 #results {
-    height: 50vh;
+    flex: 1 1 0;
+    min-height: 0; /* Important for flex children to allow shrinking */
     overflow-y: auto;
     padding: 20px;
     background: #fff;
@@ -2265,7 +2266,8 @@ input:checked + .slider:before {
 .workflow-execution {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 60px);
+    flex: 1 1 0;
+    min-height: 0; /* Important for flex children to allow shrinking */
     padding: 10px;
     box-sizing: border-box;
     overflow: hidden;
@@ -2274,9 +2276,8 @@ input:checked + .slider:before {
 }
 
 .results-container {
-    height: 40vh;
-    min-height: 40vh;
-    max-height: 40vh;
+    flex: 1 1 0;
+    min-height: 0; /* Important for flex children to allow shrinking */
     overflow-y: auto;
     padding: 10px;
     background-color: #f5f5f5;
@@ -2288,9 +2289,8 @@ input:checked + .slider:before {
 }
 
 .feature-area {
-    height: 60vh;
-    min-height: 60vh;
-    max-height: 60vh;
+    flex: 0 0 auto;
+    min-height: 200px; /* Minimum height for feature area */
     overflow-y: auto;
     padding: 10px;
     background-color: #f5f5f5;
@@ -2307,17 +2307,15 @@ input:checked + .slider:before {
     }
 
     .results-container {
-        height: 40vh;
-        min-height: 40vh;
-        max-height: 40vh;
+        flex: 1 1 0;
+        min-height: 0;
         padding: 8px;
         margin-bottom: 5px;
     }
 
     .feature-area {
-        height: 60vh;
-        min-height: 60vh;
-        max-height: 60vh;
+        flex: 0 0 auto;
+        min-height: 200px;
         padding: 8px;
     }
 }
@@ -2813,12 +2811,11 @@ input:checked + .slider:before {
 
 @media (max-width: 600px) {
     #homepage, #workflowExecution {
-        height: 100vh !important;
-        min-height: 100vh !important;
-        max-height: 100vh !important;
+        flex: 1 1 0 !important;
+        min-height: 0 !important;
     }
     #results {
-        height: auto !important;
-        max-height: none !important;
+        flex: 1 1 0 !important;
+        min-height: 0 !important;
     }
 } 
