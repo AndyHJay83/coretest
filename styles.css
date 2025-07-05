@@ -1618,8 +1618,8 @@ input:checked + .slider:before {
     }
 
     .available-features, .selected-features {
-        height: 600px !important;
-        max-height: 600px !important;
+        height: 800px !important;
+        max-height: 800px !important;
     }
 
     .selected-features {
@@ -1672,9 +1672,9 @@ input:checked + .slider:before {
     .available-features, .selected-features {
         display: flex !important;
         flex-direction: column !important;
-        min-height: 600px !important;
-        max-height: 600px !important;
-        height: 600px !important;
+        min-height: 800px !important;
+        max-height: 800px !important;
+        height: 800px !important;
         position: relative !important;
     }
     #availableFeatures {
