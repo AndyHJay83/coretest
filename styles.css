@@ -1552,16 +1552,19 @@ input:checked + .slider:before {
     cursor: pointer;
     font-size: 12px;
     z-index: 10;
-    transition: opacity 0.3s ease;
+    /* Remove transition and opacity for always-on */
+    opacity: 1;
 }
 
 .scroll-indicator:hover {
-    background: rgba(0, 0, 0, 0.8);
+    /* Remove background and transform changes to keep it static */
+    background: rgba(0, 0, 0, 0.6);
 }
 
 .scroll-indicator.hidden {
-    opacity: 0;
-    pointer-events: none;
+    /* Remove opacity and pointer-events so it is always visible */
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .feature-header {
