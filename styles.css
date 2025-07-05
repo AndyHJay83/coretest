@@ -2815,7 +2815,7 @@ input:checked + .slider:before {
 .export-button {
     position: fixed;
     bottom: 20px;
-    right: 20px;
+    left: 20px;
     z-index: 1000;
     padding: 12px 20px;
     background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
@@ -2847,7 +2847,7 @@ input:checked + .slider:before {
 @media (max-width: 600px) {
     .export-button {
         bottom: 15px;
-        right: 15px;
+        left: 15px;
         padding: 10px 16px;
         font-size: 14px;
         border-radius: 20px;
