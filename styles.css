@@ -1557,8 +1557,13 @@ input:checked + .slider:before {
 }
 
 .scroll-indicator:hover {
-    /* Remove background and transform changes to keep it static */
     background: rgba(0, 0, 0, 0.6);
+    border: none;
+    outline: none;
+    box-shadow: none;
+    transform: none;
+    transition: none;
+    padding: 0;
 }
 
 .scroll-indicator.hidden {
