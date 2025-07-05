@@ -1415,11 +1415,13 @@ input:checked + .slider:before {
     max-width: 1200px;
     margin: 0 auto;
     height: 100vh;
+    min-height: 100vh;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     display: flex;
     flex-direction: column;
     gap: 20px;
+    box-sizing: border-box;
 }
 
 /* Header with Create/Cancel buttons */
@@ -1929,8 +1931,24 @@ input:checked + .slider:before {
 /* Mobile styles */
 @media (max-width: 768px) {
     .workflow-creation {
+        height: 100vh;
+        min-height: 100vh;
+        max-height: 100vh;
         padding: 15px;
         padding-top: 60px;
+        gap: 15px;
+    }
+    
+    .workflow-content {
+        flex: 1;
+        min-height: 0;
+        height: calc(100vh - 200px);
+    }
+    
+    .available-features, .selected-features {
+        height: 100%;
+        min-height: 0;
+        max-height: none;
     }
     
     .workflow-content {
