@@ -1904,12 +1904,12 @@ input:checked + .slider:before {
 }
 
 .selected-features h3 {
-    margin: 0 0 16px 0;
+    margin: 0 0 8px 0;
     color: #495057;
     font-size: 18px;
     font-weight: 600;
     text-align: center;
-    padding-bottom: 12px;
+    padding-bottom: 6px;
 }
 
 /* Empty state styling */
