@@ -1495,7 +1495,7 @@ input:checked + .slider:before {
 /* Features section */
 .workflow-content {
     display: grid;
-    grid-template-columns: 30% 50%;
+    grid-template-columns: 30% 70%;
     gap: 15px;
     min-height: calc(100vh - 250px);
     overflow: visible;
@@ -1532,6 +1532,7 @@ input:checked + .slider:before {
     gap: 4px;
     width: 100%;
     box-sizing: border-box;
+    overflow-x: hidden;
 }
 
 .scroll-indicator {
@@ -1689,7 +1690,7 @@ input:checked + .slider:before {
 .selected-feature-item {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     padding: 8px 10px;
     margin: 0;
     background-color: #e8f5e9;
@@ -1701,6 +1702,16 @@ input:checked + .slider:before {
     min-height: 40px;
     width: 100%;
     box-sizing: border-box;
+    overflow: hidden;
+}
+
+.selected-feature-item span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+    line-height: 1.2;
+    text-align: center;
 }
 
 .selected-feature-item:hover {
@@ -1709,26 +1720,7 @@ input:checked + .slider:before {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.remove-feature {
-    background: none;
-    border: none;
-    color: #666;
-    font-size: 8px;
-    cursor: pointer;
-    padding: 0 1px;
-    margin-left: 2px;
-    transition: color 0.2s ease;
-    flex-shrink: 0;
-    width: 16px;
-    height: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
 
-.remove-feature:hover {
-    color: #d32f2f;
-}
 
 /* Mobile-specific styles */
 @media (max-width: 768px) {
@@ -1738,7 +1730,7 @@ input:checked + .slider:before {
     }
     
     .workflow-content {
-        grid-template-columns: 30% 50%;
+        grid-template-columns: 30% 70%;
         height: auto;
         min-height: 400px;
     }
@@ -1762,13 +1754,7 @@ input:checked + .slider:before {
         font-size: 14px;
     }
     
-    .remove-feature {
-        font-size: 8px;
-        padding: 0 1px;
-        margin-left: 2px;
-        width: 14px;
-        height: 14px;
-    }
+
     
     .workflow-name-input {
         font-size: 16px; /* Prevent zoom on iOS */

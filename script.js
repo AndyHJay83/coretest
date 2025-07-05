@@ -424,19 +424,16 @@ function addFeatureToList(feature) {
         featureName.textContent = feature.toUpperCase();
         featureItem.appendChild(featureName);
         
-        const removeButton = document.createElement('button');
-        removeButton.className = 'remove-feature';
-        removeButton.textContent = '×';
-        removeButton.onclick = (e) => {
-            e.stopPropagation();
+        // Add click event to remove feature
+        featureItem.addEventListener('click', () => {
             featureItem.remove();
-        };
-        featureItem.appendChild(removeButton);
+        });
         
         // Add touch and drag events for mobile
         featureItem.addEventListener('touchstart', (e) => {
             e.preventDefault();
             featureItem.classList.add('dragging');
+            featureItem.remove();
         }, { passive: false });
         
         featureItem.addEventListener('touchend', (e) => {
@@ -3809,11 +3806,7 @@ function editWorkflow(workflow) {
         featureName.textContent = step.feature.toUpperCase();
         featureItem.appendChild(featureName);
         
-        const removeButton = document.createElement('button');
-        removeButton.className = 'remove-feature';
-        removeButton.textContent = '×';
-        removeButton.onclick = () => featureItem.remove();
-        featureItem.appendChild(removeButton);
+
         
         // Add drag and drop for reordering
         featureItem.addEventListener('dragstart', (e) => {
@@ -3938,28 +3931,15 @@ function addFeatureToSelected(featureType) {
     featureName.textContent = featureButton.textContent;
     selectedFeature.appendChild(featureName);
     
-    const removeButton = document.createElement('button');
-    removeButton.className = 'remove-feature';
-    removeButton.textContent = '×';
-    removeButton.onclick = (e) => {
-        e.stopPropagation(); // Prevent the click from bubbling up
+    // Add click event to remove feature
+    selectedFeature.addEventListener('click', () => {
         selectedFeature.remove();
-    };
-    selectedFeature.appendChild(removeButton);
-    
-    // Add click event to move feature back to available
-    selectedFeature.addEventListener('click', (e) => {
-        if (e.target !== removeButton) {
-            selectedFeature.remove();
-        }
     });
     
     // Add touch event for mobile
     selectedFeature.addEventListener('touchstart', (e) => {
         e.preventDefault();
-        if (e.target !== removeButton) {
-            selectedFeature.remove();
-        }
+        selectedFeature.remove();
     }, { passive: false });
     
     selectedFeatures.appendChild(selectedFeature);
