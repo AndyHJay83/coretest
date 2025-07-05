@@ -1495,8 +1495,8 @@ input:checked + .slider:before {
 /* Features section */
 .workflow-content {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    grid-template-columns: 30% 70%;
+    gap: 15px;
     min-height: calc(100vh - 250px);
     overflow: visible;
 }
@@ -1505,7 +1505,7 @@ input:checked + .slider:before {
     background-color: #fafafa;
     border-radius: 8px;
     overflow: hidden;
-    min-height: 500px;
+    min-height: 400px;
     max-height: calc(100vh - 200px);
     display: flex;
     flex-direction: column;
@@ -1515,9 +1515,20 @@ input:checked + .slider:before {
     background-color: #fafafa;
     border-radius: 8px;
     overflow: hidden;
-    height: 200px;
+    min-height: 400px;
+    max-height: calc(100vh - 200px);
     display: flex;
     flex-direction: column;
+}
+
+#selectedFeaturesList {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 5px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
 }
 
 .feature-header {
@@ -1532,15 +1543,15 @@ input:checked + .slider:before {
 
 #availableFeatures {
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+    flex-direction: column;
+    gap: 8px;
     padding: 10px;
     background-color: #fafafa;
     border-radius: 8px;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     flex: 1;
-    min-height: 400px;
+    min-height: 350px;
     align-content: flex-start;
     height: calc(100% - 60px);
 }
@@ -1600,9 +1611,10 @@ input:checked + .slider:before {
     .feature-group {
         display: flex;
         align-items: center;
-        gap: 3.75px;
-        margin: 2px;
+        gap: 8px;
+        margin: 0;
         flex-shrink: 0;
+        width: 100%;
     }
 }
 
@@ -1619,15 +1631,19 @@ input:checked + .slider:before {
 
 /* Feature buttons */
 .feature-button {
-    display: inline-block;
-    padding: 6px 12px;
-    margin: 2px;
+    display: block;
+    width: 100%;
+    padding: 10px 12px;
+    margin: 0;
     background-color: #f0f0f0;
     border: 1px solid #ddd;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s ease;
     user-select: none;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 500;
 }
 
 .feature-button:hover {
@@ -1640,13 +1656,15 @@ input:checked + .slider:before {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 6px 12px;
-    margin: 2px;
+    padding: 8px 10px;
+    margin: 0;
     background-color: #e8f5e9;
     border: 1px solid #c8e6c9;
-    border-radius: 4px;
+    border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    min-height: 40px;
 }
 
 .selected-feature-item:hover {
@@ -1678,7 +1696,7 @@ input:checked + .slider:before {
     }
     
     .workflow-content {
-        grid-template-columns: 1fr;
+        grid-template-columns: 30% 70%;
         height: auto;
         min-height: 400px;
     }
@@ -1692,7 +1710,8 @@ input:checked + .slider:before {
     }
     
     .available-features, .selected-features {
-        height: 300px; /* Fixed height on mobile */
+        min-height: 300px;
+        max-height: calc(100vh - 200px);
     }
     
     .feature-button, .selected-feature-item {
