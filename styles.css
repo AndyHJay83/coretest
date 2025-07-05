@@ -1497,7 +1497,7 @@ input:checked + .slider:before {
 /* Features section */
 .workflow-content {
     display: grid;
-    grid-template-columns: 70% 30%;
+    grid-template-columns: 60% 40%;
     gap: 15px;
     min-height: 1000px;
     height: 100%;
@@ -1951,7 +1951,7 @@ input:checked + .slider:before {
     }
     
     .workflow-content {
-        grid-template-columns: 30% 70%;
+        grid-template-columns: 40% 60%;
         height: 1500px;
         min-height: 600px;
     }
