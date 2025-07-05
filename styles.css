@@ -2788,7 +2788,7 @@ input:checked + .slider:before {
 
 @media (max-width: 768px) {
     .workflow-content {
-        grid-template-columns: 70% 30% !important;
+        grid-template-columns: 60% 40% !important;
     }
     #availableFeatures {
         display: grid !important;
