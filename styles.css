@@ -1663,8 +1663,14 @@ input:checked + .slider:before {
 
 @media (max-width: 768px) {
     .available-features, .selected-features {
-        min-height: 600px;
+        min-height: 600px !important;
         max-height: calc(100vh - 200px);
+        position: relative !important;
+    }
+    .scroll-indicator {
+        display: flex !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
     }
 }
 
