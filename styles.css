@@ -2617,3 +2617,24 @@ input:checked + .slider:before {
         font-size: 16px;
     }
 } 
+
+@media (max-width: 768px) {
+    .workflow-content {
+        grid-template-columns: 70% 30% !important;
+    }
+    #availableFeatures {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px !important;
+        height: 100% !important;
+        overflow-y: auto !important;
+    }
+    #selectedFeaturesList {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 4px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        overflow-y: auto !important;
+    }
+} 
