@@ -1495,10 +1495,27 @@ input:checked + .slider:before {
 /* Features section */
 .workflow-content {
     display: grid;
-    grid-template-columns: 30% 70%;
+    grid-template-columns: 70% 30%;
     gap: 15px;
     min-height: calc(100vh - 250px);
     overflow: visible;
+}
+
+#availableFeatures {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    height: 100%;
+    overflow-y: auto;
+}
+
+#selectedFeaturesList {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-y: auto;
 }
 
 .available-features {
@@ -1570,25 +1587,6 @@ input:checked + .slider:before {
     position: sticky;
     top: 0;
     z-index: 1;
-}
-
-#availableFeatures {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 10px;
-    padding-bottom: 40px;
-    background-color: #fafafa;
-    border-radius: 8px;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    flex: 1;
-    min-height: 350px;
-    align-content: flex-start;
-    height: calc(100% - 60px);
-    max-height: calc(100vh - 300px);
-    border: 2px solid red !important;
-    background: #fffbe6 !important;
 }
 
 #availableFeatures {
