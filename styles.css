@@ -1530,7 +1530,7 @@ input:checked + .slider:before {
     flex-direction: column;
     background-color: #fafafa;
     border-radius: 8px;
-    overflow: hidden;
+    overflow: visible;
     min-height: 1000px;
     height: 100%;
     position: relative;
@@ -1932,7 +1932,7 @@ input:checked + .slider:before {
     .workflow-creation {
         height: 100vh;
         min-height: 100vh;
-        max-height: 100vh;
+        max-height: none;
         padding: 15px;
         padding-top: 60px;
         gap: 15px;
@@ -1952,7 +1952,7 @@ input:checked + .slider:before {
     
     .workflow-content {
         grid-template-columns: 30% 70%;
-        height: 100%;
+        height: calc(100vh + 400px);
         min-height: 600px;
     }
     
