@@ -1502,13 +1502,14 @@ input:checked + .slider:before {
 }
 
 .available-features {
+    display: flex;
+    flex-direction: column;
     background-color: #fafafa;
     border-radius: 8px;
     overflow: hidden;
     min-height: 400px;
-    max-height: calc(100vh - 200px);
-    display: flex;
-    flex-direction: column;
+    max-height: 600px;
+    height: 600px;
     position: relative;
 }
 
@@ -1536,11 +1537,10 @@ input:checked + .slider:before {
 }
 
 .scroll-indicator {
-    position: static;
-    margin: 16px auto 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
     background: rgba(0, 0, 0, 0.6);
     color: white;
     border: none;
@@ -1549,6 +1549,9 @@ input:checked + .slider:before {
     border-radius: 50%;
     width: 30px;
     height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
     font-size: 12px;
     z-index: 10;
@@ -1664,19 +1667,51 @@ input:checked + .slider:before {
 }
 
 @media (max-width: 768px) {
+    .workflow-content {
+        height: 100% !important;
+    }
     .available-features, .selected-features {
+        display: flex !important;
+        flex-direction: column !important;
         min-height: 600px !important;
         max-height: 600px !important;
         height: 600px !important;
         position: relative !important;
     }
-    .workflow-content {
-        height: 100% !important;
+    #availableFeatures {
+        flex: 1 1 auto !important;
+        overflow-y: auto !important;
+        min-height: 0 !important;
+        height: auto !important;
+        padding-bottom: 0 !important;
+    }
+    .scroll-indicator-container {
+        flex: 0 0 48px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background: transparent !important;
     }
     .scroll-indicator {
+        position: static !important;
+        margin: 0 auto !important;
+        background: rgba(0, 0, 0, 0.6) !important;
+        color: white !important;
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+        border-radius: 50% !important;
+        width: 30px !important;
+        height: 30px !important;
         display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+        font-size: 12px !important;
+        z-index: 10 !important;
         opacity: 1 !important;
         pointer-events: auto !important;
+        transition: none !important;
     }
 }
 
