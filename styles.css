@@ -1653,6 +1653,13 @@ input:checked + .slider:before {
     }
 }
 
+@media (max-width: 768px) {
+    .available-features, .selected-features {
+        min-height: 600px;
+        max-height: calc(100vh - 200px);
+    }
+}
+
 /* Saved workflows section */
 .saved-workflows {
     width: 100%;
