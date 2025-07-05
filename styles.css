@@ -1505,7 +1505,7 @@ input:checked + .slider:before {
     background-color: #fafafa;
     border-radius: 8px;
     overflow: hidden;
-    height: calc(100% + 100px);
+    height: calc(100vh - 300px);
     display: flex;
     flex-direction: column;
 }
@@ -1514,7 +1514,7 @@ input:checked + .slider:before {
     background-color: #fafafa;
     border-radius: 8px;
     overflow: hidden;
-    height: calc(100% - 100px);
+    height: 200px;
     display: flex;
     flex-direction: column;
 }
@@ -1541,7 +1541,7 @@ input:checked + .slider:before {
     flex: 1;
     min-height: 0;
     align-content: flex-start;
-    height: 100%;
+    height: calc(100% - 50px);
 }
 
 /* Mobile and PWA styles */
@@ -1554,7 +1554,7 @@ input:checked + .slider:before {
     }
     
     .available-features {
-        height: 100vh; /* Full viewport height */
+        height: calc(100vh - 200px); /* Adjusted for better fit */
         display: flex;
         flex-direction: column;
         overflow: hidden;
@@ -1591,7 +1591,7 @@ input:checked + .slider:before {
         flex-wrap: wrap;
         gap: 7.5px;
         align-content: flex-start;
-        height: calc(100% - 45px);
+        height: calc(100% - 60px);
     }
 
     .feature-group {
@@ -2292,17 +2292,7 @@ input:checked + .slider:before {
     justify-content: center;
     gap: 10px;
 }
-.abcde-letter-group {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-.abcde-letter {
-    font-size: 1.2em;
-    font-weight: bold;
-    margin-bottom: 6px;
-}
-.abcde-yes-btn {
+.abcde-btn {
     width: 44px;
     height: 44px;
     min-width: 44px;
@@ -2315,7 +2305,6 @@ input:checked + .slider:before {
     color: #1B5E20;
     font-weight: bold;
     font-size: 1em;
-    margin-bottom: 2px;
     transition: background 0.2s, color 0.2s;
     box-sizing: border-box;
     padding: 0;
@@ -2323,18 +2312,17 @@ input:checked + .slider:before {
     align-items: center;
     justify-content: center;
 }
-.abcde-yes-btn.active {
-    background: #2196F3 !important; /* Bright blue */
-    color: #fff !important;
-    border-color: #1976D2 !important;
-    box-shadow: 0 0 0 2px #1976D233;
+.abcde-btn.active {
+    background-color: #87CEEB !important;
+    color: white !important;
+    transform: scale(1.05);
 }
 
 @media (max-width: 600px) {
     .abcde-row {
         gap: 6px;
     }
-    .abcde-yes-btn {
+    .abcde-btn {
         width: 38px;
         height: 38px;
         min-width: 38px;
@@ -2351,17 +2339,7 @@ input:checked + .slider:before {
     justify-content: center;
     gap: 10px;
 }
-.abc-letter-group {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-.abc-letter {
-    font-size: 1.2em;
-    font-weight: bold;
-    margin-bottom: 6px;
-}
-.abc-yes-btn {
+.abc-btn {
     width: 44px;
     height: 44px;
     min-width: 44px;
@@ -2374,7 +2352,6 @@ input:checked + .slider:before {
     color: #1B5E20;
     font-weight: bold;
     font-size: 1em;
-    margin-bottom: 2px;
     transition: background 0.2s, color 0.2s;
     box-sizing: border-box;
     padding: 0;
@@ -2382,18 +2359,17 @@ input:checked + .slider:before {
     align-items: center;
     justify-content: center;
 }
-.abc-yes-btn.active {
-    background: #2196F3 !important; /* Bright blue */
-    color: #fff !important;
-    border-color: #1976D2 !important;
-    box-shadow: 0 0 0 2px #1976D233;
+.abc-btn.active {
+    background-color: #87CEEB !important;
+    color: white !important;
+    transform: scale(1.05);
 }
 
 @media (max-width: 600px) {
     .abc-row {
         gap: 6px;
     }
-    .abc-yes-btn {
+    .abc-btn {
         width: 38px;
         height: 38px;
         min-width: 38px;
@@ -2401,5 +2377,128 @@ input:checked + .slider:before {
         max-width: 38px;
         max-height: 38px;
         font-size: 0.95em;
+    }
+}
+
+/* FIND-EEE Feature Styles */
+.find-eee-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.find-eee-btn {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    max-width: 44px;
+    max-height: 44px;
+    border-radius: 8px;
+    background: #f0f0f0;
+    border: 1px solid #1B5E20;
+    color: #1B5E20;
+    font-weight: bold;
+    font-size: 1em;
+    transition: background 0.2s, color 0.2s;
+    box-sizing: border-box;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.find-eee-btn.active {
+    background-color: #87CEEB !important;
+    color: white !important;
+    transform: scale(1.05);
+}
+
+.find-eee-position-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+}
+.find-eee-position-btn {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    max-width: 44px;
+    max-height: 44px;
+    border-radius: 8px;
+    background: #f0f0f0;
+    border: 1px solid #1B5E20;
+    color: #1B5E20;
+    font-weight: bold;
+    font-size: 1em;
+    transition: background 0.2s, color 0.2s;
+    box-sizing: border-box;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.find-eee-position-btn.active {
+    background-color: #87CEEB !important;
+    color: white !important;
+    transform: scale(1.05);
+}
+
+@media (max-width: 600px) {
+    .find-eee-row {
+        gap: 6px;
+    }
+    .find-eee-btn {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        min-height: 38px;
+        max-width: 38px;
+        max-height: 38px;
+        font-size: 0.95em;
+    }
+    .find-eee-position-row {
+        gap: 6px;
+    }
+    .find-eee-position-btn {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        min-height: 38px;
+        max-width: 38px;
+        max-height: 38px;
+        font-size: 0.95em;
+    }
+}
+
+.none-button {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.none-button:hover {
+    background-color: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.none-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 600px) {
+    .none-button {
+        padding: 12px 24px;
+        font-size: 16px;
     }
 } 

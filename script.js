@@ -1264,6 +1264,7 @@ async function executeWorkflow(steps) {
             notInFeature: createNotInFeature(),
             abcde: createAbcdeFeature(),
             abc: createAbcFeature(),
+            findEee: createFindEeeFeature(),
         };
         
         // Add all feature elements to the document body
@@ -1380,6 +1381,9 @@ async function executeWorkflow(steps) {
                     break;
                 case 'abc':
                     featureElement = createAbcFeature();
+                    break;
+                case 'findEee':
+                    featureElement = createFindEeeFeature();
                     break;
                 default:
                     featureElement = null;
@@ -1705,29 +1709,15 @@ function createAbcdeFeature() {
     div.innerHTML = `
         <h2 class="feature-title">ABCDE</h2>
         <div class="abcde-row" style="display: flex; justify-content: center; gap: 10px;">
-            <div class="abcde-letter-group" data-letter="A">
-                <div class="abcde-letter">A</div>
-                <button class="abcde-yes-btn" data-letter="A">YES</button>
-            </div>
-            <div class="abcde-letter-group" data-letter="B">
-                <div class="abcde-letter">B</div>
-                <button class="abcde-yes-btn" data-letter="B">YES</button>
-            </div>
-            <div class="abcde-letter-group" data-letter="C">
-                <div class="abcde-letter">C</div>
-                <button class="abcde-yes-btn" data-letter="C">YES</button>
-            </div>
-            <div class="abcde-letter-group" data-letter="D">
-                <div class="abcde-letter">D</div>
-                <button class="abcde-yes-btn" data-letter="D">YES</button>
-            </div>
-            <div class="abcde-letter-group" data-letter="E">
-                <div class="abcde-letter">E</div>
-                <button class="abcde-yes-btn" data-letter="E">YES</button>
-            </div>
+            <button class="abcde-btn" data-letter="A">A</button>
+            <button class="abcde-btn" data-letter="B">B</button>
+            <button class="abcde-btn" data-letter="C">C</button>
+            <button class="abcde-btn" data-letter="D">D</button>
+            <button class="abcde-btn" data-letter="E">E</button>
         </div>
         <div style="display: flex; flex-direction: column; align-items: center; margin-top: 20px; gap: 10px;">
             <button id="abcdeDoneButton">DONE</button>
+            <button id="abcdeNoneButton" class="none-button">NONE</button>
             <button id="abcdeSkipButton" class="skip-button">SKIP</button>
         </div>
     `;
@@ -1742,22 +1732,49 @@ function createAbcFeature() {
     div.innerHTML = `
         <h2 class="feature-title">ABC</h2>
         <div class="abc-row" style="display: flex; justify-content: center; gap: 10px;">
-            <div class="abc-letter-group" data-letter="A">
-                <div class="abc-letter">A</div>
-                <button class="abc-yes-btn" data-letter="A">YES</button>
-            </div>
-            <div class="abc-letter-group" data-letter="B">
-                <div class="abc-letter">B</div>
-                <button class="abc-yes-btn" data-letter="B">YES</button>
-            </div>
-            <div class="abc-letter-group" data-letter="C">
-                <div class="abc-letter">C</div>
-                <button class="abc-yes-btn" data-letter="C">YES</button>
-            </div>
+            <button class="abc-btn" data-letter="A">A</button>
+            <button class="abc-btn" data-letter="B">B</button>
+            <button class="abc-btn" data-letter="C">C</button>
         </div>
         <div style="display: flex; flex-direction: column; align-items: center; margin-top: 20px; gap: 10px;">
             <button id="abcDoneButton">DONE</button>
+            <button id="abcNoneButton" class="none-button">NONE</button>
             <button id="abcSkipButton" class="skip-button">SKIP</button>
+        </div>
+    `;
+    return div;
+}
+
+// --- FIND-EEE Feature Logic ---
+function createFindEeeFeature() {
+    const div = document.createElement('div');
+    div.id = 'findEeeFeature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">FIND-EEE</h2>
+        <div class="find-eee-row" style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+            <button class="find-eee-btn" data-letter="B">B</button>
+            <button class="find-eee-btn" data-letter="C">C</button>
+            <button class="find-eee-btn" data-letter="D">D</button>
+            <button class="find-eee-btn" data-letter="E">E</button>
+            <button class="find-eee-btn" data-letter="G">G</button>
+            <button class="find-eee-btn" data-letter="P">P</button>
+            <button class="find-eee-btn" data-letter="T">T</button>
+            <button class="find-eee-btn" data-letter="V">V</button>
+            <button class="find-eee-btn" data-letter="Z">Z</button>
+        </div>
+        <div class="find-eee-position-row" style="display: flex; justify-content: center; gap: 10px; margin-top: 15px;">
+            <button class="find-eee-position-btn" data-position="1">1</button>
+            <button class="find-eee-position-btn" data-position="2">2</button>
+            <button class="find-eee-position-btn" data-position="3">3</button>
+            <button class="find-eee-position-btn" data-position="4">4</button>
+            <button class="find-eee-position-btn" data-position="5">5</button>
+            <button class="find-eee-position-btn" data-position="6">6</button>
+            <button class="find-eee-position-btn" data-position="7">7</button>
+            <button class="find-eee-position-btn" data-position="8">8</button>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; margin-top: 20px; gap: 10px;">
+            <button id="findEeeSkipButton" class="skip-button">SKIP</button>
         </div>
     `;
     return div;
@@ -1790,6 +1807,20 @@ function filterWordsByAbc(words, yesLetters) {
             if (!yesLetters.includes(letter) && word.includes(letter)) return false;
         }
         return true;
+    });
+}
+
+// Filtering logic for FIND-EEE feature
+function filterWordsByFindEee(words, selectedLetter, selectedPosition) {
+    return words.filter(word => {
+        if (selectedPosition === null) {
+            // Only letter filtering - word must contain the letter anywhere
+            return word.includes(selectedLetter);
+        } else {
+            // Letter + position filtering - word must have the letter at the specific position
+            const position = selectedPosition - 1;
+            return word.length > position && word[position] === selectedLetter;
+        }
     });
 }
 
@@ -2556,9 +2587,10 @@ function setupFeatureListeners(feature, callback) {
         }
 
         case 'abcde': {
-            const yesBtns = Array.from(document.querySelectorAll('.abcde-yes-btn'));
+            const yesBtns = Array.from(document.querySelectorAll('.abcde-btn'));
             const doneBtn = document.getElementById('abcdeDoneButton');
             const skipBtn = document.getElementById('abcdeSkipButton');
+            const noneBtn = document.getElementById('abcdeNoneButton');
             let yesLetters = [];
 
             yesBtns.forEach(btn => {
@@ -2611,6 +2643,38 @@ function setupFeatureListeners(feature, callback) {
                     doneBtn.onclick();
                 }, { passive: false });
             }
+            
+            if (noneBtn) {
+                noneBtn.onclick = () => {
+                    // Update workflow state - exclude all ABCDE letters
+                    workflowState.abcdeSelection = new Set([]);
+                    
+                    // Add all ABCDE letters to excluded letters
+                    ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
+                        workflowState.excludedLetters.add(letter);
+                    });
+                    
+                    console.log(`ABCDE feature completed. NONE selected - all letters excluded`);
+                    logWorkflowState();
+                    
+                    // Filter out words containing any of A, B, C, D, E
+                    const filteredWords = currentFilteredWords.filter(word => {
+                        return !['A', 'B', 'C', 'D', 'E'].some(letter => 
+                            word.toUpperCase().includes(letter)
+                        );
+                    });
+                    
+                    callback(filteredWords);
+                    const featureDiv = document.getElementById('abcdeFeature');
+                    featureDiv.classList.add('completed');
+                    featureDiv.dispatchEvent(new Event('completed'));
+                };
+                noneBtn.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    noneBtn.onclick();
+                }, { passive: false });
+            }
+            
             if (skipBtn) {
                 skipBtn.onclick = () => {
                     callback(currentFilteredWords);
@@ -2626,9 +2690,10 @@ function setupFeatureListeners(feature, callback) {
             break;
         }
         case 'abc': {
-            const yesBtns = Array.from(document.querySelectorAll('.abc-yes-btn'));
+            const yesBtns = Array.from(document.querySelectorAll('.abc-btn'));
             const doneBtn = document.getElementById('abcDoneButton');
             const skipBtn = document.getElementById('abcSkipButton');
+            const noneBtn = document.getElementById('abcNoneButton');
             let yesLetters = [];
 
             yesBtns.forEach(btn => {
@@ -2681,10 +2746,125 @@ function setupFeatureListeners(feature, callback) {
                     doneBtn.onclick();
                 }, { passive: false });
             }
+            
+            if (noneBtn) {
+                noneBtn.onclick = () => {
+                    // Update workflow state - exclude all ABC letters
+                    workflowState.abcSelection = new Set([]);
+                    
+                    // Add all ABC letters to excluded letters
+                    ['A', 'B', 'C'].forEach(letter => {
+                        workflowState.excludedLetters.add(letter);
+                    });
+                    
+                    console.log(`ABC feature completed. NONE selected - all letters excluded`);
+                    logWorkflowState();
+                    
+                    // Filter out words containing any of A, B, C
+                    const filteredWords = currentFilteredWords.filter(word => {
+                        return !['A', 'B', 'C'].some(letter => 
+                            word.toUpperCase().includes(letter)
+                        );
+                    });
+                    
+                    callback(filteredWords);
+                    const featureDiv = document.getElementById('abcFeature');
+                    featureDiv.classList.add('completed');
+                    featureDiv.dispatchEvent(new Event('completed'));
+                };
+                noneBtn.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    noneBtn.onclick();
+                }, { passive: false });
+            }
+            
             if (skipBtn) {
                 skipBtn.onclick = () => {
                     callback(currentFilteredWords);
                     const featureDiv = document.getElementById('abcFeature');
+                    featureDiv.classList.add('completed');
+                    featureDiv.dispatchEvent(new Event('completed'));
+                };
+                skipBtn.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    skipBtn.onclick();
+                }, { passive: false });
+            }
+            break;
+        }
+        case 'findEee': {
+            const letterBtns = Array.from(document.querySelectorAll('.find-eee-btn'));
+            const positionBtns = Array.from(document.querySelectorAll('.find-eee-position-btn'));
+            const skipBtn = document.getElementById('findEeeSkipButton');
+            let selectedLetter = null;
+            let selectedPosition = null;
+
+            // Reset all buttons
+            letterBtns.forEach(btn => {
+                btn.classList.remove('active');
+                btn.onclick = () => {
+                    const letter = btn.dataset.letter;
+                    
+                    // Select the letter
+                    letterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    selectedLetter = letter;
+                    
+                    console.log('Letter selected:', letter, 'Button classes:', btn.className);
+                    
+                    // Filter immediately by letter only
+                    const filteredWords = filterWordsByFindEee(currentFilteredWords, letter, null);
+                    callback(filteredWords);
+                };
+                // Touch event for mobile
+                btn.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    btn.onclick();
+                }, { passive: false });
+            });
+
+            positionBtns.forEach(btn => {
+                btn.classList.remove('active');
+                btn.onclick = () => {
+                    const position = parseInt(btn.dataset.position);
+                    
+                    // Select the position
+                    positionBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    selectedPosition = position;
+                    
+                    console.log('Position selected:', position, 'Button classes:', btn.className);
+                    
+                    // If both letter and position are selected, apply filter and move to next feature
+                    if (selectedLetter && selectedPosition) {
+                        const filteredWords = filterWordsByFindEee(currentFilteredWords, selectedLetter, selectedPosition);
+                        callback(filteredWords);
+                        
+                        // Move to next feature automatically
+                        const featureDiv = document.getElementById('findEeeFeature');
+                        featureDiv.classList.add('completed');
+                        featureDiv.dispatchEvent(new Event('completed'));
+                    }
+                };
+                // Touch event for mobile
+                btn.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    btn.onclick();
+                }, { passive: false });
+            });
+
+            if (skipBtn) {
+                skipBtn.onclick = () => {
+                    // If letter is selected but no position, keep the letter filter
+                    if (selectedLetter && !selectedPosition) {
+                        // Keep current filtered words (letter filter already applied)
+                        callback(currentFilteredWords);
+                    } else if (!selectedLetter && !selectedPosition) {
+                        // Nothing selected, no changes to wordlist
+                        callback(currentFilteredWords);
+                    }
+                    
+                    const featureDiv = document.getElementById('findEeeFeature');
                     featureDiv.classList.add('completed');
                     featureDiv.dispatchEvent(new Event('completed'));
                 };

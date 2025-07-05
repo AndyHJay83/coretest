@@ -150,6 +150,10 @@
                                 <button class="feature-button" data-feature="abc" draggable="true">ABC</button>
                                 <button class="info-button" data-feature="abc"><i class="fas fa-info-circle"></i></button>
                             </div>
+                            <div class="feature-group">
+                                <button class="feature-button" data-feature="findEee" draggable="true">FIND-EEE</button>
+                                <button class="info-button" data-feature="findEee"><i class="fas fa-info-circle"></i></button>
+                            </div>
                         </div>
                     </div>
 
@@ -352,29 +356,15 @@
                 <div id="abcdeFeature" class="feature-section" style="display: none;">
                     <h2 class="feature-title">ABCDE</h2>
                     <div class="abcde-row" style="display: flex; justify-content: center; gap: 10px;">
-                        <div class="abcde-letter-group" data-letter="A">
-                            <div class="abcde-letter">A</div>
-                            <button class="abcde-yes-btn" data-letter="A">YES</button>
-                        </div>
-                        <div class="abcde-letter-group" data-letter="B">
-                            <div class="abcde-letter">B</div>
-                            <button class="abcde-yes-btn" data-letter="B">YES</button>
-                        </div>
-                        <div class="abcde-letter-group" data-letter="C">
-                            <div class="abcde-letter">C</div>
-                            <button class="abcde-yes-btn" data-letter="C">YES</button>
-                        </div>
-                        <div class="abcde-letter-group" data-letter="D">
-                            <div class="abcde-letter">D</div>
-                            <button class="abcde-yes-btn" data-letter="D">YES</button>
-                        </div>
-                        <div class="abcde-letter-group" data-letter="E">
-                            <div class="abcde-letter">E</div>
-                            <button class="abcde-yes-btn" data-letter="E">YES</button>
-                        </div>
+                        <button class="abcde-btn" data-letter="A">A</button>
+                        <button class="abcde-btn" data-letter="B">B</button>
+                        <button class="abcde-btn" data-letter="C">C</button>
+                        <button class="abcde-btn" data-letter="D">D</button>
+                        <button class="abcde-btn" data-letter="E">E</button>
                     </div>
                     <div style="display: flex; flex-direction: column; align-items: center; margin-top: 20px; gap: 10px;">
                         <button id="abcdeDoneButton">DONE</button>
+                        <button id="abcdeNoneButton" class="none-button">NONE</button>
                         <button id="abcdeSkipButton" class="skip-button">SKIP</button>
                     </div>
                 </div>
@@ -383,22 +373,43 @@
                 <div id="abcFeature" class="feature-section" style="display: none;">
                     <h2 class="feature-title">ABC</h2>
                     <div class="abc-row" style="display: flex; justify-content: center; gap: 10px;">
-                        <div class="abc-letter-group" data-letter="A">
-                            <div class="abc-letter">A</div>
-                            <button class="abc-yes-btn" data-letter="A">YES</button>
-                        </div>
-                        <div class="abc-letter-group" data-letter="B">
-                            <div class="abc-letter">B</div>
-                            <button class="abc-yes-btn" data-letter="B">YES</button>
-                        </div>
-                        <div class="abc-letter-group" data-letter="C">
-                            <div class="abc-letter">C</div>
-                            <button class="abc-yes-btn" data-letter="C">YES</button>
-                        </div>
+                        <button class="abc-btn" data-letter="A">A</button>
+                        <button class="abc-btn" data-letter="B">B</button>
+                        <button class="abc-btn" data-letter="C">C</button>
                     </div>
                     <div style="display: flex; flex-direction: column; align-items: center; margin-top: 20px; gap: 10px;">
                         <button id="abcDoneButton">DONE</button>
+                        <button id="abcNoneButton" class="none-button">NONE</button>
                         <button id="abcSkipButton" class="skip-button">SKIP</button>
+                    </div>
+                </div>
+
+                <!-- FIND-EEE feature -->
+                <div id="findEeeFeature" class="feature-section" style="display: none;">
+                    <h2 class="feature-title">FIND-EEE</h2>
+                    <div class="find-eee-row" style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+                        <button class="find-eee-btn" data-letter="B">B</button>
+                        <button class="find-eee-btn" data-letter="C">C</button>
+                        <button class="find-eee-btn" data-letter="D">D</button>
+                        <button class="find-eee-btn" data-letter="E">E</button>
+                        <button class="find-eee-btn" data-letter="G">G</button>
+                        <button class="find-eee-btn" data-letter="P">P</button>
+                        <button class="find-eee-btn" data-letter="T">T</button>
+                        <button class="find-eee-btn" data-letter="V">V</button>
+                        <button class="find-eee-btn" data-letter="Z">Z</button>
+                    </div>
+                    <div class="find-eee-position-row" style="display: flex; justify-content: center; gap: 10px; margin-top: 15px;">
+                        <button class="find-eee-position-btn" data-position="1">1</button>
+                        <button class="find-eee-position-btn" data-position="2">2</button>
+                        <button class="find-eee-position-btn" data-position="3">3</button>
+                        <button class="find-eee-position-btn" data-position="4">4</button>
+                        <button class="find-eee-position-btn" data-position="5">5</button>
+                        <button class="find-eee-position-btn" data-position="6">6</button>
+                        <button class="find-eee-position-btn" data-position="7">7</button>
+                        <button class="find-eee-position-btn" data-position="8">8</button>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center; margin-top: 20px; gap: 10px;">
+                        <button id="findEeeSkipButton" class="skip-button">SKIP</button>
                     </div>
                 </div>
             </div>
@@ -531,6 +542,13 @@
             <div class="feature-info-content">
                 <h3>ABC</h3>
                 <p>Are there the letters A-C within the word? Answer YES for individual letters, then DONE to confirm.</p>
+                <button class="close-info-button">&times;</button>
+            </div>
+        </div>
+        <div id="findEeeInfo" class="feature-info-modal">
+            <div class="feature-info-content">
+                <h3>FIND-EEE</h3>
+                <p>Select a letter that is definitely present in the target word. Words will be filtered to only include those containing the selected letter. Only one letter can be selected at a time.</p>
                 <button class="close-info-button">&times;</button>
             </div>
         </div>
