@@ -1620,9 +1620,9 @@ input:checked + .slider:before {
         border-radius: 8px;
     }
 
-    .available-features {
-        height: 300px !important;
-        max-height: 300px !important;
+    .available-features, .selected-features {
+        height: 600px !important;
+        max-height: 600px !important;
     }
 
     .selected-features {
