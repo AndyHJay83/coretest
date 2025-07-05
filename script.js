@@ -139,6 +139,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         wordList = [];
         currentFilteredWords = [];
     });
+
+    const availableFeatures = document.getElementById('availableFeatures');
+    if (availableFeatures) {
+        console.log('[DEBUG] On load: scrollHeight:', availableFeatures.scrollHeight, 'clientHeight:', availableFeatures.clientHeight);
+        setTimeout(() => {
+            console.log('[DEBUG] After 500ms: scrollHeight:', availableFeatures.scrollHeight, 'clientHeight:', availableFeatures.clientHeight);
+        }, 500);
+        window.addEventListener('resize', () => {
+            console.log('[DEBUG] On resize: scrollHeight:', availableFeatures.scrollHeight, 'clientHeight:', availableFeatures.clientHeight);
+        });
+    }
 });
 
 // Function to initialize dropdowns

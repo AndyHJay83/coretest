@@ -1587,6 +1587,8 @@ input:checked + .slider:before {
     align-content: flex-start;
     height: calc(100% - 60px);
     max-height: calc(100vh - 300px);
+    border: 2px solid red !important;
+    background: #fffbe6 !important;
 }
 
 /* Mobile and PWA styles */
