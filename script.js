@@ -3945,15 +3945,54 @@ function addFeatureToSelected(featureType) {
     // Add click event to remove feature
     selectedFeature.addEventListener('click', () => {
         selectedFeature.remove();
+        adjustSelectedFeaturesHeight();
     });
     
     // Add touch event for mobile
     selectedFeature.addEventListener('touchstart', (e) => {
         e.preventDefault();
         selectedFeature.remove();
+        adjustSelectedFeaturesHeight();
     }, { passive: false });
     
     selectedFeatures.appendChild(selectedFeature);
+    adjustSelectedFeaturesHeight();
+}
+
+function adjustSelectedFeaturesHeight() {
+    const selectedFeatures = document.getElementById('selectedFeaturesList');
+    const featureItems = selectedFeatures.querySelectorAll('.selected-feature-item');
+    const totalFeatures = featureItems.length;
+    
+    // Base height is 48px, minimum height is 24px (50% reduction)
+    const baseHeight = 48;
+    const minHeight = 24;
+    
+    if (totalFeatures <= 3) {
+        // Normal height for 3 or fewer features
+        featureItems.forEach(item => {
+            item.style.minHeight = '48px';
+            item.style.padding = '12px 16px';
+        });
+    } else if (totalFeatures <= 6) {
+        // Slight reduction for 4-6 features
+        featureItems.forEach(item => {
+            item.style.minHeight = '40px';
+            item.style.padding = '10px 14px';
+        });
+    } else if (totalFeatures <= 10) {
+        // Medium reduction for 7-10 features
+        featureItems.forEach(item => {
+            item.style.minHeight = '32px';
+            item.style.padding = '8px 12px';
+        });
+    } else {
+        // Maximum reduction (50%) for 10+ features
+        featureItems.forEach(item => {
+            item.style.minHeight = '24px';
+            item.style.padding = '6px 10px';
+        });
+    }
 }
 
 function removeFeature(featureType) {
@@ -4102,15 +4141,18 @@ function addFeatureToSelected(featureType) {
     // Add click event to remove feature
     selectedFeature.addEventListener('click', () => {
         selectedFeature.remove();
+        adjustSelectedFeaturesHeight();
     });
     
     // Add touch event for mobile
     selectedFeature.addEventListener('touchstart', (e) => {
         e.preventDefault();
         selectedFeature.remove();
+        adjustSelectedFeaturesHeight();
     }, { passive: false });
     
     selectedFeatures.appendChild(selectedFeature);
+    adjustSelectedFeaturesHeight();
 }
 
 // Remove the duplicate addFeatureToList function since we're using addFeatureToSelected
@@ -4669,15 +4711,18 @@ function addFeatureToSelected(featureType) {
     // Add click event to remove feature
     selectedFeature.addEventListener('click', () => {
         selectedFeature.remove();
+        adjustSelectedFeaturesHeight();
     });
     
     // Add touch event for mobile
     selectedFeature.addEventListener('touchstart', (e) => {
         e.preventDefault();
         selectedFeature.remove();
+        adjustSelectedFeaturesHeight();
     }, { passive: false });
     
     selectedFeatures.appendChild(selectedFeature);
+    adjustSelectedFeaturesHeight();
 }
 
 // Add NOT IN feature to the featureElements object
