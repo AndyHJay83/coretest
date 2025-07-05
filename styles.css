@@ -1942,7 +1942,7 @@ input:checked + .slider:before {
     .workflow-content {
         flex: 1;
         min-height: 0;
-        height: calc(100vh - 200px);
+        height: calc(100vh + 400px);
     }
     
     .available-features, .selected-features {
