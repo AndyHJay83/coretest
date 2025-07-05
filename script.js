@@ -4099,28 +4099,15 @@ function addFeatureToSelected(featureType) {
     featureName.textContent = featureButton.textContent;
     selectedFeature.appendChild(featureName);
     
-    const removeButton = document.createElement('button');
-    removeButton.className = 'remove-feature';
-    removeButton.textContent = '×';
-    removeButton.onclick = (e) => {
-        e.stopPropagation();
+    // Add click event to remove feature
+    selectedFeature.addEventListener('click', () => {
         selectedFeature.remove();
-    };
-    selectedFeature.appendChild(removeButton);
-    
-    // Add click event to move feature back to available
-    selectedFeature.addEventListener('click', (e) => {
-        if (e.target !== removeButton) {
-            selectedFeature.remove();
-        }
     });
     
     // Add touch event for mobile
     selectedFeature.addEventListener('touchstart', (e) => {
         e.preventDefault();
-        if (e.target !== removeButton) {
-            selectedFeature.remove();
-        }
+        selectedFeature.remove();
     }, { passive: false });
     
     selectedFeatures.appendChild(selectedFeature);
@@ -4679,28 +4666,15 @@ function addFeatureToSelected(featureType) {
     featureName.textContent = featureButton.textContent;
     selectedFeature.appendChild(featureName);
     
-    const removeButton = document.createElement('button');
-    removeButton.className = 'remove-feature';
-    removeButton.textContent = '×';
-    removeButton.onclick = (e) => {
-        e.stopPropagation();
+    // Add click event to remove feature
+    selectedFeature.addEventListener('click', () => {
         selectedFeature.remove();
-    };
-    selectedFeature.appendChild(removeButton);
-    
-    // Add click event to move feature back to available
-    selectedFeature.addEventListener('click', (e) => {
-        if (e.target !== removeButton) {
-            selectedFeature.remove();
-        }
     });
     
     // Add touch event for mobile
     selectedFeature.addEventListener('touchstart', (e) => {
         e.preventDefault();
-        if (e.target !== removeButton) {
-            selectedFeature.remove();
-        }
+        selectedFeature.remove();
     }, { passive: false });
     
     selectedFeatures.appendChild(selectedFeature);
