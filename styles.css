@@ -1512,10 +1512,14 @@ input:checked + .slider:before {
 #selectedFeaturesList {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 8px;
     width: 100%;
     box-sizing: border-box;
-    overflow-y: auto;
+    overflow-y: visible;
+    padding: 8px 0;
+    min-height: 100px;
+    height: auto;
+    max-height: none;
 }
 
 .available-features {
@@ -1859,11 +1863,11 @@ input:checked + .slider:before {
     gap: 8px;
     width: 100%;
     box-sizing: border-box;
-    overflow-y: auto;
+    overflow-y: visible;
     padding: 8px 0;
-    max-height: 400px;
-    scrollbar-width: thin;
-    scrollbar-color: #c1c1c1 #f1f1f1;
+    min-height: 100px;
+    height: auto;
+    max-height: none;
 }
 
 #selectedFeaturesList::-webkit-scrollbar {
@@ -2782,10 +2786,14 @@ input:checked + .slider:before {
     #selectedFeaturesList {
         display: flex !important;
         flex-direction: column !important;
-        gap: 4px !important;
+        gap: 8px !important;
         width: 100% !important;
         box-sizing: border-box !important;
-        overflow-y: auto !important;
+        overflow-y: visible !important;
+        padding: 8px 0 !important;
+        min-height: 100px !important;
+        height: auto !important;
+        max-height: none !important;
     }
 } 
 
