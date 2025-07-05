@@ -1591,6 +1591,16 @@ input:checked + .slider:before {
     background: #fffbe6 !important;
 }
 
+#availableFeatures {
+    height: calc(100% - 48px) !important;
+}
+
+@media (max-width: 768px) {
+    #availableFeatures {
+        height: calc(100% - 48px) !important;
+    }
+}
+
 /* Mobile and PWA styles */
 @media (max-width: 768px) {
     .workflow-content {
