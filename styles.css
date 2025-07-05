@@ -1529,6 +1529,8 @@ input:checked + .slider:before {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 4px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .feature-header {
@@ -1554,6 +1556,7 @@ input:checked + .slider:before {
     min-height: 350px;
     align-content: flex-start;
     height: calc(100% - 60px);
+    max-height: calc(100vh - 300px);
 }
 
 /* Mobile and PWA styles */
@@ -1665,6 +1668,8 @@ input:checked + .slider:before {
     transition: all 0.2s ease;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     min-height: 40px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .selected-feature-item:hover {
@@ -1677,11 +1682,12 @@ input:checked + .slider:before {
     background: none;
     border: none;
     color: #666;
-    font-size: 18px;
+    font-size: 11px;
     cursor: pointer;
-    padding: 0 4px;
-    margin-left: 8px;
+    padding: 0 2px;
+    margin-left: 4px;
     transition: color 0.2s ease;
+    flex-shrink: 0;
 }
 
 .remove-feature:hover {
@@ -1721,8 +1727,9 @@ input:checked + .slider:before {
     }
     
     .remove-feature {
-        font-size: 1.4rem;
-        padding: 0 12px;
+        font-size: 10px;
+        padding: 0 2px;
+        margin-left: 2px;
     }
     
     .workflow-name-input {
