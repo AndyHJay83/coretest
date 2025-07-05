@@ -1621,8 +1621,8 @@ input:checked + .slider:before {
     }
 
     .available-features {
-        height: 400px !important;
-        max-height: 400px !important;
+        height: 300px !important;
+        max-height: 300px !important;
     }
 
     .selected-features {
