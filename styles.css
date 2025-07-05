@@ -1410,17 +1410,10 @@ input:checked + .slider:before {
 
 /* Workflow Creation Styles */
 .workflow-creation {
-    padding: 20px;
-    padding-top: 60px; /* Increased padding to avoid status bar */
-    max-width: 1200px;
-    margin: 0 auto;
-    height: 200vh;
-    min-height: 200vh;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    height: 100vh;
+    min-height: 100vh;
     box-sizing: border-box;
 }
 
@@ -1496,12 +1489,12 @@ input:checked + .slider:before {
 
 /* Features section */
 .workflow-content {
+    flex: 1 1 0;
+    min-height: 0;
+    height: auto;
     display: grid;
     grid-template-columns: 60% 40%;
     gap: 15px;
-    min-height: 1000px;
-    height: 100%;
-    overflow: visible;
 }
 
 #availableFeatures {
@@ -1526,15 +1519,11 @@ input:checked + .slider:before {
 }
 
 .available-features {
+    height: 100%;
+    min-height: 0;
+    max-height: none;
     display: flex;
     flex-direction: column;
-    background-color: #fafafa;
-    border-radius: 8px;
-    overflow: visible;
-    min-height: 1000px;
-    height: 100%;
-    position: relative;
-    flex: 1;
 }
 
 .scroll-indicator-container {
