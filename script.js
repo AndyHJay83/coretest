@@ -1179,7 +1179,7 @@ async function executeWorkflow(steps) {
         if (workflowExecution) {
             workflowExecution.style.display = 'flex';
             workflowExecution.style.flexDirection = 'column';
-            workflowExecution.style.height = '100vh';
+            workflowExecution.style.height = '100dvh';
         }
 
         // Add home button if it doesn't exist
@@ -1306,7 +1306,7 @@ async function executeWorkflow(steps) {
         }
         
         // Set up the layout
-        featureArea.style.flex = '0 0 33vh';
+        featureArea.style.flex = '0 0 33dvh';
         featureArea.style.minHeight = '200px';
         featureArea.style.padding = '20px';
         featureArea.style.backgroundColor = '#f5f5f5';

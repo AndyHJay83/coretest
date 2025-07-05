@@ -1301,7 +1301,7 @@ input:checked + .slider:before {
     padding: 30px;
     border-radius: 10px;
     max-width: 80%;
-    max-height: 80vh;
+    max-height: 80dvh;
     overflow-y: auto;
     position: relative;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
@@ -1415,8 +1415,8 @@ input:checked + .slider:before {
 .workflow-creation {
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    min-height: 100vh;
+    height: 100dvh;
+    min-height: 100dvh;
     box-sizing: border-box;
 }
 
@@ -1609,7 +1609,7 @@ input:checked + .slider:before {
     
     .available-features {
         min-height: 400px;
-        max-height: calc(100vh - 150px);
+        max-height: calc(100dvh - 150px);
         display: flex;
         flex-direction: column;
         overflow: hidden;
