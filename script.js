@@ -3975,6 +3975,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Handle scroll indicator click
         scrollIndicator.addEventListener('click', () => {
+            console.log('Scroll indicator clicked');
+            console.log('availableFeatures:', availableFeatures);
+            console.log('scrollHeight:', availableFeatures.scrollHeight, 'clientHeight:', availableFeatures.clientHeight);
             availableFeatures.scrollTo({
                 top: availableFeatures.scrollHeight,
                 behavior: 'smooth'
@@ -3986,6 +3989,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const isAtBottom = availableFeatures.scrollTop + availableFeatures.clientHeight >= availableFeatures.scrollHeight - 10;
             scrollIndicator.classList.toggle('hidden', isAtBottom);
         });
+    } else {
+        if (!scrollIndicator) console.log('Scroll indicator button not found');
+        if (!availableFeatures) console.log('Available features container not found');
     }
     
     // Improve LENGTH input touch sensitivity
