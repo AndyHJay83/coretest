@@ -1378,6 +1378,9 @@ async function executeWorkflow(steps) {
                 case 'vowel':
                     featureElement = createVowelFeature();
                     break;
+                case 'vowelPos':
+                    featureElement = createVowelPosFeature();
+                    break;
                 case 'o':
                     featureElement = createOFeature();
                     break;
@@ -1604,6 +1607,26 @@ function createVowelFeature() {
             <button class="position-btn" data-position="6">6</button>
             <button class="position-btn" data-position="7">7</button>
             <button class="position-btn" data-position="8">8</button>
+        </div>
+    `;
+    return div;
+}
+
+function createVowelPosFeature() {
+    const div = document.createElement('div');
+    div.id = 'vowelPosFeature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">VOWEL POS</h2>
+        <div class="vowel-letter"></div>
+        <div class="button-container">
+            <button class="vowel-btn yes-btn">YES</button>
+            <button class="vowel-btn no-btn">NO</button>
+        </div>
+        <div class="section-buttons">
+            <button class="section-btn" data-section="begin">BEGIN</button>
+            <button class="section-btn" data-section="mid">MID</button>
+            <button class="section-btn" data-section="end">END</button>
         </div>
     `;
     return div;
@@ -2165,6 +2188,119 @@ function setupFeatureListeners(feature, callback) {
                 vowelNoBtn.addEventListener('touchstart', (e) => {
                     e.preventDefault();
                     vowelNoBtn.click();
+                }, { passive: false });
+            }
+            break;
+        }
+        
+        case 'vowelPos': {
+            const vowelPosYesBtn = document.querySelector('#vowelPosFeature .yes-btn');
+            const vowelPosNoBtn = document.querySelector('#vowelPosFeature .no-btn');
+            const vowelPosPositionBtns = document.querySelectorAll('#vowelPosFeature .position-btn');
+            
+            // Initialize vowel processing with current words
+            currentFilteredWordsForVowels = [...currentFilteredWords];
+            originalFilteredWords = [...currentFilteredWords];
+            currentVowelIndex = 0;
+            
+            // Get vowels from Position 1 word in order
+            const vowels = new Set(['a', 'e', 'i', 'o', 'u']);
+            uniqueVowels = [];
+            if (currentPosition1Word) {
+                for (const char of currentPosition1Word.toLowerCase()) {
+                    if (vowels.has(char)) {
+                        uniqueVowels.push(char);
+                    }
+                }
+            }
+            
+            // Set up the vowel display
+            const vowelPosFeature = document.getElementById('vowelPosFeature');
+            const vowelPosLetter = vowelPosFeature.querySelector('.vowel-letter');
+            if (uniqueVowels.length > 0) {
+                vowelPosLetter.textContent = uniqueVowels[0].toUpperCase();
+                vowelPosLetter.style.display = 'inline-block';
+            }
+
+            // Function to get section positions based on word length
+            function getSectionPositions(wordLength) {
+                const beginEnd = Math.ceil(wordLength / 2);
+                
+                let midStart, midEnd;
+                if (wordLength <= 5) {
+                    midStart = 2;
+                    midEnd = wordLength - 1;
+                } else if (wordLength <= 8) {
+                    midStart = 2;
+                    midEnd = wordLength - 1;
+                } else if (wordLength <= 12) {
+                    midStart = 4;
+                    midEnd = wordLength - 1;
+                } else {
+                    midStart = 4;
+                    midEnd = wordLength - 1;
+                }
+                
+                return {
+                    begin: [0, beginEnd],
+                    mid: [midStart - 1, midEnd],
+                    end: [beginEnd, wordLength]
+                };
+            }
+
+            // Function to filter words by vowel section
+            function filterWordsByVowelSection(words, vowel, section) {
+                return words.filter(word => {
+                    const wordLower = word.toLowerCase();
+                    const sections = getSectionPositions(word.length);
+                    const [start, end] = sections[section];
+                    const sectionText = wordLower.slice(start, end);
+                    return sectionText.includes(vowel.toLowerCase());
+                });
+            }
+
+            // Add click handlers for section buttons
+            const vowelPosSectionBtns = document.querySelectorAll('#vowelPosFeature .section-btn');
+            vowelPosSectionBtns.forEach(btn => {
+                btn.onclick = () => {
+                    const section = btn.dataset.section;
+                    const currentVowel = uniqueVowels[currentVowelIndex];
+                    if (currentVowel) {
+                        const filteredWords = filterWordsByVowelSection(currentFilteredWords, currentVowel, section);
+                        callback(filteredWords);
+                        document.getElementById('vowelPosFeature').dispatchEvent(new Event('completed'));
+                    }
+                };
+                
+                // Add touch event for mobile
+                btn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    btn.click();
+                }, { passive: false });
+            });
+
+            // YES/NO button handlers
+            if (vowelPosYesBtn) {
+                vowelPosYesBtn.onclick = () => {
+                    handleVowelSelection(true);
+                };
+                
+                // Add touch event for mobile
+                vowelPosYesBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    vowelPosYesBtn.click();
+                }, { passive: false });
+            }
+            
+            if (vowelPosNoBtn) {
+                vowelPosNoBtn.onclick = () => {
+                    handleVowelSelection(false);
+                };
+                
+                // Add touch event for mobile
+                vowelPosNoBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    vowelPosNoBtn.click();
                 }, { passive: false });
             }
             break;

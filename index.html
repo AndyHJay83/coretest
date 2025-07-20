@@ -108,6 +108,10 @@
                                 <button class="info-button" data-feature="vowel"><i class="fas fa-info-circle"></i></button>
                             </div>
                             <div class="feature-group">
+                                <button class="feature-button" data-feature="vowelPos" draggable="true">VOWEL POS</button>
+                                <button class="info-button" data-feature="vowelPos"><i class="fas fa-info-circle"></i></button>
+                            </div>
+                            <div class="feature-group">
                                 <button class="feature-button" data-feature="o" draggable="true">O?</button>
                                 <button class="info-button" data-feature="o"><i class="fas fa-info-circle"></i></button>
                             </div>
@@ -329,6 +333,21 @@
                     </div>
                 </div>
 
+                <!-- VOWEL POS feature -->
+                <div id="vowelPosFeature" class="feature-section" style="display: none;">
+                    <div class="feature-title">VOWEL POS</div>
+                    <div class="vowel-letter"></div>
+                    <div class="button-container">
+                        <button class="vowel-btn yes-btn">YES</button>
+                        <button class="vowel-btn no-btn">NO</button>
+                    </div>
+                    <div class="section-buttons">
+                        <button class="section-btn" data-section="begin">BEGIN</button>
+                        <button class="section-btn" data-section="mid">MID</button>
+                        <button class="section-btn" data-section="end">END</button>
+                    </div>
+                </div>
+
                 <!-- Shape feature -->
                 <div id="shapeFeature" class="feature-section" style="display: none;">
                     <div class="shape-display">
@@ -494,6 +513,13 @@
             <div class="feature-info-content">
                 <h3>VOWEL</h3>
                 <p><strong>Vowel</strong><br>This MUST follow Short Word. Will cycle through vowels within Short Word.</p>
+                <button class="close-info-button">&times;</button>
+            </div>
+        </div>
+        <div id="vowelPosInfo" class="feature-info-modal">
+            <div class="feature-info-content">
+                <h3>VOWEL POS</h3>
+                <p><strong>Vowel Position</strong><br>This MUST follow Short Word. Will cycle through vowels within Short Word. Select BEGIN, MID, or END to specify which section of the word must contain the vowel.</p>
                 <button class="close-info-button">&times;</button>
             </div>
         </div>
