@@ -1372,9 +1372,6 @@ async function executeWorkflow(steps) {
                 case 'consMid':
                     featureElement = createConsMidFeature();
                     break;
-                case 'consMid2':
-                    featureElement = createConsMid2Feature();
-                    break;
                 case 'vowel':
                     featureElement = createVowelFeature();
                     break;
@@ -1564,21 +1561,6 @@ function createConsMidFeature() {
             <input type="text" id="consMidInput" placeholder="Enter a word">
             <button id="consMidButton">SUBMIT</button>
             <button id="consMidDoneButton">DONE</button>
-        </div>
-    `;
-    return div;
-}
-
-function createConsMid2Feature() {
-    const div = document.createElement('div');
-    div.id = 'consMid2Feature';
-    div.className = 'feature-section';
-    div.innerHTML = `
-        <h2 class="feature-title">CONS MID</h2>
-        <div class="position-input">
-            <input type="text" id="consMid2Input" placeholder="Enter a word">
-            <button id="consMid2Button">SUBMIT</button>
-            <button id="consMid2DoneButton">DONE</button>
         </div>
     `;
     return div;
@@ -2034,52 +2016,6 @@ function setupFeatureListeners(feature, callback) {
                 consMidDoneButton.addEventListener('touchstart', (e) => {
                     e.preventDefault();
                     consMidDoneButton.click();
-                }, { passive: false });
-            }
-            break;
-        }
-        
-        case 'consMid2': {
-            const consMid2Button = document.getElementById('consMid2Button');
-            const consMid2DoneButton = document.getElementById('consMid2DoneButton');
-            const consMid2Input = document.getElementById('consMid2Input');
-            
-            if (consMid2Button) {
-                consMid2Button.onclick = () => {
-                    const input = consMid2Input?.value.trim();
-                    if (input) {
-                        const letters = input.toLowerCase().split('').filter(char => /[a-z]/.test(char));
-                        if (letters.length >= 2) {
-                            const filteredWords = filterWordsByConsMid2(currentFilteredWords, letters);
-                            // Store the input word for potential future use
-                            currentPosition1Word = input.toUpperCase(); // Ensure it's uppercase
-                            callback(filteredWords);
-                            document.getElementById('consMid2Feature').dispatchEvent(new Event('completed'));
-                        } else {
-                            alert('Please enter a word with at least 2 letters');
-                        }
-                    } else {
-                        alert('Please enter a word');
-                    }
-                };
-                
-                // Add touch event for mobile
-                consMid2Button.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    consMid2Button.click();
-                }, { passive: false });
-            }
-            
-            if (consMid2DoneButton) {
-                consMid2DoneButton.onclick = () => {
-                    callback(currentFilteredWords);
-                    document.getElementById('consMid2Feature').dispatchEvent(new Event('completed'));
-                };
-                
-                // Add touch event for mobile
-                consMid2DoneButton.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    consMid2DoneButton.click();
                 }, { passive: false });
             }
             break;
@@ -3837,22 +3773,6 @@ function filterWordsByPosition1(words, consonants) {
 }
 
 function filterWordsByConsMid(words, letters) {
-    if (!letters || letters.length < 2) return words;
-    
-    return words.filter(word => {
-        const wordLower = word.toLowerCase();
-        
-        // Check if the word contains ALL of the letters from the input
-        for (const letter of letters) {
-            if (!wordLower.includes(letter)) {
-                return false;
-            }
-        }
-        return true;
-    });
-}
-
-function filterWordsByConsMid2(words, letters) {
     if (!letters || letters.length < 2) return words;
     
     return words.filter(word => {
