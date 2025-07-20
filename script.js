@@ -1420,10 +1420,15 @@ async function executeWorkflow(steps) {
                 default:
                     featureElement = null;
             }
-            if (!featureElement) continue;
+            if (!featureElement) {
+                console.log('No feature element created for:', step.feature);
+                continue;
+            }
+            console.log('Created feature element for:', step.feature, featureElement);
             featureArea.innerHTML = '';
             featureArea.appendChild(featureElement);
             featureElement.style.display = 'block';
+            console.log('Feature element display set to block');
             
             // For MOST FREQUENT feature, use the current rank
             if (step.feature === 'mostFrequent') {
@@ -1613,6 +1618,7 @@ function createVowelFeature() {
 }
 
 function createVowelPosFeature() {
+    console.log('Creating VOWEL POS feature element');
     const div = document.createElement('div');
     div.id = 'vowelPosFeature';
     div.className = 'feature-section';
@@ -1629,6 +1635,7 @@ function createVowelPosFeature() {
             <button class="section-btn" data-section="end">END</button>
         </div>
     `;
+    console.log('VOWEL POS feature element created:', div);
     return div;
 }
 
