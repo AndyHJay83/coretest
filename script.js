@@ -104,6 +104,16 @@ const performButton = document.getElementById('performButton');
 
 // Initialize the app when the DOM is loaded
 document.addEventListener('DOMContentLoaded', async () => {
+    // Register service worker for PWA functionality
+    if ('serviceWorker' in navigator) {
+        try {
+            const registration = await navigator.serviceWorker.register('/grail-binary/service-worker.js');
+            console.log('Service Worker registered successfully:', registration);
+        } catch (error) {
+            console.log('Service Worker registration failed:', error);
+        }
+    }
+    
     // Load saved workflows from localStorage
     const savedWorkflows = localStorage.getItem('workflows');
     if (savedWorkflows) {

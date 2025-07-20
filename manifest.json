@@ -2,7 +2,7 @@
   "name": "Word Filter",
   "short_name": "Word Filter",
   "description": "A word filtering and workflow management application",
-  "start_url": "/",
+  "start_url": "/grail-binary/",
   "display": "standalone",
   "background_color": "#f0f0f0",
   "theme_color": "#f0f0f0",
