@@ -1372,6 +1372,9 @@ async function executeWorkflow(steps) {
                 case 'consMid':
                     featureElement = createConsMidFeature();
                     break;
+                case 'consMid2':
+                    featureElement = createConsMid2Feature();
+                    break;
                 case 'vowel':
                     featureElement = createVowelFeature();
                     break;
@@ -1561,6 +1564,21 @@ function createConsMidFeature() {
             <input type="text" id="consMidInput" placeholder="Enter a word">
             <button id="consMidButton">SUBMIT</button>
             <button id="consMidDoneButton">DONE</button>
+        </div>
+    `;
+    return div;
+}
+
+function createConsMid2Feature() {
+    const div = document.createElement('div');
+    div.id = 'consMid2Feature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">CONS MID</h2>
+        <div class="position-input">
+            <input type="text" id="consMid2Input" placeholder="Enter a word">
+            <button id="consMid2Button">SUBMIT</button>
+            <button id="consMid2DoneButton">DONE</button>
         </div>
     `;
     return div;
@@ -2016,6 +2034,52 @@ function setupFeatureListeners(feature, callback) {
                 consMidDoneButton.addEventListener('touchstart', (e) => {
                     e.preventDefault();
                     consMidDoneButton.click();
+                }, { passive: false });
+            }
+            break;
+        }
+        
+        case 'consMid2': {
+            const consMid2Button = document.getElementById('consMid2Button');
+            const consMid2DoneButton = document.getElementById('consMid2DoneButton');
+            const consMid2Input = document.getElementById('consMid2Input');
+            
+            if (consMid2Button) {
+                consMid2Button.onclick = () => {
+                    const input = consMid2Input?.value.trim();
+                    if (input) {
+                        const consonants = getConsonantsInOrder(input);
+                        if (consonants.length >= 2) {
+                            const filteredWords = filterWordsByConsMid2(currentFilteredWords, consonants);
+                            // Store the input word for potential future use
+                            currentPosition1Word = input.toUpperCase(); // Ensure it's uppercase
+                            callback(filteredWords);
+                            document.getElementById('consMid2Feature').dispatchEvent(new Event('completed'));
+                        } else {
+                            alert('Please enter a word with at least 2 consonants');
+                        }
+                    } else {
+                        alert('Please enter a word');
+                    }
+                };
+                
+                // Add touch event for mobile
+                consMid2Button.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    consMid2Button.click();
+                }, { passive: false });
+            }
+            
+            if (consMid2DoneButton) {
+                consMid2DoneButton.onclick = () => {
+                    callback(currentFilteredWords);
+                    document.getElementById('consMid2Feature').dispatchEvent(new Event('completed'));
+                };
+                
+                // Add touch event for mobile
+                consMid2DoneButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    consMid2DoneButton.click();
                 }, { passive: false });
             }
             break;
@@ -3785,6 +3849,59 @@ function filterWordsByConsMid(words, letters) {
             }
         }
         return true;
+    });
+}
+
+function filterWordsByConsMid2(words, consonants) {
+    if (!consonants || consonants.length < 2) return words;
+    
+    return words.filter(word => {
+                        const wordLower = word.toLowerCase();
+                        
+        if (hasAdjacentConsonants) {
+            // YES to Consonants Together: look for the specific consonant pairs together
+                        // Create all possible pairs of consonants from the input word
+                        const consonantPairs = [];
+                        for (let i = 0; i < consonants.length; i++) {
+                            for (let j = i + 1; j < consonants.length; j++) {
+                                consonantPairs.push([consonants[i], consonants[j]]);
+                            }
+                        }
+                        
+                        // Check if any of the consonant pairs appear together in the word
+                        for (const [con1, con2] of consonantPairs) {
+                            const pair1 = con1 + con2;
+                            const pair2 = con2 + con1;
+                            if (wordLower.includes(pair1) || wordLower.includes(pair2)) {
+                                return true;
+                            }
+                        }
+                        return false;
+                } else {
+                    // NO to Consonants Together: look for ANY pair of consonants in middle 5/6 characters
+                        const wordLength = wordLower.length;
+                        
+                        // Determine middle section length (5 for odd, 6 for even)
+                        const middleLength = wordLength % 2 === 0 ? 6 : 5;
+                        const startPos = Math.floor((wordLength - middleLength) / 2);
+                        const middleSection = wordLower.slice(startPos, startPos + middleLength);
+                        
+                        // Create all possible pairs of consonants from the input word
+                        const consonantPairs = [];
+                        for (let i = 0; i < consonants.length; i++) {
+                            for (let j = i + 1; j < consonants.length; j++) {
+                                consonantPairs.push([consonants[i], consonants[j]]);
+                            }
+                        }
+                        
+                        // Check if ANY pair of consonants appears in the middle section
+                        for (const [con1, con2] of consonantPairs) {
+                            if (middleSection.includes(con1) && middleSection.includes(con2)) {
+                                return true;
+                            }
+                        }
+                        return false;
+        }
     });
 }
 

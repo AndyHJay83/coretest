@@ -100,6 +100,10 @@
                                 <button class="info-button" data-feature="consMid"><i class="fas fa-info-circle"></i></button>
                             </div>
                             <div class="feature-group">
+                                <button class="feature-button" data-feature="consMid2" draggable="true">Cons MID</button>
+                                <button class="info-button" data-feature="consMid2"><i class="fas fa-info-circle"></i></button>
+                            </div>
+                            <div class="feature-group">
                                 <button class="feature-button" data-feature="vowel" draggable="true">Vowel</button>
                                 <button class="info-button" data-feature="vowel"><i class="fas fa-info-circle"></i></button>
                             </div>
@@ -295,6 +299,16 @@
                     </div>
                 </div>
 
+                <!-- Cons MID feature -->
+                <div id="consMid2Feature" class="feature-section" style="display: none;">
+                    <div class="feature-title">Cons MID</div>
+                    <div class="position-input">
+                        <input type="text" id="consMid2Input" placeholder="Enter a word...">
+                        <button id="consMid2Button">DONE</button>
+                        <button id="consMid2DoneButton" class="skip-button">SKIP</button>
+                    </div>
+                </div>
+
                 <!-- Vowel feature -->
                 <div id="vowelFeature" class="feature-section" style="display: none;">
                     <div class="feature-title">VOWEL</div>
@@ -466,6 +480,13 @@
             <div class="feature-info-content">
                 <h3>3 LETTER WORD</h3>
                 <p><strong>3 LETTER WORD</strong><br>Input a 3 letter word. All letters taken into consideration.</p>
+                <button class="close-info-button">&times;</button>
+            </div>
+        </div>
+        <div id="consMid2Info" class="feature-info-modal">
+            <div class="feature-info-content">
+                <h3>Cons MID</h3>
+                <p><strong>Cons MID</strong><br>Input a short word that includes 2 of the spectators chosen consonants.</p>
                 <button class="close-info-button">&times;</button>
             </div>
         </div>
