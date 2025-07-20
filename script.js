@@ -1556,7 +1556,7 @@ function createConsMidFeature() {
     div.id = 'consMidFeature';
     div.className = 'feature-section';
     div.innerHTML = `
-        <h2 class="feature-title">CONS MID</h2>
+        <h2 class="feature-title">3 LETTER WORD</h2>
         <div class="position-input">
             <input type="text" id="consMidInput" placeholder="Enter a word">
             <button id="consMidButton">SUBMIT</button>
