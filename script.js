@@ -1022,6 +1022,9 @@ async function loadWordList() {
                 wordlistPath = 'words/ENUK-Long words Noun.txt';
                 gzippedPath = 'words/ENUK-Long words Noun.txt.gz';
                 break;
+            case 'months_starsigns':
+                wordlistPath = 'words/MONTHS_STARSIGNS.txt';
+                break;
         }
         console.log('Selected wordlist path:', wordlistPath);
         console.log('Gzipped path:', gzippedPath);
