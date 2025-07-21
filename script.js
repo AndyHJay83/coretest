@@ -2275,6 +2275,7 @@ function setupFeatureListeners(feature, callback) {
                     if (currentVowel) {
                         const filteredWords = filterWordsByVowelSection(currentFilteredWords, currentVowel, section);
                         callback(filteredWords);
+                        // Immediately advance to the next feature
                         document.getElementById('vowelPosFeature').dispatchEvent(new Event('completed'));
                     }
                 };
@@ -2289,9 +2290,13 @@ function setupFeatureListeners(feature, callback) {
             // YES/NO button handlers
             if (vowelPosYesBtn) {
                 vowelPosYesBtn.onclick = () => {
-                    handleVowelSelection(true);
+                    const currentVowel = uniqueVowels[currentVowelIndex];
+                    if (currentVowel) {
+                        const filteredWords = currentFilteredWords.filter(word => word.toLowerCase().includes(currentVowel.toLowerCase()));
+                        callback(filteredWords);
+                        document.getElementById('vowelPosFeature').dispatchEvent(new Event('completed'));
+                    }
                 };
-                
                 // Add touch event for mobile
                 vowelPosYesBtn.addEventListener('touchstart', (e) => {
                     e.preventDefault();
@@ -2301,9 +2306,13 @@ function setupFeatureListeners(feature, callback) {
             
             if (vowelPosNoBtn) {
                 vowelPosNoBtn.onclick = () => {
-                    handleVowelSelection(false);
+                    const currentVowel = uniqueVowels[currentVowelIndex];
+                    if (currentVowel) {
+                        const filteredWords = currentFilteredWords.filter(word => !word.toLowerCase().includes(currentVowel.toLowerCase()));
+                        callback(filteredWords);
+                        document.getElementById('vowelPosFeature').dispatchEvent(new Event('completed'));
+                    }
                 };
-                
                 // Add touch event for mobile
                 vowelPosNoBtn.addEventListener('touchstart', (e) => {
                     e.preventDefault();
