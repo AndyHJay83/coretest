@@ -1,4 +1,4 @@
-const CACHE_NAME = 'word-filter-v1';
+const CACHE_NAME = 'word-filter-v2';
 const ASSETS_TO_CACHE = [
   '/grail-binary/',
   '/grail-binary/index.html',

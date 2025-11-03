@@ -1,7 +1,7 @@
 {
-  "name": "Word Filter",
-  "short_name": "Word Filter",
-  "description": "A word filtering and workflow management application",
+  "name": "The Core",
+  "short_name": "The Core",
+  "description": "Word filtering and workflow management application",
   "start_url": "/grail-binary/",
   "display": "standalone",
   "background_color": "#f0f0f0",
