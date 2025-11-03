@@ -1936,13 +1936,14 @@ function createFindEeeFeature() {
 // Filtering logic for ABCDE feature
 function filterWordsByAbcde(words, yesLetters) {
     return words.filter(word => {
+        const wordUpper = word.toUpperCase();
         // Must include all YES letters
         for (const letter of yesLetters) {
-            if (!word.includes(letter)) return false;
+            if (!wordUpper.includes(letter.toUpperCase())) return false;
         }
         // Must NOT include any of the other letters (A-E not in yesLetters)
         for (const letter of ['A','B','C','D','E']) {
-            if (!yesLetters.includes(letter) && word.includes(letter)) return false;
+            if (!yesLetters.includes(letter) && wordUpper.includes(letter)) return false;
         }
         return true;
     });
@@ -1951,13 +1952,14 @@ function filterWordsByAbcde(words, yesLetters) {
 // Filtering logic for ABC feature
 function filterWordsByAbc(words, yesLetters) {
     return words.filter(word => {
+        const wordUpper = word.toUpperCase();
         // Must include all YES letters
         for (const letter of yesLetters) {
-            if (!word.includes(letter)) return false;
+            if (!wordUpper.includes(letter.toUpperCase())) return false;
         }
         // Must NOT include any of the other letters (A-C not in yesLetters)
         for (const letter of ['A','B','C']) {
-            if (!yesLetters.includes(letter) && word.includes(letter)) return false;
+            if (!yesLetters.includes(letter) && wordUpper.includes(letter)) return false;
         }
         return true;
     });
@@ -1968,11 +1970,11 @@ function filterWordsByFindEee(words, selectedLetter, selectedPosition) {
     return words.filter(word => {
         if (selectedPosition === null) {
             // Only letter filtering - word must contain the letter anywhere
-            return word.includes(selectedLetter);
+            return word.toUpperCase().includes(selectedLetter);
         } else {
             // Letter + position filtering - word must have the letter at the specific position
             const position = selectedPosition - 1;
-            return word.length > position && word[position] === selectedLetter;
+            return word.length > position && word[position].toUpperCase() === selectedLetter;
         }
     });
 }
@@ -4983,9 +4985,10 @@ function findMostFrequentLetter(words, rank = 1) {
     const frequencyMap = new Map();
     words.forEach(word => {
         [...word].forEach(letter => {
-            // Only count letters A-Z (same filter as findLeastFrequentLetter)
-            if (/^[A-Z]$/.test(letter)) {
-                frequencyMap.set(letter, (frequencyMap.get(letter) || 0) + 1);
+            // Only count letters A-Z, convert to uppercase first
+            const upperLetter = letter.toUpperCase();
+            if (/^[A-Z]$/.test(upperLetter)) {
+                frequencyMap.set(upperLetter, (frequencyMap.get(upperLetter) || 0) + 1);
             }
         });
     });
@@ -5023,9 +5026,10 @@ function findLeastFrequentLetter(words) {
     const frequencyMap = new Map();
     words.forEach(word => {
         [...word].forEach(letter => {
-            // Only count letters A-Z
-            if (/^[A-Z]$/.test(letter)) {
-                frequencyMap.set(letter, (frequencyMap.get(letter) || 0) + 1);
+            // Only count letters A-Z, convert to uppercase first
+            const upperLetter = letter.toUpperCase();
+            if (/^[A-Z]$/.test(upperLetter)) {
+                frequencyMap.set(upperLetter, (frequencyMap.get(upperLetter) || 0) + 1);
             }
         });
     });
@@ -5049,7 +5053,7 @@ function findLeastFrequentLetter(words) {
 function filterWordsByLeastFrequent(words, letter, include) {
     if (!letter) return words;
     return words.filter(word => {
-        const hasLetter = word.includes(letter);
+        const hasLetter = word.toUpperCase().includes(letter);
         return include ? hasLetter : !hasLetter;
     });
 }
