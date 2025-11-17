@@ -142,51 +142,32 @@ function getPositionLetterGroups(position) {
     const consonants = orderedLetters.filter(letter => !VOWEL_SET.has(letter));
     const vowels = orderedLetters.filter(letter => VOWEL_SET.has(letter));
 
-    const consonantGroups = [];
-    if (consonants.length) {
-        for (let i = 0; i < consonants.length; i += 6) {
-            const chunk = consonants.slice(i, i + 6);
-            while (chunk.length < 6) {
-                const filler = CONSONANT_LETTERS.find(letter => !chunk.includes(letter));
+    const allGroups = [];
+    if (orderedLetters.length) {
+        for (let i = 0; i < orderedLetters.length; i += 6) {
+            const chunk = orderedLetters.slice(i, i + 6);
+            while (chunk.length < 6 && consonants.length) {
+                const filler = consonants.find(letter => !chunk.includes(letter)) ||
+                              CONSONANT_LETTERS.find(letter => !chunk.includes(letter));
                 if (!filler) break;
                 chunk.push(filler);
             }
-            consonantGroups.push(chunk.slice(0, 6));
+            allGroups.push(chunk.slice(0, 6));
         }
     } else {
-        consonantGroups.push(CONSONANT_LETTERS.slice(0, 6));
+        allGroups.push(CONSONANT_LETTERS.slice(0, 6));
     }
 
     return {
         signature: orderedLetters.join(''),
-        consonantGroups,
+        allGroups,
+        consonants,
         vowels,
     };
 }
 
-function fillChunkWithVowels(baseChunk, vowels) {
-    const chunk = [...baseChunk];
-    if (!vowels || !vowels.length) return chunk;
-    const used = new Set(chunk);
-    const vowelPool = vowels.slice(0, 2);
-    vowelPool.forEach(vowel => {
-        if (chunk.length >= 6) return;
-        if (!used.has(vowel)) {
-            chunk.push(vowel);
-            used.add(vowel);
-        }
-    });
-    while (chunk.length < 6) {
-        const filler = CONSONANT_LETTERS.find(letter => !used.has(letter));
-        if (!filler) break;
-        chunk.push(filler);
-        used.add(filler);
-    }
-    return chunk.slice(0, 6);
-}
-
 function generateStructuredLetterString(position = 1) {
-    const { signature, consonantGroups, vowels } = getPositionLetterGroups(position);
+    const { signature, allGroups, consonants, vowels } = getPositionLetterGroups(position);
 
     if (!positionConsSequenceState[position] || positionConsSequenceState[position].signature !== signature) {
         positionConsSequenceState[position] = {
@@ -197,15 +178,26 @@ function generateStructuredLetterString(position = 1) {
     }
 
     const state = positionConsSequenceState[position];
-    const groups = consonantGroups.length ? consonantGroups : [CONSONANT_LETTERS.slice(0, 6)];
+    const groups = allGroups.length ? allGroups : [CONSONANT_LETTERS.slice(0, 6)];
     state.index = (state.index + 1) % groups.length;
     state.useVowels = !state.useVowels;
 
     const baseChunk = groups[state.index];
+    
     if (state.useVowels && vowels.length) {
-        return fillChunkWithVowels(baseChunk, vowels).join('');
+        return baseChunk.join('');
+    } else {
+        const consonantOnly = baseChunk.filter(letter => !VOWEL_SET.has(letter));
+        const used = new Set(consonantOnly);
+        while (consonantOnly.length < 6) {
+            const filler = consonants.find(letter => !used.has(letter)) ||
+                          CONSONANT_LETTERS.find(letter => !used.has(letter));
+            if (!filler) break;
+            consonantOnly.push(filler);
+            used.add(filler);
+        }
+        return consonantOnly.slice(0, 6).join('');
     }
-    return baseChunk.slice(0, 6).join('');
 }
 
 // DOM Elements
