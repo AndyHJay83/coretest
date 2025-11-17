@@ -23,6 +23,8 @@ let mostFrequentLetter = null;
 let leastFrequentLetter = null;
 let usedLettersInWorkflow = [];  // Track letters used in current workflow
 let letterFrequencyMap = new Map();  // Store frequency of all letters
+const ALPHABET_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+const VOWEL_SET = new Set(['A', 'E', 'I', 'O', 'U']);
 let lastPositionConsLetters = '';
 let lastPositionConsGeneratedLetters = '';
 
@@ -98,6 +100,232 @@ function sanitizeLetterString(value = '') {
     return (value || '')
         .toUpperCase()
         .replace(/[^A-Z]/g, '');
+}
+
+function getSourceWordsForPosition(position = 1) {
+    const source = (currentFilteredWords && currentFilteredWords.length ? currentFilteredWords : wordList) || [];
+    return source.filter(word => typeof word === 'string' && word.length >= position);
+}
+
+function buildPositionLetterStats(words, position) {
+    const stats = {};
+    const index = Math.max(0, position - 1);
+    words.forEach(word => {
+        const letter = (word[index] || '').toUpperCase();
+        if (!letter || letter < 'A' || letter > 'Z') return;
+        if (!stats[letter]) {
+            stats[letter] = { count: 0, words: [] };
+        }
+        stats[letter].count += 1;
+        stats[letter].words.push(word);
+    });
+    return stats;
+}
+
+function mapToSortedUniqueArray(map) {
+    return [...map.entries()]
+        .sort((a, b) => a[1] - b[1] || a[0].localeCompare(b[0]))
+        .map(([letter]) => letter);
+}
+
+function pickLetterFromStats(stats, exclude = new Set()) {
+    const entries = Object.entries(stats || {})
+        .filter(([letter]) => !exclude.has(letter))
+        .map(([letter, data]) => ({ letter, data }));
+    if (!entries.length) return null;
+    entries.sort((a, b) => a.data.count - b.data.count || a.letter.localeCompare(b.letter));
+    const pool = entries.slice(0, Math.min(5, entries.length));
+    return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function buildLetterPoolsForGroup(words, position) {
+    const consonantCounts = new Map();
+    const vowelCounts = new Map();
+    const index = Math.max(0, position - 1);
+    words.forEach(word => {
+        for (let i = 0; i < word.length; i++) {
+            if (i === index) continue;
+            const char = (word[i] || '').toUpperCase();
+            if (char < 'A' || char > 'Z') continue;
+            const targetMap = VOWEL_SET.has(char) ? vowelCounts : consonantCounts;
+            targetMap.set(char, (targetMap.get(char) || 0) + 1);
+        }
+    });
+    return {
+        consonants: mapToSortedUniqueArray(consonantCounts),
+        vowels: mapToSortedUniqueArray(vowelCounts),
+    };
+}
+
+function buildGlobalLetterPools(words) {
+    const counts = new Map();
+    words.forEach(word => {
+        for (const char of word.toUpperCase()) {
+            if (char < 'A' || char > 'Z') continue;
+            counts.set(char, (counts.get(char) || 0) + 1);
+        }
+    });
+    const sortedLetters = mapToSortedUniqueArray(counts);
+    const letterSet = new Set(sortedLetters);
+    return {
+        consonants: sortedLetters.filter(letter => !VOWEL_SET.has(letter)),
+        vowels: sortedLetters.filter(letter => VOWEL_SET.has(letter)),
+        all: sortedLetters,
+        letterSet,
+    };
+}
+
+function drawFromPool(pool, used) {
+    if (!pool) return null;
+    while (pool.length) {
+        const letter = pool.shift();
+        if (letter && !used.has(letter)) {
+            return letter;
+        }
+    }
+    return null;
+}
+
+function drawLetterFromPoolSequence(pools, used) {
+    if (!Array.isArray(pools)) return null;
+    for (const pool of pools) {
+        const letter = drawFromPool(pool, used);
+        if (letter) return letter;
+    }
+    return null;
+}
+
+function pickRandomAlphabetLetter(used) {
+    const available = ALPHABET_LETTERS.filter(letter => !used.has(letter));
+    if (!available.length) return null;
+    return available[Math.floor(Math.random() * available.length)];
+}
+
+function generateFallbackLetterString() {
+    const used = new Set();
+    const letters = [];
+    while (letters.length < 6) {
+        const letter = pickRandomAlphabetLetter(used);
+        if (!letter) break;
+        used.add(letter);
+        letters.push(letter);
+    }
+    return letters.join('');
+}
+
+function generateStructuredLetterString(position = 1) {
+    const sourceWords = getSourceWordsForPosition(position);
+    if (!sourceWords.length) {
+        return generateFallbackLetterString();
+    }
+
+    const stats = buildPositionLetterStats(sourceWords, position);
+    const firstChoice = pickLetterFromStats(stats);
+    if (!firstChoice) {
+        return generateFallbackLetterString();
+    }
+
+    const exclusion = new Set([firstChoice.letter]);
+    const secondChoice = pickLetterFromStats(stats, exclusion) || { letter: pickRandomAlphabetLetter(exclusion), data: { words: sourceWords } };
+
+    const group1Pools = buildLetterPoolsForGroup(firstChoice.data.words, position);
+    const group2Pools = buildLetterPoolsForGroup(secondChoice.data.words, position);
+    const globalPools = buildGlobalLetterPools(sourceWords);
+    const deadLettersPool = ALPHABET_LETTERS.filter(letter => !globalPools.letterSet.has(letter));
+
+    const poolState = {
+        group1: {
+            consonants: [...group1Pools.consonants],
+            vowels: [...group1Pools.vowels],
+        },
+        group2: {
+            consonants: [...group2Pools.consonants],
+            vowels: [...group2Pools.vowels],
+        },
+        global: {
+            consonants: [...globalPools.consonants],
+            vowels: [...globalPools.vowels],
+            all: [...globalPools.all],
+        },
+        dead: [...deadLettersPool],
+    };
+
+    const usedLetters = new Set();
+    const letters = [];
+
+    const addLetter = (letter) => {
+        if (!letter || usedLetters.has(letter)) return false;
+        usedLetters.add(letter);
+        letters.push(letter);
+        return true;
+    };
+
+    addLetter(firstChoice.letter);
+    if (secondChoice && secondChoice.letter) {
+        addLetter(secondChoice.letter);
+    }
+
+    const plan = [
+        { type: 'group1Consonant' },
+        { type: 'group2Consonant' },
+        { type: 'group2Consonant' },
+        { type: 'group2Consonant' },
+    ];
+
+    const roll = Math.random();
+    if (roll < 0.2) {
+        plan[plan.length - 1] = { type: 'deadLetter' };
+    } else if (roll < 0.5) {
+        plan[plan.length - 1] = { type: 'vowel' };
+    }
+
+    const drawLetterForStep = (step) => {
+        switch (step.type) {
+            case 'group1Consonant':
+                return drawLetterFromPoolSequence(
+                    [poolState.group1.consonants, poolState.group2.consonants, poolState.global.consonants],
+                    usedLetters
+                );
+            case 'group2Consonant':
+                return drawLetterFromPoolSequence(
+                    [poolState.group2.consonants, poolState.group1.consonants, poolState.global.consonants],
+                    usedLetters
+                );
+            case 'vowel':
+                return drawLetterFromPoolSequence(
+                    [poolState.group2.vowels, poolState.group1.vowels, poolState.global.vowels],
+                    usedLetters
+                );
+            case 'deadLetter':
+                return drawLetterFromPoolSequence(
+                    [poolState.dead, poolState.global.all],
+                    usedLetters
+                );
+            default:
+                return drawLetterFromPoolSequence(
+                    [poolState.global.all],
+                    usedLetters
+                );
+        }
+    };
+
+    plan.forEach(step => {
+        const letter = drawLetterForStep(step) || pickRandomAlphabetLetter(usedLetters);
+        addLetter(letter);
+    });
+
+    while (letters.length < 6) {
+        const fallback = pickRandomAlphabetLetter(usedLetters);
+        if (!fallback) break;
+        addLetter(fallback);
+    }
+
+    for (let i = letters.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [letters[i], letters[j]] = [letters[j], letters[i]];
+    }
+
+    return letters.slice(0, 6).join('');
 }
 
 // DOM Elements
@@ -2270,17 +2498,19 @@ function setupFeatureListeners(feature, callback) {
             if (generateButton) {
                 const handleGenerate = (e) => {
                     e.preventDefault();
-                    const targetLength = Math.max(lettersInput?.value?.length || 0, 6);
-                    let generated = '';
-                    for (let i = 0; i < targetLength; i++) {
-                        generated += String.fromCharCode(65 + Math.floor(Math.random() * 26));
+                    const positionValue = parseInt(positionInput?.value, 10);
+                    if (Number.isNaN(positionValue) || positionValue < 1 || positionValue > 6) {
+                        setMessage('Enter a position (1-6) before generating letters.', true);
+                        alert('Please enter a valid position (1-6) before generating letters.');
+                        return;
                     }
+                    const generated = generateStructuredLetterString(positionValue);
                     if (lettersInput) {
                         lettersInput.value = generated;
                     }
                     lastPositionConsLetters = generated;
                     lastPositionConsGeneratedLetters = generated;
-                    setMessage('Random letters generated.');
+                    setMessage('Structured letters generated.');
                 };
 
                 generateButton.addEventListener('click', handleGenerate);
@@ -4240,34 +4470,15 @@ function filterWordsByPositionCons(words, options) {
         const targetLetter = upperWord[targetIndex];
         if (!letterSet.has(targetLetter)) continue;
 
-        const otherLettersArray = letterArray.slice();
-        const removalIndex = otherLettersArray.indexOf(targetLetter);
-        if (removalIndex !== -1) {
-            otherLettersArray.splice(removalIndex, 1);
-        }
-
-        const otherLetterSet = new Set(otherLettersArray);
-        let uniqueMatchesCount = 0;
-        let occurrenceCount = 0;
-
-        if (otherLetterSet.size > 0) {
-            const uniqueMatches = new Set();
-            for (let i = 0; i < upperWord.length; i++) {
-                if (i === targetIndex) continue;
-                const char = upperWord[i];
-                if (otherLetterSet.has(char)) {
-                    uniqueMatches.add(char);
-                    occurrenceCount += 1;
-                }
+        const otherLetterSet = new Set(letterArray.filter(letter => letter !== targetLetter));
+        let matchCount = 0;
+        otherLetterSet.forEach(letter => {
+            if (upperWord.includes(letter)) {
+                matchCount += 1;
             }
-            uniqueMatchesCount = uniqueMatches.size;
-        }
+        });
 
-        const matchesRequirement = otherLetterSet.size === 0
-            ? normalizedLetterCount === 0
-            : uniqueMatchesCount === normalizedLetterCount || occurrenceCount === normalizedLetterCount;
-
-        if (!matchesRequirement) continue;
+        if (matchCount !== normalizedLetterCount) continue;
 
         const key = upperWord;
         if (!seen.has(key)) {
