@@ -789,6 +789,86 @@ input[type="text"] {
     z-index: 2;
 }
 
+.position-cons-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.position-cons-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.position-cons-row .position-input {
+    flex: 1;
+    min-width: 140px;
+}
+
+.position-cons-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.position-cons-helper {
+    font-size: 0.85em;
+    color: #666;
+    text-align: center;
+    margin-top: 6px;
+}
+
+.position-cons-message {
+    text-align: center;
+    font-weight: bold;
+    min-height: 24px;
+    color: #1B5E20;
+}
+
+.primary-btn,
+.secondary-btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    min-width: 150px;
+}
+
+.primary-btn {
+    background-color: #1B5E20;
+    color: #fff;
+    align-self: center;
+}
+
+.primary-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.primary-btn:active {
+    transform: translateY(0);
+}
+
+.secondary-btn {
+    background-color: #e0e0e0;
+    color: #333;
+}
+
+.secondary-btn:hover {
+    background-color: #d5d5d5;
+}
+
+.secondary-btn:active {
+    transform: translateY(0);
+}
+
 /* Mobile-specific improvements */
 @media (max-width: 600px) {
     .lexicon-input input {

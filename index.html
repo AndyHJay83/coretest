@@ -105,6 +105,10 @@
                                 <button class="info-button" data-feature="consMid2"><i class="fas fa-info-circle"></i></button>
                             </div>
                             <div class="feature-group">
+                                <button class="feature-button" data-feature="positionCons" draggable="true">POSITION-CONS</button>
+                                <button class="info-button" data-feature="positionCons"><i class="fas fa-info-circle"></i></button>
+                            </div>
+                            <div class="feature-group">
                                 <button class="feature-button" data-feature="vowel" draggable="true">Vowel</button>
                                 <button class="info-button" data-feature="vowel"><i class="fas fa-info-circle"></i></button>
                             </div>
@@ -311,6 +315,34 @@
                         <input type="text" id="consMid2Input" placeholder="Enter a word...">
                         <button id="consMid2Button">DONE</button>
                         <button id="consMid2DoneButton" class="skip-button">SKIP</button>
+                    </div>
+                </div>
+
+                <!-- POSITION-CONS feature -->
+                <div id="positionConsFeature" class="feature-section" style="display: none;">
+                    <div class="feature-title">POSITION-CONS</div>
+                    <div class="position-cons-form">
+                        <div class="position-cons-row">
+                            <div class="position-input">
+                                <label for="positionConsPosition">Position (1-6)</label>
+                                <input type="number" id="positionConsPosition" min="1" max="6" placeholder="Enter position...">
+                            </div>
+                            <div class="position-input">
+                                <label for="positionConsCount">Letter count</label>
+                                <input type="number" id="positionConsCount" min="0" placeholder="Enter count...">
+                            </div>
+                        </div>
+                        <div class="position-input">
+                            <label for="positionConsLetters">Letters</label>
+                            <input type="text" id="positionConsLetters" placeholder="Enter letters...">
+                            <div class="position-cons-helper">Letters are uppercased automatically; non A–Z characters are removed.</div>
+                            <div class="position-cons-actions">
+                                <button id="positionConsUseCurrent" class="secondary-btn">Use Last Letters</button>
+                                <button id="positionConsGenerate" class="secondary-btn">Random Letters</button>
+                            </div>
+                        </div>
+                        <button id="positionConsSubmit" class="primary-btn">FILTER</button>
+                        <div id="positionConsMessage" class="position-cons-message"></div>
                     </div>
                 </div>
 
@@ -619,6 +651,13 @@
             <div class="feature-info-content">
                 <h3>FIND-EEE</h3>
                 <p>Select a letter that is definitely present in the target word. Words will be filtered to only include those containing the selected letter. Only one letter can be selected at a time.</p>
+                <button class="close-info-button">&times;</button>
+            </div>
+        </div>
+        <div id="positionConsInfo" class="feature-info-modal">
+            <div class="feature-info-content">
+                <h3>POSITION-CONS</h3>
+                <p><strong>Position-Consonant Filter</strong><br>Enter the target position, the string of letters you are testing, and how many other letters from that string should appear elsewhere in the spectator's word. FILTER enforces the letter position plus the global consonant count clue.</p>
                 <button class="close-info-button">&times;</button>
             </div>
         </div>
