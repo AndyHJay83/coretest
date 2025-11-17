@@ -121,51 +121,91 @@ function buildConsonantFrequencyByPosition(words, position) {
     return freq;
 }
 
+function buildPositionLetterStats(words, position) {
+    const freq = new Map();
+    const index = Math.max(0, position - 1);
+    words.forEach(word => {
+        const letter = (word[index] || '').toUpperCase();
+        if (!letter || letter < 'A' || letter > 'Z') return;
+        freq.set(letter, (freq.get(letter) || 0) + 1);
+    });
+    return freq;
+}
+
 function getPositionLetterGroups(position) {
     const sourceWords = getSourceWordsForPosition(position);
-    const freq = buildConsonantFrequencyByPosition(sourceWords, position);
+    const freq = buildPositionLetterStats(sourceWords, position);
     const orderedLetters = [...freq.entries()]
         .sort((a, b) => a[1] - b[1] || a[0].localeCompare(b[0]))
         .map(([letter]) => letter);
 
-    const groups = [];
-    if (!orderedLetters.length) {
-        groups.push(CONSONANT_LETTERS.slice(0, 6));
-    } else {
-        for (let i = 0; i < orderedLetters.length; i += 6) {
-            groups.push(orderedLetters.slice(i, i + 6));
+    const consonants = orderedLetters.filter(letter => !VOWEL_SET.has(letter));
+    const vowels = orderedLetters.filter(letter => VOWEL_SET.has(letter));
+
+    const consonantGroups = [];
+    if (consonants.length) {
+        for (let i = 0; i < consonants.length; i += 6) {
+            const chunk = consonants.slice(i, i + 6);
+            while (chunk.length < 6) {
+                const filler = CONSONANT_LETTERS.find(letter => !chunk.includes(letter));
+                if (!filler) break;
+                chunk.push(filler);
+            }
+            consonantGroups.push(chunk.slice(0, 6));
         }
+    } else {
+        consonantGroups.push(CONSONANT_LETTERS.slice(0, 6));
     }
 
     return {
         signature: orderedLetters.join(''),
-        letters: orderedLetters,
-        groups,
+        consonantGroups,
+        vowels,
     };
 }
 
+function fillChunkWithVowels(baseChunk, vowels) {
+    const chunk = [...baseChunk];
+    if (!vowels || !vowels.length) return chunk;
+    const used = new Set(chunk);
+    const vowelPool = vowels.slice(0, 2);
+    vowelPool.forEach(vowel => {
+        if (chunk.length >= 6) return;
+        if (!used.has(vowel)) {
+            chunk.push(vowel);
+            used.add(vowel);
+        }
+    });
+    while (chunk.length < 6) {
+        const filler = CONSONANT_LETTERS.find(letter => !used.has(letter));
+        if (!filler) break;
+        chunk.push(filler);
+        used.add(filler);
+    }
+    return chunk.slice(0, 6);
+}
+
 function generateStructuredLetterString(position = 1) {
-    const { signature, groups } = getPositionLetterGroups(position);
+    const { signature, consonantGroups, vowels } = getPositionLetterGroups(position);
 
     if (!positionConsSequenceState[position] || positionConsSequenceState[position].signature !== signature) {
         positionConsSequenceState[position] = {
             signature,
             index: -1,
+            useVowels: false,
         };
     }
 
     const state = positionConsSequenceState[position];
-    const effectiveGroups = groups.length ? groups : [CONSONANT_LETTERS.slice(0, 6)];
-    state.index = (state.index + 1) % effectiveGroups.length;
-    const chunk = effectiveGroups[state.index];
+    const groups = consonantGroups.length ? consonantGroups : [CONSONANT_LETTERS.slice(0, 6)];
+    state.index = (state.index + 1) % groups.length;
+    state.useVowels = !state.useVowels;
 
-    // Ensure at least one letter is returned; if there are fewer than 6 unique letters overall,
-    // we keep the chunk as-is (duplicates would not help filtering).
-    if (!chunk.length) {
-        return CONSONANT_LETTERS.slice(0, 6).join('');
+    const baseChunk = groups[state.index];
+    if (state.useVowels && vowels.length) {
+        return fillChunkWithVowels(baseChunk, vowels).join('');
     }
-
-    return chunk.join('');
+    return baseChunk.slice(0, 6).join('');
 }
 
 // DOM Elements
