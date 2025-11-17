@@ -4786,8 +4786,8 @@ function handleDrop(e) {
 
 function isFeatureAlreadySelected(featureType) {
     const selectedFeatures = document.getElementById('selectedFeaturesList');
-    // Allow multiple instances of MOST FREQUENT and LEAST FREQUENT features
-    if (featureType === 'mostFrequent' || featureType === 'leastFrequent') {
+    // Allow multiple instances of MOST/LEAST FREQUENT and POSITION-CONS
+    if (featureType === 'mostFrequent' || featureType === 'leastFrequent' || featureType === 'positionCons') {
         return false;
     }
     // For all other features, maintain the single instance rule
@@ -4969,8 +4969,8 @@ function initializeFeatureSelection() {
 
 function isFeatureAlreadySelected(featureType) {
     const selectedFeatures = document.getElementById('selectedFeaturesList');
-    // Allow multiple instances of MOST FREQUENT and LEAST FREQUENT features
-    if (featureType === 'mostFrequent' || featureType === 'leastFrequent') {
+    // Allow multiple instances of MOST FREQUENT, LEAST FREQUENT, and POSITION-CONS
+    if (featureType === 'mostFrequent' || featureType === 'leastFrequent' || featureType === 'positionCons') {
         // Check if the feature was just added (within the last 500ms)
         const lastAdded = selectedFeatures.getAttribute('lastAdded');
         const lastAddedTime = selectedFeatures.getAttribute('lastAddedTime');
@@ -5552,8 +5552,8 @@ function initializeFeatureSelection() {
 
 function isFeatureAlreadySelected(featureType) {
     const selectedFeatures = document.getElementById('selectedFeaturesList');
-    // Allow multiple instances of MOST FREQUENT and LEAST FREQUENT features
-    if (featureType === 'mostFrequent' || featureType === 'leastFrequent') {
+    // Allow multiple instances of MOST FREQUENT, LEAST FREQUENT, and POSITION-CONS features
+    if (featureType === 'mostFrequent' || featureType === 'leastFrequent' || featureType === 'positionCons') {
         return false;
     }
     // For all other features, maintain the single instance rule
