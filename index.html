@@ -109,6 +109,10 @@
                                 <button class="info-button" data-feature="positionCons"><i class="fas fa-info-circle"></i></button>
                             </div>
                             <div class="feature-group">
+                                <button class="feature-button" data-feature="firstCurved" draggable="true">FIRST CURVED</button>
+                                <button class="info-button" data-feature="firstCurved"><i class="fas fa-info-circle"></i></button>
+                            </div>
+                            <div class="feature-group">
                                 <button class="feature-button" data-feature="vowel" draggable="true">Vowel</button>
                                 <button class="info-button" data-feature="vowel"><i class="fas fa-info-circle"></i></button>
                             </div>
@@ -343,6 +347,19 @@
                         </div>
                         <button id="positionConsSubmit" class="primary-btn">FILTER</button>
                         <div id="positionConsMessage" class="position-cons-message"></div>
+                    </div>
+                </div>
+
+                <!-- FIRST CURVED feature -->
+                <div id="firstCurvedFeature" class="feature-section" style="display: none;">
+                    <div class="feature-title">FIRST CURVED</div>
+                    <div class="position-cons-form">
+                        <div class="position-input">
+                            <label for="firstCurvedPosition">Position of first curved letter</label>
+                            <input type="number" id="firstCurvedPosition" min="1" placeholder="Enter position...">
+                        </div>
+                        <button id="firstCurvedSubmit" class="primary-btn">SUBMIT</button>
+                        <div id="firstCurvedMessage" class="position-cons-message"></div>
                     </div>
                 </div>
 
@@ -658,6 +675,13 @@
             <div class="feature-info-content">
                 <h3>POSITION-CONS</h3>
                 <p><strong>Position-Consonant Filter</strong><br>Enter the target position, the string of letters you are testing, and how many other letters from that string should appear elsewhere in the spectator's word. FILTER enforces the letter position plus the global consonant count clue.</p>
+                <button class="close-info-button">&times;</button>
+            </div>
+        </div>
+        <div id="firstCurvedInfo" class="feature-info-modal">
+            <div class="feature-info-content">
+                <h3>FIRST CURVED</h3>
+                <p><strong>First Curved Letter Position</strong><br>Enter the position where the first curved letter appears in the word. All words must have non-curved letters before this position, and a curved letter at this position (which is the first curved letter in the word).</p>
                 <button class="close-info-button">&times;</button>
             </div>
         </div>

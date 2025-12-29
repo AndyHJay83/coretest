@@ -1400,6 +1400,7 @@ async function executeWorkflow(steps) {
             abc: createAbcFeature(),
             findEee: createFindEeeFeature(),
             positionConsFeature: createPositionConsFeature(),
+            firstCurvedFeature: createFirstCurvedFeature(),
         };
         
         // Add all feature elements to the document body
@@ -1531,6 +1532,9 @@ async function executeWorkflow(steps) {
                     break;
                 case 'positionCons':
                     featureElement = createPositionConsFeature();
+                    break;
+                case 'firstCurved':
+                    featureElement = createFirstCurvedFeature();
                     break;
                 default:
                     featureElement = null;
@@ -2078,6 +2082,24 @@ function createPositionConsFeature() {
     return div;
 }
 
+function createFirstCurvedFeature() {
+    const div = document.createElement('div');
+    div.id = 'firstCurvedFeature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">FIRST CURVED</h2>
+        <div class="position-cons-form">
+            <div class="position-input">
+                <label for="firstCurvedPosition">Position of first curved letter</label>
+                <input type="number" id="firstCurvedPosition" min="1" placeholder="Enter position...">
+            </div>
+            <button id="firstCurvedSubmit" class="primary-btn">SUBMIT</button>
+            <div id="firstCurvedMessage" class="position-cons-message"></div>
+        </div>
+    `;
+    return div;
+}
+
 // Filtering logic for ABCDE feature
 function filterWordsByAbcde(words, yesLetters) {
     return words.filter(word => {
@@ -2391,6 +2413,50 @@ function setupFeatureListeners(feature, callback) {
                     handleGenerate(e);
                 }, { passive: false });
             }
+
+            if (submitButton) {
+                submitButton.addEventListener('click', handleSubmit);
+                submitButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    handleSubmit();
+                }, { passive: false });
+            }
+            break;
+        }
+
+        case 'firstCurved': {
+            const positionInput = document.getElementById('firstCurvedPosition');
+            const submitButton = document.getElementById('firstCurvedSubmit');
+            const messageElement = document.getElementById('firstCurvedMessage');
+
+            const setMessage = (text = '', isError = false) => {
+                if (messageElement) {
+                    messageElement.textContent = text;
+                    messageElement.style.color = isError ? '#C62828' : '#1B5E20';
+                }
+            };
+
+            const handleSubmit = () => {
+                setMessage('');
+                const positionValue = parseInt(positionInput?.value, 10);
+                if (Number.isNaN(positionValue) || positionValue < 1) {
+                    setMessage('Position must be a positive number.', true);
+                    alert('Position must be a positive number.');
+                    return;
+                }
+
+                const filteredWords = filterWordsByFirstCurved(currentFilteredWords, positionValue);
+
+                if (filteredWords.length === 0) {
+                    setMessage('No matches found.', true);
+                    alert('No matches found.');
+                } else {
+                    setMessage(`${filteredWords.length} matches found.`);
+                }
+
+                callback(filteredWords);
+                document.getElementById('firstCurvedFeature').dispatchEvent(new Event('completed'));
+            };
 
             if (submitButton) {
                 submitButton.addEventListener('click', handleSubmit);
@@ -4360,6 +4426,30 @@ function filterWordsByPositionCons(words, options) {
     }
 
     return results.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+}
+
+function filterWordsByFirstCurved(words, position) {
+    if (!Array.isArray(words) || typeof position !== 'number' || position < 1) return [];
+    
+    const curvedLetters = letterShapes.curved;
+    const targetIndex = position - 1;
+    
+    return words.filter(word => {
+        const upperWord = word.toUpperCase();
+        
+        // Exclude words shorter than the target position
+        if (upperWord.length <= targetIndex) return false;
+        
+        // Check that the target position IS curved
+        if (!curvedLetters.has(upperWord[targetIndex])) return false;
+        
+        // Check that all positions BEFORE the target are NOT curved
+        for (let i = 0; i < targetIndex; i++) {
+            if (curvedLetters.has(upperWord[i])) return false;
+        }
+        
+        return true;
+    });
 }
 
 // Function to display saved workflows in the workflow builder
