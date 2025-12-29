@@ -772,8 +772,16 @@ input[type="text"] {
     z-index: 1;
 }
 
+.position-input label {
+    font-weight: bold;
+    color: #333;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
 .lexicon-input input,
-.position-input input {
+.position-input input,
+.position-input input[type="number"] {
     width: 100%;
     padding: 15px;
     font-size: 16px !important;
@@ -784,9 +792,16 @@ input[type="text"] {
     text-align: center;
     -webkit-appearance: none;
     appearance: none;
+    -moz-appearance: textfield;
     margin: 0;
     position: relative;
     z-index: 2;
+}
+
+.position-input input[type="number"]::-webkit-outer-spin-button,
+.position-input input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 .position-cons-form {
