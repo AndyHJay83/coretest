@@ -4633,25 +4633,25 @@ function filterWordsByPin(words, wordBoxes, code) {
         
         // Check each word-code pair
         for (const { word, codeDigit } of wordCodePairs) {
-            // Count total occurrences of letters from word box in target word
-            // Build frequency map of letters in word box
-            const wordBoxLetterFreq = new Map();
-            for (const letter of word) {
-                wordBoxLetterFreq.set(letter, (wordBoxLetterFreq.get(letter) || 0) + 1);
+            // Count total occurrences: for each letter in the word box,
+            // count how many times it appears in the target word
+            let occurrenceCount = 0;
+            
+            // Create a map to track how many times each letter from word box
+            // has been "used" from the target word
+            const targetLetterCounts = new Map();
+            for (const letter of upperTarget) {
+                targetLetterCounts.set(letter, (targetLetterCounts.get(letter) || 0) + 1);
             }
             
-            // Count occurrences of each letter from word box in target word
-            let occurrenceCount = 0;
-            for (const [letter, countInWordBox] of wordBoxLetterFreq.entries()) {
-                // Count how many times this letter appears in target word
-                let countInTarget = 0;
-                for (const targetLetter of upperTarget) {
-                    if (targetLetter === letter) {
-                        countInTarget++;
-                    }
+            // For each letter in the word box, count occurrences in target
+            for (const letter of word) {
+                const available = targetLetterCounts.get(letter) || 0;
+                if (available > 0) {
+                    occurrenceCount++;
+                    // Decrement to avoid double-counting the same letter instance
+                    targetLetterCounts.set(letter, available - 1);
                 }
-                // Add the count (each occurrence in word box contributes)
-                occurrenceCount += countInTarget;
             }
             
             // Must match exactly
