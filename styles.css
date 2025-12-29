@@ -843,6 +843,22 @@ input[type="text"] {
     color: #1B5E20;
 }
 
+.pin-word-inputs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.pin-word-inputs .position-input {
+    width: 100%;
+}
+
+@media (max-width: 600px) {
+    .pin-word-inputs {
+        grid-template-columns: 1fr;
+    }
+}
+
 .primary-btn,
 .secondary-btn {
     padding: 12px 20px;

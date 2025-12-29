@@ -1401,6 +1401,7 @@ async function executeWorkflow(steps) {
             findEee: createFindEeeFeature(),
             positionConsFeature: createPositionConsFeature(),
             firstCurvedFeature: createFirstCurvedFeature(),
+            pinFeature: createPinFeature(),
         };
         
         // Add all feature elements to the document body
@@ -1535,6 +1536,9 @@ async function executeWorkflow(steps) {
                     break;
                 case 'firstCurved':
                     featureElement = createFirstCurvedFeature();
+                    break;
+                case 'pin':
+                    featureElement = createPinFeature();
                     break;
                 default:
                     featureElement = null;
@@ -2100,6 +2104,51 @@ function createFirstCurvedFeature() {
     return div;
 }
 
+function createPinFeature() {
+    const div = document.createElement('div');
+    div.id = 'pinFeature';
+    div.className = 'feature-section';
+    div.innerHTML = `
+        <h2 class="feature-title">PIN</h2>
+        <div class="position-cons-form">
+            <div class="pin-word-inputs">
+                <div class="position-input">
+                    <label for="pinWord1">Word 1</label>
+                    <input type="text" id="pinWord1" placeholder="Enter word...">
+                </div>
+                <div class="position-input">
+                    <label for="pinWord2">Word 2</label>
+                    <input type="text" id="pinWord2" placeholder="Enter word...">
+                </div>
+                <div class="position-input">
+                    <label for="pinWord3">Word 3</label>
+                    <input type="text" id="pinWord3" placeholder="Enter word...">
+                </div>
+                <div class="position-input">
+                    <label for="pinWord4">Word 4</label>
+                    <input type="text" id="pinWord4" placeholder="Enter word...">
+                </div>
+                <div class="position-input">
+                    <label for="pinWord5">Word 5</label>
+                    <input type="text" id="pinWord5" placeholder="Enter word...">
+                </div>
+                <div class="position-input">
+                    <label for="pinWord6">Word 6</label>
+                    <input type="text" id="pinWord6" placeholder="Enter word...">
+                </div>
+            </div>
+            <div class="position-input">
+                <label for="pinCode">Code</label>
+                <input type="text" id="pinCode" placeholder="Enter code (digits only, max 6)" maxlength="6">
+                <div class="position-cons-helper">Each digit represents how many letters from the corresponding word appear in the target word.</div>
+            </div>
+            <button id="pinSubmit" class="primary-btn">SUBMIT</button>
+            <div id="pinMessage" class="position-cons-message"></div>
+        </div>
+    `;
+    return div;
+}
+
 // Filtering logic for ABCDE feature
 function filterWordsByAbcde(words, yesLetters) {
     return words.filter(word => {
@@ -2464,6 +2513,111 @@ function setupFeatureListeners(feature, callback) {
                     e.preventDefault();
                     handleSubmit();
                 }, { passive: false });
+            }
+            break;
+        }
+
+        case 'pin': {
+            const wordInputs = [
+                document.getElementById('pinWord1'),
+                document.getElementById('pinWord2'),
+                document.getElementById('pinWord3'),
+                document.getElementById('pinWord4'),
+                document.getElementById('pinWord5'),
+                document.getElementById('pinWord6')
+            ];
+            const codeInput = document.getElementById('pinCode');
+            const submitButton = document.getElementById('pinSubmit');
+            const messageElement = document.getElementById('pinMessage');
+
+            const setMessage = (text = '', isError = false) => {
+                if (messageElement) {
+                    messageElement.textContent = text;
+                    messageElement.style.color = isError ? '#C62828' : '#1B5E20';
+                }
+            };
+
+            const handleSubmit = () => {
+                setMessage('');
+                
+                // Get non-empty word boxes
+                const wordBoxes = wordInputs
+                    .map(input => (input?.value || '').trim())
+                    .filter(word => word.length > 0);
+                
+                if (wordBoxes.length === 0) {
+                    setMessage('Enter at least one word.', true);
+                    alert('Enter at least one word.');
+                    return;
+                }
+                
+                // Get and validate code
+                const codeValue = (codeInput?.value || '').trim();
+                if (!codeValue) {
+                    setMessage('Enter a code.', true);
+                    alert('Enter a code.');
+                    return;
+                }
+                
+                // Extract digits only, max 6
+                const digitsOnly = codeValue.replace(/[^0-9]/g, '').slice(0, 6);
+                if (!digitsOnly) {
+                    setMessage('Code must contain at least one digit.', true);
+                    alert('Code must contain at least one digit.');
+                    return;
+                }
+                
+                // Validate code length matches number of non-empty boxes
+                if (digitsOnly.length < wordBoxes.length) {
+                    setMessage(`Code must have at least ${wordBoxes.length} digits for ${wordBoxes.length} word(s).`, true);
+                    alert(`Code must have at least ${wordBoxes.length} digits for ${wordBoxes.length} word(s).`);
+                    return;
+                }
+                
+                // Filter words
+                const filteredWords = filterWordsByPin(currentFilteredWords, wordInputs.map(input => input?.value || ''), digitsOnly);
+                
+                if (filteredWords.length === 0) {
+                    setMessage('No matches found.', true);
+                    alert('No matches found.');
+                } else {
+                    setMessage(`${filteredWords.length} matches found.`);
+                }
+                
+                callback(filteredWords);
+                document.getElementById('pinFeature').dispatchEvent(new Event('completed'));
+            };
+
+            if (submitButton) {
+                submitButton.addEventListener('click', handleSubmit);
+                submitButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    handleSubmit();
+                }, { passive: false });
+            }
+            
+            // Auto-uppercase word inputs (not case-sensitive)
+            wordInputs.forEach(input => {
+                if (input) {
+                    input.addEventListener('input', () => {
+                        const value = input.value;
+                        const upperValue = value.toUpperCase();
+                        if (value !== upperValue) {
+                            input.value = upperValue;
+                        }
+                    });
+                }
+            });
+            
+            // Restrict code input to digits only
+            if (codeInput) {
+                codeInput.addEventListener('input', () => {
+                    const value = codeInput.value;
+                    const digitsOnly = value.replace(/[^0-9]/g, '').slice(0, 6);
+                    if (value !== digitsOnly) {
+                        codeInput.value = digitsOnly;
+                    }
+                });
             }
             break;
         }
@@ -4452,6 +4606,64 @@ function filterWordsByFirstCurved(words, position) {
     });
 }
 
+function filterWordsByPin(words, wordBoxes, code) {
+    if (!Array.isArray(words) || !Array.isArray(wordBoxes) || !code) return [];
+    
+    // Extract only digits from code, max 6
+    const digitsOnly = code.toString().replace(/[^0-9]/g, '').slice(0, 6);
+    if (!digitsOnly) return [];
+    
+    // Get non-empty word boxes and their corresponding code digits
+    const wordCodePairs = [];
+    for (let i = 0; i < wordBoxes.length && i < digitsOnly.length; i++) {
+        const word = (wordBoxes[i] || '').trim().toUpperCase();
+        if (word) {
+            const codeDigit = parseInt(digitsOnly[i], 10);
+            if (!isNaN(codeDigit)) {
+                wordCodePairs.push({ word, codeDigit });
+            }
+        }
+    }
+    
+    if (wordCodePairs.length === 0) return [];
+    
+    // Filter words that match all code requirements
+    return words.filter(targetWord => {
+        const upperTarget = targetWord.toUpperCase();
+        
+        // Check each word-code pair
+        for (const { word, codeDigit } of wordCodePairs) {
+            // Count total occurrences of letters from word box in target word
+            // Build frequency map of letters in word box
+            const wordBoxLetterFreq = new Map();
+            for (const letter of word) {
+                wordBoxLetterFreq.set(letter, (wordBoxLetterFreq.get(letter) || 0) + 1);
+            }
+            
+            // Count occurrences of each letter from word box in target word
+            let occurrenceCount = 0;
+            for (const [letter, countInWordBox] of wordBoxLetterFreq.entries()) {
+                // Count how many times this letter appears in target word
+                let countInTarget = 0;
+                for (const targetLetter of upperTarget) {
+                    if (targetLetter === letter) {
+                        countInTarget++;
+                    }
+                }
+                // Add the count (each occurrence in word box contributes)
+                occurrenceCount += countInTarget;
+            }
+            
+            // Must match exactly
+            if (occurrenceCount !== codeDigit) {
+                return false;
+            }
+        }
+        
+        return true;
+    }).sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+}
+
 // Function to display saved workflows in the workflow builder
 function displaySavedWorkflows() {
     const savedWorkflowsContainer = document.getElementById('savedWorkflows');
@@ -4748,8 +4960,8 @@ function handleDrop(e) {
 
 function isFeatureAlreadySelected(featureType) {
     const selectedFeatures = document.getElementById('selectedFeaturesList');
-    // Allow multiple instances of MOST/LEAST FREQUENT and POSITION-CONS
-    if (featureType === 'mostFrequent' || featureType === 'leastFrequent' || featureType === 'positionCons') {
+    // Allow multiple instances of MOST/LEAST FREQUENT, POSITION-CONS, and PIN
+    if (featureType === 'mostFrequent' || featureType === 'leastFrequent' || featureType === 'positionCons' || featureType === 'pin') {
         return false;
     }
     // For all other features, maintain the single instance rule
@@ -4931,8 +5143,8 @@ function initializeFeatureSelection() {
 
 function isFeatureAlreadySelected(featureType) {
     const selectedFeatures = document.getElementById('selectedFeaturesList');
-    // Allow multiple instances of MOST FREQUENT, LEAST FREQUENT, and POSITION-CONS
-    if (featureType === 'mostFrequent' || featureType === 'leastFrequent' || featureType === 'positionCons') {
+    // Allow multiple instances of MOST FREQUENT, LEAST FREQUENT, POSITION-CONS, and PIN
+    if (featureType === 'mostFrequent' || featureType === 'leastFrequent' || featureType === 'positionCons' || featureType === 'pin') {
         // Check if the feature was just added (within the last 500ms)
         const lastAdded = selectedFeatures.getAttribute('lastAdded');
         const lastAddedTime = selectedFeatures.getAttribute('lastAddedTime');
@@ -5514,8 +5726,8 @@ function initializeFeatureSelection() {
 
 function isFeatureAlreadySelected(featureType) {
     const selectedFeatures = document.getElementById('selectedFeaturesList');
-    // Allow multiple instances of MOST FREQUENT, LEAST FREQUENT, and POSITION-CONS features
-    if (featureType === 'mostFrequent' || featureType === 'leastFrequent' || featureType === 'positionCons') {
+    // Allow multiple instances of MOST FREQUENT, LEAST FREQUENT, POSITION-CONS, and PIN features
+    if (featureType === 'mostFrequent' || featureType === 'leastFrequent' || featureType === 'positionCons' || featureType === 'pin') {
         return false;
     }
     // For all other features, maintain the single instance rule

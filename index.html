@@ -113,6 +113,10 @@
                                 <button class="info-button" data-feature="firstCurved"><i class="fas fa-info-circle"></i></button>
                             </div>
                             <div class="feature-group">
+                                <button class="feature-button" data-feature="pin" draggable="true">PIN</button>
+                                <button class="info-button" data-feature="pin"><i class="fas fa-info-circle"></i></button>
+                            </div>
+                            <div class="feature-group">
                                 <button class="feature-button" data-feature="vowel" draggable="true">Vowel</button>
                                 <button class="info-button" data-feature="vowel"><i class="fas fa-info-circle"></i></button>
                             </div>
@@ -682,6 +686,13 @@
             <div class="feature-info-content">
                 <h3>FIRST CURVED</h3>
                 <p><strong>First Curved Letter Position</strong><br>Enter the position where the first curved letter appears in the word. All words must have non-curved letters before this position, and a curved letter at this position (which is the first curved letter in the word).</p>
+                <button class="close-info-button">&times;</button>
+            </div>
+        </div>
+        <div id="pinInfo" class="feature-info-modal">
+            <div class="feature-info-content">
+                <h3>PIN</h3>
+                <p><strong>PIN Code Filter</strong><br>Enter up to 6 words in the text boxes, then enter a code where each digit represents how many letters from that word appear in the target word. Only words matching all code requirements will be kept.</p>
                 <button class="close-info-button">&times;</button>
             </div>
         </div>
